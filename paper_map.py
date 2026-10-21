@@ -254,7 +254,7 @@ def load_pdf(source):
     arxiv_id = m.group(1)
     url = f"https://arxiv.org/pdf/{arxiv_id}"
     print(f"Downloading {url} ...")
-    req = urllib.request.Request(url, headers={"User-Agent": "paper-map/1.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "paper-atlas/1.0"})
     with urllib.request.urlopen(req, timeout=60) as r:
         return r.read(), "arxiv-" + arxiv_id.replace("/", "_")
 

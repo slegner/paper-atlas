@@ -1,4 +1,4 @@
-# paper-map
+# paper-atlas
 
 Turns a research paper into an interactive **paper atlas**: a single HTML page that shows what the paper asks
 and finds, how it gets there, and what a newcomer needs to learn first, with a reading list for every concept.

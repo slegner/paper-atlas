@@ -151,6 +151,8 @@
                   background: var(--card); white-space: nowrap; }
   .z-cite .cite:hover { background: var(--bc); color: var(--card); }
   .z-cite .src { margin: 0; }
+  .big-cta { display: block; width: 100%; margin: 4px 0 4px; padding: 13px 18px; font-size: 16px; font-weight: 700; border-radius: 14px; }
+  .big-cta:hover { filter: brightness(1.08); }
   .z-folds { margin-top: 14px; }
   .z-eqs { margin-top: 12px; --c: var(--paper); }
   .z-eqs > .tag { color: var(--paper); margin-bottom: 6px; }
@@ -707,8 +709,8 @@
     return { color: "var(--paper)", html: () =>
       `<span class="p-tag">This paper</span><h2>${esc(paper.title || roots.title || "")}</h2>` +
       `<p class="muted">${linkMeta([paper.authors, paper.year, paper.venue].filter(Boolean).join(" · "))}</p>` +
-      (paper.tldr ? `<div class="z-key">${keyBox("TL;DR", linkText(paper.tldr), "var(--paper)", "here")}</div>` : "") + qaHtml() +
-      `<p style="margin-top:16px"><button class="primary" data-flow>Read how they got there →</button></p>` };
+      `<button class="primary big-cta" data-flow>Read how they got there →</button>` +
+      (paper.tldr ? `<div class="z-key">${keyBox("TL;DR", linkText(paper.tldr), "var(--paper)", "here")}</div>` : "") + qaHtml() };
   }
   function orderView() {
     return { color: "var(--paper)", html: () => {
