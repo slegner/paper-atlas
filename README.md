@@ -85,7 +85,7 @@ python3 atlas.py --map maps/arxiv-2507.09228.json --roots maps/arxiv-2507.09228.
 
 **Without an API key**, ask Claude Code: *"Read this paper and write `<name>.json` following `SCHEMA` in
 `paper_map.py` and `<name>.roots.json` following `SCHEMA` in `roots_map.py`, then run `atlas.py` on them."*
-That is how the three maps in `maps/` were made.
+That is how the maps in `maps/` were made.
 
 Figure cropping needs PyMuPDF (`pip install pymupdf`); equations are typeset with KaTeX, loaded from a CDN the
 first time they are opened (offline they show as LaTeX source). Everything else works offline.
@@ -125,7 +125,6 @@ it, and a reading ladder) and `readings`.
 | Paper | Atlas |
 |---|---|
 | Legner et al., *Alleviating the Hubble tension with Torsion Condensation (TorC)*, arXiv:2507.09228 | [`maps/arxiv-2507.09228.atlas.html`](maps/arxiv-2507.09228.atlas.html) |
-| Kumar & Cooke, *Simulations of the Evolving Ozone Layer*, arXiv:2610.18864 (two big questions) | [`maps/arxiv-2610.18864.atlas.html`](maps/arxiv-2610.18864.atlas.html) |
 | Vaswani et al., *Attention Is All You Need*, arXiv:1706.03762 | [`maps/arxiv-1706.03762.atlas.html`](maps/arxiv-1706.03762.atlas.html) |
 
 ## Files

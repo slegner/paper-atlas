@@ -5,3 +5,5 @@ maps/*.figs/
 # intermediate standalone outputs; the atlas pages are the published ones
 maps/arxiv-*[0-9].html
 maps/*.roots.html
+# kept locally, not published
+maps/arxiv-2610.18864*
