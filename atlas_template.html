@@ -1,0 +1,1402 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__PAGE_TITLE__</title>
+<style>
+  :root {
+    --bg: #f7f6f2; --card: #ffffff; --ink: #1d1d1b; --muted: #6b6a65; --line: #d9d6cc;
+    --q: #2f5d8a; --a: #2e7d4f; --why: #b5562b; --bg-k: #7a5aa6; --method: #2a7f8f; --results: #b08419; --concl: #4b7a2c;
+    --novel: #b0307a; --warn: #c0392b;
+    --paper: #2f5d8a; --hi: #b0307a; --cite: #2e7d4f; --sugg: #8a6d00; --on-c: #ffffff;
+    --s1: #6b6a65; --s2: #a4501f; --s3: #2a7f8f; --s4: #6a4a9e; --s5: #2f5d8a; --s6: #2e7d4f; --s7: #b0307a; --s8: #8a6d00;
+    --t1: #2f5d8a; --t2: #a4501f; --t3: #6a4a9e; --t4: #2e7d4f; --t5: #8a6d00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17181a; --card: #222427; --ink: #ecebe6; --muted: #9c9b95; --line: #3a3c40;
+      --q: #7fb0e0; --a: #77c79a; --why: #e08a5f; --bg-k: #b39ae0; --method: #6cc3d1; --results: #e2bf5a; --concl: #9fcb7a;
+      --novel: #f07ab8; --warn: #ff7b6b;
+      --paper: #7fb0e0; --hi: #f07ab8; --cite: #77c79a; --sugg: #e6c65c; --on-c: #111111;
+      --s1: #a9a8a2; --s2: #f0a070; --s3: #6cc3d1; --s4: #c0a6ee; --s5: #8dbbe8; --s6: #7fd0a0; --s7: #f07ab8; --s8: #e6c65c;
+      --t1: #8dbbe8; --t2: #f0a070; --t3: #c0a6ee; --t4: #7fd0a0; --t5: #e6c65c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17181a; --card: #222427; --ink: #ecebe6; --muted: #9c9b95; --line: #3a3c40;
+    --q: #7fb0e0; --a: #77c79a; --why: #e08a5f; --bg-k: #b39ae0; --method: #6cc3d1; --results: #e2bf5a; --concl: #9fcb7a;
+    --novel: #f07ab8; --warn: #ff7b6b;
+    --paper: #7fb0e0; --hi: #f07ab8; --cite: #77c79a; --sugg: #e6c65c; --on-c: #111111;
+    --s1: #a9a8a2; --s2: #f0a070; --s3: #6cc3d1; --s4: #c0a6ee; --s5: #8dbbe8; --s6: #7fd0a0; --s7: #f07ab8; --s8: #e6c65c;
+    --t1: #8dbbe8; --t2: #f0a070; --t3: #c0a6ee; --t4: #7fd0a0; --t5: #e6c65c;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  a { color: inherit; }
+  button { font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 999px; cursor: pointer;
+           border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  button.primary { background: var(--paper); border-color: var(--paper); color: var(--card); font-weight: 600; }
+  button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--paper); }
+  .tag { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--c, var(--muted)); }
+  .muted { color: var(--muted); font-size: 13.5px; }
+
+  /* ================= mind map ================= */
+  #gx-view { display: flex; flex-direction: column; height: 100vh; min-height: 560px; }
+  .gx-top { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: flex-end; justify-content: space-between; padding: 18px 24px 6px; }
+  .gx-title { font-size: 19px; line-height: 1.25; margin: 3px 0 2px; max-width: 900px; }
+  .gx-meta { color: var(--muted); font-size: 13px; }
+  .gx-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+  .gx-hint { margin: 0; padding: 0 24px 6px; font-size: 13px; color: var(--muted); }
+  #gx-stage { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: none; }
+  #gx-svg { width: 100%; height: 100%; display: block; cursor: grab; user-select: none; -webkit-user-select: none; }
+  #gx-svg.panning { cursor: grabbing; }
+  /* layers: alternating shaded bands, each named on a pill at the top */
+  .gx-band { stroke: color-mix(in srgb, var(--ink) 14%, var(--bg)); stroke-width: 1; transition: fill .2s; }
+  .gx-band.b0 { fill: color-mix(in srgb, var(--ink) 5%, var(--bg)); }
+  .gx-band.b1 { fill: var(--bg); }
+  .gx-band.hl { fill: color-mix(in srgb, var(--paper) 14%, var(--bg)); }
+  .gx-lname { fill: var(--ink); opacity: .32; font-size: 11px; font-weight: 800; letter-spacing: .32em; text-transform: uppercase; pointer-events: none; }
+  .gx-link { fill: none; stroke: var(--lc); stroke-width: 1.2; opacity: .4; transition: opacity .2s; }
+  .gx-link.spoke { stroke-width: 3; opacity: .55; }
+  .gx-pre { fill: none; stroke: var(--hi); stroke-width: 2; stroke-dasharray: 5 4; opacity: .9; }
+  .gx-node { cursor: pointer; transition: opacity .2s; }
+  .gx-node.area circle { fill: var(--nc); stroke: color-mix(in srgb, var(--nc) 60%, var(--ink)); stroke-width: 1.5; }
+  .gx-node.area text { fill: var(--on-c); font-weight: 700; font-size: 12.5px; }
+  .gx-node.concept circle { fill: color-mix(in srgb, var(--nc) 22%, var(--card)); stroke: var(--nc); stroke-width: 2; }
+  .gx-node.concept text { fill: var(--ink); font-size: 11px; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
+  .gx-node.concept text.lv { fill: var(--nc); font-weight: 800; font-size: 10px; stroke: none; }
+  .gx-node.concept.frontier circle:not(.glow) { fill: var(--nc); stroke: color-mix(in srgb, var(--nc) 55%, var(--ink)); stroke-width: 2; }
+  .gx-node.concept.frontier text.lv { fill: var(--on-c); font-size: 16px; }
+  .gx-node.concept.frontier text:not(.lv) { font-size: 12.5px; font-weight: 800; }
+  .gx-node.concept.frontier circle.glow { fill: none; stroke: var(--nc); stroke-width: 2; opacity: .45; stroke-dasharray: 4 4;
+                                           animation: glow 6s linear infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes glow { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .gx-node.concept.frontier circle.glow { animation: none; } }
+  .gx-node.paper circle { fill: var(--card); stroke: var(--paper); stroke-width: 3; }
+  .gx-node.paper circle.halo { fill: none; stroke: var(--paper); stroke-width: 1.5; opacity: .35; }
+  .gx-node.paper text { fill: var(--ink); font-size: 12px; }
+  .gx-node.paper text.big { font-weight: 700; font-size: 13.5px; }
+  .gx-node.paper text.go { fill: var(--paper); font-weight: 700; font-size: 11px; }
+  .gx-node:hover circle:not(.halo):not(.glow) { stroke-width: 4; }
+  .gx-node:focus { outline: none; }
+  .gx-node:focus-visible circle:not(.halo):not(.glow) { stroke: var(--hi); stroke-width: 4; }
+  #gx-svg.focus .gx-node { opacity: .18; }
+  #gx-svg.focus .gx-node.on { opacity: 1; }
+  #gx-svg.focus .gx-link { opacity: .05; }
+  #gx-svg.focus .gx-link.on { opacity: .85; }
+  .gx-node.sel circle:not(.halo):not(.glow) { stroke: var(--hi); stroke-width: 4; }
+  .gx-badge circle { fill: var(--hi); stroke: none; }
+  .gx-badge text { fill: var(--card); font-size: 10px; font-weight: 800; stroke: none; }
+  #gx-svg.nolabels .gx-node.concept text:not(.lv) { display: none; }
+  #gx-svg.nolabels .gx-node.concept.on text, #gx-svg.nolabels .gx-node.concept:hover text { display: inline; }
+  .gx-zoom { position: absolute; right: 14px; bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .gx-zoom button { width: 34px; height: 34px; padding: 0; font-size: 17px; border-radius: 10px; }
+  .gx-legend { position: absolute; left: 14px; bottom: 14px; display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted);
+               background: color-mix(in srgb, var(--bg) 88%, transparent); padding: 8px 10px; border-radius: 12px; max-width: 46%; }
+  .gx-legend .lg-h { font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); margin: 2px 0 1px; }
+  .gx-legend .lg-h:not(:first-child) { margin-top: 8px; }
+  .gx-legend button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .gx-legend button:hover, .gx-legend button:focus-visible { color: var(--ink); }
+  .gx-legend i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
+  .gx-legend b.ln { display: inline-flex; width: 16px; height: 16px; border-radius: 50%; align-items: center; justify-content: center; font-size: 10px;
+                    color: var(--paper); border: 1.5px solid var(--paper); flex: none; }
+  /* the paper's question and answer, floating over the map */
+  .qa { position: absolute; left: 14px; top: 10px; width: min(330px, 40%); z-index: 2; background: color-mix(in srgb, var(--card) 94%, transparent);
+        border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; box-shadow: 0 4px 16px rgba(0,0,0,.07); font-size: 13.5px; }
+  .qa .q { font-weight: 600; margin: 3px 0 10px; line-height: 1.3; }
+  .qa .a { margin: 3px 0 10px; line-height: 1.35; }
+  .qa .min { position: absolute; top: 6px; right: 6px; border: 0; background: none; padding: 2px 8px; font-size: 15px; color: var(--muted); }
+  .qa .qa-pill { display: none; }
+  .qa.mini { width: auto; padding: 8px 36px 8px 14px; }
+  .qa.mini > :not(.min):not(.qa-pill) { display: none; }
+  .qa.mini .qa-pill { display: inline; all: unset; cursor: pointer; font-size: 12.5px; font-weight: 700; color: var(--paper); }
+
+  /* ================= zoom card: a circle that opens into the details ================= */
+  #zoom { position: fixed; inset: 0; z-index: 40; pointer-events: none; }
+  .z-bg { display: none; }
+  .z-card { position: absolute; right: 12px; top: 12px; bottom: 12px; width: min(470px, calc(100vw - 24px)); pointer-events: auto;
+            display: flex; flex-direction: column; background: var(--card); border: 2px solid var(--c, var(--paper)); border-radius: 28px;
+            box-shadow: 0 24px 60px rgba(0,0,0,.25); overflow: hidden; transform-origin: center; }
+  body.panel-open #gx-stage, body.panel-open .gx-top, body.panel-open .gx-hint { margin-right: 494px; }
+  body.panel-open #fl-view > :not(.fl-bar) { margin-right: max(494px, calc((100vw - 1100px) / 2)); }
+  body.panel-open .fl-bar { padding-right: 506px; }
+  .z-top { display: flex; gap: 6px; padding: 12px 14px 0; }
+  .z-top .sp { flex: 1; }
+  .z-body { padding: 4px 26px 26px; overflow-y: auto; }
+  .z-body.fade { animation: zfade .28s ease both; }
+  @keyframes zfade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .z-body h2 { margin: 6px 0 8px; font-size: 22px; line-height: 1.25; }
+  .z-body h3 { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 20px 0 8px; }
+  .z-body p { margin: 7px 0; }
+  .z-body .lead { font-size: 16px; }
+  .z-body img.fig { display: block; width: 100%; max-height: 62vh; object-fit: contain; background: #fff; border-radius: 12px; margin-top: 8px; }
+  .z-key { display: grid; gap: 10px; margin-top: 12px; }
+  .z-box { border-radius: 16px; padding: 12px 16px 13px; border: 1.5px solid color-mix(in srgb, var(--bc) 40%, var(--line));
+           background: color-mix(in srgb, var(--bc) 9%, var(--card)); }
+  .z-box .tag { color: var(--bc); }
+  .z-box p { margin: 5px 0 0; font-size: 17px; line-height: 1.45; }
+  .z-box.here { border-left: 5px solid var(--bc); }
+  .z-box .sub-d { display: block; font-size: 14px; color: var(--muted); margin-top: 6px; font-weight: 400; }
+  .z-reads { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; margin-top: 12px; }
+  .z-read { border: 1px solid var(--line); border-left: 4px solid var(--rc); border-radius: 12px; padding: 9px 12px; }
+  .z-read .role { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--rc); margin-bottom: 2px; }
+  .z-cites { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; padding-top: 9px; border-top: 1px dashed color-mix(in srgb, var(--bc) 40%, var(--line)); }
+  .z-cites .lbl { font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--bc); }
+  .z-cite { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-size: 14px; }
+  .z-cite .cite { font-weight: 700; text-decoration: none; padding: 1px 10px; border-radius: 999px; border: 1.5px solid var(--bc);
+                  background: var(--card); white-space: nowrap; }
+  .z-cite .cite:hover { background: var(--bc); color: var(--card); }
+  .z-cite .src { margin: 0; }
+  .z-folds { margin-top: 14px; }
+  .z-eqs { margin-top: 12px; --c: var(--paper); }
+  .z-eqs > .tag { color: var(--paper); margin-bottom: 6px; }
+  details.z-fold { border-top: 1px solid var(--line); }
+  details.z-fold:last-child { border-bottom: 1px solid var(--line); }
+  details.z-fold summary { list-style: none; display: flex; gap: 10px; align-items: baseline; padding: 11px 2px; cursor: pointer; }
+  details.z-fold summary::-webkit-details-marker { display: none; }
+  details.z-fold summary:hover .ft { color: var(--c); }
+  .z-fold .ft { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; font-weight: 800; color: var(--ink); white-space: nowrap; }
+  .z-fold .fh { flex: 1; min-width: 0; font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .z-fold .chev { color: var(--c); font-size: 16px; transition: transform .15s; }
+  .z-fold[open] .chev { transform: rotate(90deg); }
+  .z-fold .fb { padding: 0 2px 14px; }
+  .p-tag { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 1px 9px; border-radius: 999px; color: var(--c);
+           border: 1.5px solid var(--c); background: color-mix(in srgb, var(--c) 10%, var(--card)); }
+  .p-lvl { display: inline-block; font-size: 11px; font-weight: 700; padding: 0 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); margin-left: 4px; }
+  .p-here { font-size: 14px; padding: 9px 12px; border-radius: 10px; background: color-mix(in srgb, var(--paper) 8%, var(--card)); border-left: 3px solid var(--paper); margin-top: 10px; }
+  .p-btn { margin-top: 12px; }
+  .badge { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .05em; margin-right: 6px; padding: 0 6px; border-radius: 4px;
+           vertical-align: 2px; color: var(--card); background: var(--bc); }
+  .badge.novel { --bc: var(--novel); } .badge.caveat { --bc: var(--warn); } .badge.key { --bc: var(--c, var(--ink)); }
+  .cond { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 0 8px; border-radius: 999px; color: var(--tc); border: 1.5px solid var(--tc);
+          background: color-mix(in srgb, var(--tc) 10%, var(--card)); }
+  .steps { list-style: none; margin: 0; padding: 0; }
+  .steps li { position: relative; padding: 0 0 12px 30px; margin: 0; }
+  .steps li::before { content: ""; position: absolute; left: 10px; top: 22px; bottom: 0; width: 2px; background: var(--line); }
+  .steps li:last-child::before { display: none; }
+  .steps .dot { position: absolute; left: 0; top: 0; width: 22px; height: 22px; border-radius: 11px; font-size: 11px; font-weight: 800;
+                display: flex; align-items: center; justify-content: center; color: var(--card); background: var(--rc); }
+  .steps .role { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--rc); }
+  .r-ttl { font-size: 13.5px; color: var(--muted); }
+  .r-meta { font-size: 12.5px; }
+  .kind { display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 0 6px;
+          border-radius: 4px; border: 1px solid var(--line); color: var(--muted); margin-right: 5px; vertical-align: 1px; }
+  .src { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 0 6px; border-radius: 4px; vertical-align: 1px; margin-right: 5px; }
+  .src.cited { color: var(--cite); border: 1px solid var(--cite); }
+  .src.sugg { color: var(--sugg); border: 1px dashed var(--sugg); }
+  .rlink { font-weight: 600; text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--ink) 30%, transparent); }
+  .rlink:hover { border-bottom-color: var(--ink); }
+  .pchips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .mini { font: inherit; font-size: 12px; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--c); color: var(--ink);
+          background: color-mix(in srgb, var(--c) 10%, var(--card)); cursor: pointer; }
+  .plist { margin: 0; padding-left: 20px; font-size: 13.5px; } .plist li { margin: 5px 0; }
+  #warp { position: fixed; z-index: 50; border-radius: 50%; background: var(--bg); border: 3px solid var(--paper); pointer-events: none; }
+
+  /* ================= concept words ================= */
+  .term { cursor: pointer; border-bottom: 1.5px dotted color-mix(in srgb, var(--tc, var(--paper)) 85%, transparent); border-radius: 2px; }
+  .term:hover, .term:focus-visible { background: color-mix(in srgb, var(--tc, var(--paper)) 16%, transparent); outline: none; }
+  #term-pop { position: fixed; z-index: 45; width: min(360px, calc(100vw - 24px)); background: var(--card); border: 1px solid var(--line);
+              border-top: 4px solid var(--c); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.18); padding: 12px 14px; font-size: 14px; }
+  #term-pop h4 { margin: 6px 0 4px; font-size: 16px; }
+  #term-pop p { margin: 5px 0; }
+  #term-pop .p-here { font-size: 13px; }
+  #term-pop .row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  #term-pop .x { position: absolute; top: 6px; right: 6px; border: 0; background: none; font-size: 16px; padding: 2px 8px; }
+
+  /* ================= paper flow ================= */
+  .fl-bar { position: sticky; top: 0; z-index: 15; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 10px 24px;
+            background: color-mix(in srgb, var(--bg) 92%, transparent); border-bottom: 1px solid var(--line); backdrop-filter: blur(6px); }
+  .fl-bar .seg { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+  .fl-bar .seg span { font-size: 12.5px; color: var(--muted); margin-right: 2px; }
+  .fl-bar .spacer { flex: 1; }
+  .fl-head { max-width: 1100px; margin: 0 auto; padding: 22px 24px 4px; }
+  .fl-head h1 { font-size: 22px; line-height: 1.25; margin: 4px 0; }
+  .fl-head .meta { color: var(--muted); font-size: 13px; }
+  .fl-head .tldr { margin: 14px 0 0; font-size: 17px; line-height: 1.5; max-width: 900px; padding: 12px 18px; border-radius: 16px;
+                   background: color-mix(in srgb, var(--paper) 9%, var(--card)); border: 1.5px solid color-mix(in srgb, var(--paper) 35%, var(--line));
+                   border-left: 6px solid var(--paper); }
+  .fl-head .tldr b { display: block; color: var(--paper); font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 3px; }
+  .fl-head .how { font-size: 13px; color: var(--muted); margin-top: 8px; }
+  /* top to bottom, like the original paper map: question → [why it matters | background] → method → results → conclusion → answer */
+  #fl-full { padding: 10px 24px 50px; }
+  .fl-inner { position: relative; max-width: 1100px; margin: 0 auto; }
+  #fl-stages { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 42px; }
+  #fl-wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  #fl-wires path { fill: none; stroke-width: 3; opacity: .45; stroke-dasharray: 2 7; stroke-linecap: round; }
+  .row { display: grid; gap: 20px; align-items: start; }
+  .row.n2 { grid-template-columns: 1fr 1fr; }
+  .hub { justify-self: center; width: min(780px, 100%); display: flex; gap: 16px; align-items: flex-start; background: var(--card);
+         border: 2px solid var(--c); border-radius: 20px; padding: 14px 18px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+  .row.n2 .hub { width: 100%; }
+  .hub-node { flex: none; width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+              color: var(--c); border: 3px solid var(--c); background: color-mix(in srgb, var(--c) 8%, var(--card)); font-size: 26px; font-weight: 800; }
+  .hub-node.txt { font-size: 18px; }
+  .hub-text { flex: 1; min-width: 0; }
+  .hub-item + .hub-item { margin-top: 10px; padding-top: 10px; border-top: 1px dashed color-mix(in srgb, var(--c) 35%, var(--line)); }
+  .re-q { font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.35; margin: 2px 0 2px; }
+  .kp-card .re-q { margin-top: 8px; }
+  .hub-text .big { font-size: 16.5px; font-weight: 600; line-height: 1.3; margin: 3px 0 4px; }
+  .hub-text .small { font-size: 13.5px; color: var(--muted); }
+  .qtag { display: inline-block; font-size: 10.5px; font-weight: 800; padding: 0 6px; border-radius: 999px; color: var(--tc); border: 1.5px solid var(--tc);
+          background: color-mix(in srgb, var(--tc) 10%, var(--card)); vertical-align: 1px; letter-spacing: .02em; }
+  /* each part of the paper: a tinted block led by its circle; points unfold in place */
+  .st { background: color-mix(in srgb, var(--c) 7%, var(--bg)); border: 1px solid color-mix(in srgb, var(--c) 28%, transparent); border-radius: 20px; padding: 12px 14px; }
+  .st.collapsed:hover { background: color-mix(in srgb, var(--c) 12%, var(--bg)); }
+  .st-head { display: flex; align-items: center; gap: 14px; width: 100%; padding: 0; border: 0; border-radius: 0; background: none; text-align: left;
+             font: inherit; color: inherit; cursor: pointer; }
+  .st-node { flex: none; width: 84px; height: 84px; border-radius: 50%; background: var(--c); color: var(--on-c); font-weight: 700; font-size: 12px;
+             line-height: 1.15; display: flex; align-items: center; justify-content: center; text-align: center; padding: 8px;
+             box-shadow: 0 0 0 5px color-mix(in srgb, var(--c) 18%, transparent); transition: transform .18s; }
+  .st-head:hover .st-node { transform: scale(1.06); }
+  .st-info { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .st-head .chev { margin-left: auto; color: var(--c); font-size: 20px; transition: transform .15s; }
+  .st:not(.collapsed) .st-head .chev { transform: rotate(90deg); }
+  .st.collapsed .st-body { display: none; }
+  .st-body { margin-top: 14px; }
+  .hint { font-size: 11px; font-weight: 800; padding: 0 6px; border-radius: 4px; color: var(--card); }
+  .hint.novel { background: var(--novel); } .hint.caveat { background: var(--warn); }
+  .pts { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 6px 14px; align-items: start; }
+  .row.n2 .pts, .q-lanes .pts { grid-template-columns: 1fr; }
+  .pt { position: relative; border: 1.5px solid transparent; border-radius: 14px; transition: opacity .2s, background .2s; }
+  .pt.open { background: var(--card); border-color: color-mix(in srgb, var(--c) 40%, var(--line)); box-shadow: 0 4px 14px rgba(0,0,0,.06); }
+  .pt.test.open { grid-column: 1 / -1; }
+  .pt-row { display: flex; gap: 10px; align-items: flex-start; width: 100%; padding: 5px 8px; border: 0; background: none; border-radius: 12px;
+            font: inherit; color: inherit; text-align: left; cursor: pointer; }
+  .pt-row:hover { background: color-mix(in srgb, var(--c) 10%, transparent); }
+  .pt-dot { position: relative; flex: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: color-mix(in srgb, var(--c) 22%, var(--card)); border: 2px solid var(--c); color: var(--c); font-weight: 800; font-size: 12.5px;
+            transition: transform .18s; }
+  .pt-row:hover .pt-dot { transform: scale(1.15); }
+  .pt-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding-top: 5px; }
+  .pt-h { font-size: 14px; font-weight: 600; line-height: 1.35; }
+  .pt-tags { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+  .pt.test > .pt-row .pt-txt { padding-top: 8px; }
+  .pt .badge, .pt .cond { margin: 0; }
+  .pt-row .chev { color: var(--c); padding-top: 6px; transition: transform .15s; }
+  .pt.open > .pt-row .chev { transform: rotate(90deg); }
+  .pt-more { display: none; padding: 0 14px 12px 48px; font-size: 14px; --bc: var(--c); }
+  .pt.open > .pt-more { display: block; }
+  .pt-detail { margin: 2px 0 6px; font-size: 14.5px; line-height: 1.45; }
+  .pt-cs { margin-top: 10px; }
+  .pt-cs summary { list-style: none; display: inline-flex; gap: 6px; align-items: center; cursor: pointer; padding: 2px 10px 2px 0; }
+  .pt-cs summary::-webkit-details-marker { display: none; }
+  .pt-cs summary .n { font-size: 11px; font-weight: 800; color: var(--c); border: 1.5px solid var(--c); border-radius: 999px; padding: 0 6px; }
+  .pt-cs summary .chev { color: var(--c); font-size: 12px; transition: transform .15s; }
+  .pt-cs[open] summary .chev { transform: rotate(90deg); }
+  .pt-cs .pchips { margin-top: 6px; }
+  .pt-cs .lbl, .sub-lbl { font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--c); margin-right: 2px; }
+  .sublist { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 4px 12px; margin-top: 8px; align-items: start; }
+  .sub-lbl { display: block; margin-top: 12px; }
+  /* the findings of a test: their own tinted panel so they stand out from the "How" */
+  .found { margin-top: 14px; padding: 10px 12px 12px; border-radius: 14px; border: 1.5px solid color-mix(in srgb, var(--c) 45%, var(--line));
+           border-left: 6px solid var(--c); background: color-mix(in srgb, var(--c) 9%, var(--card)); }
+  .found-h { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--c); }
+  .found-h span { font-size: 11px; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--muted); }
+  .found .sublist { margin-top: 8px; }
+  .found .pt.open { background: var(--card); }
+  .pt.flag-novel > .pt-row .pt-dot { border-color: var(--novel); color: var(--novel); background: color-mix(in srgb, var(--novel) 14%, var(--card)); }
+  .pt.flag-caveat > .pt-row .pt-dot { border: 2px dashed var(--warn); color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, var(--card)); }
+  .pt.flag-key > .pt-row .pt-dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 35%, transparent); }
+  .pt.flag-key > .pt-row .pt-h { font-weight: 800; }
+  .pt.test > .pt-row .pt-dot { width: 36px; height: 36px; font-size: 16px; }
+  .pt.test.open > .pt-row .pt-dot { background: var(--c); color: var(--on-c); }
+  .pt.pulse > .pt-row .pt-dot { animation: pulse 1.1s ease 3; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--hi) 45%, transparent); transform: scale(1.2); } }
+  .q-group { font-size: 12.5px; font-weight: 700; color: var(--muted); margin: 12px 0 4px; line-height: 1.3; }
+  .q-group:first-child { margin-top: 0; }
+  .q-lanes { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+  .q-lane { border: 1.5px dashed color-mix(in srgb, var(--c) 40%, var(--line)); border-radius: 16px; padding: 10px; }
+  .extras { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+  .pt-more .extras { margin: 8px 0 10px; }
+  .ex-btn { font-size: 12.5px; font-weight: 700; color: var(--c); border: 1.5px solid color-mix(in srgb, var(--c) 55%, var(--line));
+            background: var(--card); padding: 4px 12px; }
+  .ex-btn span { font-size: 11px; margin-left: 2px; padding: 0 6px; border-radius: 999px; background: color-mix(in srgb, var(--c) 14%, var(--card)); }
+  .ex-btn[aria-expanded="true"] { background: var(--c); color: var(--on-c); border-color: var(--c); }
+  .ex-btn[aria-expanded="true"] span { background: color-mix(in srgb, var(--on-c) 25%, transparent); }
+  .ex-panel { margin: 0 0 14px; }
+  .eq-list { display: flex; flex-direction: column; gap: 8px; }
+  .eq { background: var(--card); border: 1.5px solid color-mix(in srgb, var(--c) 30%, var(--line)); border-radius: 12px; padding: 8px 14px 10px; }
+  .eq-tex { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+  .eq-tex code { font-size: 12.5px; color: var(--muted); white-space: pre-wrap; word-break: break-word; }
+  .eq-tex.done code { display: none; }
+  .eq-tex .katex-display { margin: 6px 0; display: flex; }
+  .eq-tex .katex-display > .katex { margin: 0 auto; }  /* centred when it fits, starts at the left and scrolls when it doesn't */
+  .eq-meta { font-size: 13.5px; line-height: 1.45; border-top: 1px dashed color-mix(in srgb, var(--c) 30%, var(--line)); padding-top: 6px; }
+  .eq-n { font-weight: 800; color: var(--c); }
+  .eq-sym { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+  .pt-mark { font-size: 11.5px; font-weight: 400; color: var(--muted); }
+  a.paper-link { color: var(--paper); font-weight: 600; text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--paper) 40%, transparent); }
+  a.paper-link:hover { border-bottom-color: var(--paper); }
+  a.btn-link { display: inline-flex; align-items: center; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 999px; text-decoration: none;
+               border: 1.5px solid var(--paper); color: var(--paper); background: var(--card); }
+  a.btn-link:hover { background: var(--paper); color: var(--card); }
+  a.btn-link.small { font-size: 12px; padding: 1px 10px; margin-left: 6px; vertical-align: 1px; }
+  .fig-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin: 2px 0 14px; }
+  .pt-more .fig-row { margin: 8px 0 10px; }
+  .fig-th { border: 1.5px solid color-mix(in srgb, var(--c) 35%, var(--line)); background: var(--card); border-radius: 12px; padding: 6px; cursor: zoom-in;
+            display: flex; flex-direction: column; gap: 5px; font: inherit; text-align: left; color: inherit; transition: box-shadow .15s, border-color .15s; }
+  .fig-th:hover { border-color: var(--c); box-shadow: 0 4px 14px rgba(0,0,0,.1); }
+  .fig-th img { width: 100%; height: 120px; object-fit: contain; border-radius: 8px; background: #fff; }
+  .fig-cap { font-size: 12px; line-height: 1.35; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .fig-cap b { color: var(--ink); }
+  .fig-hint { font-size: 12px; font-weight: 400; color: var(--muted); white-space: nowrap; }
+  #figbox { position: fixed; inset: 0; z-index: 44; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 28px 16px;
+            background: rgba(12,12,14,.88); cursor: zoom-out; }
+  #figbox figure { margin: 0; max-width: min(1300px, 92vw); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  #figbox img { max-width: 100%; max-height: 78vh; object-fit: contain; background: #fff; border-radius: 10px; }
+  #figbox figcaption { color: #eee; font-size: 15px; line-height: 1.45; max-width: 900px; text-align: center; cursor: auto; }
+  #figbox figcaption .term { --tc: #9cc7f0; }
+  .fb-x { position: absolute; top: 14px; right: 16px; background: rgba(255,255,255,.12); color: #fff; border-color: transparent; font-size: 16px; }
+  .fb-nav { flex: none; width: 44px; height: 44px; padding: 0; border-radius: 50%; font-size: 26px; line-height: 1; background: rgba(255,255,255,.12);
+            color: #fff; border-color: transparent; }
+  #fl-full[data-hl="novel"] .pt:not(.flag-novel):not(.has-novel), #fl-full[data-hl="caveat"] .pt:not(.flag-caveat):not(.has-caveat) { opacity: .2; }
+  /* key points: a short top-to-bottom path through the key points only */
+  #fl-key { max-width: 780px; margin: 0 auto; padding: 14px 24px 60px; }
+  .kp-intro { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+  .kp { list-style: none; margin: 0; padding: 0; position: relative; }
+  .kp::before { content: ""; position: absolute; left: 27px; top: 30px; bottom: 30px; width: 3px; background: var(--line); border-radius: 2px; }
+  .kp-step { position: relative; display: flex; gap: 16px; align-items: flex-start; margin: 0 0 18px; }
+  .kp-dot { position: relative; flex: none; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: var(--c); color: var(--on-c); font-weight: 800; font-size: 18px; box-shadow: 0 0 0 6px var(--bg); }
+  .kp-step.hub .kp-dot { background: var(--card); color: var(--c); border: 3px solid var(--c); font-size: 24px; }
+  .kp-card { flex: 1; min-width: 0; background: var(--card); border: 1.5px solid color-mix(in srgb, var(--c) 40%, var(--line)); border-radius: 16px; padding: 10px 14px 12px; --bc: var(--c); }
+  .kp-card .h { font-weight: 700; font-size: 16px; margin: 3px 0 4px; line-height: 1.3; }
+  .kp-card p { margin: 4px 0; font-size: 14px; }
+  .kp-more { display: none; }
+  .kp-card.open .kp-more { display: block; }
+  .kp-arrow { position: relative; font-size: 12.5px; font-weight: 700; color: var(--c); margin: -6px 0 12px 72px; }
+
+  @media (max-width: 700px) {
+    .gx-top { padding: 14px 16px 4px; }
+    .gx-hint { padding: 0 16px 6px; }
+    .gx-legend { display: none; }
+    .qa { position: static; width: auto; margin: 0 16px 6px; }
+    .fl-bar { padding: 8px 12px; }
+    .fl-head { padding-left: 14px; padding-right: 14px; }
+    #fl-full, #fl-key { padding-left: 14px; padding-right: 14px; }
+    .row.n2, .q-lanes { grid-template-columns: 1fr; }
+    .pts, .sublist { grid-template-columns: 1fr; }
+    .z-card { top: auto; right: 0; left: 0; bottom: 0; width: 100vw; max-height: 72vh; border-radius: 24px 24px 0 0; }
+    body.panel-open #gx-stage, body.panel-open .gx-top, body.panel-open .gx-hint, body.panel-open .fl-bar { margin-right: 0; padding-right: 12px; }
+    body.panel-open #fl-view > :not(.fl-bar) { margin-right: auto; }
+    .z-body { padding: 4px 18px 24px; }
+    #term-pop { left: 12px !important; right: 12px; top: auto !important; bottom: 12px; width: auto; }
+  }
+</style>
+</head>
+<body>
+<div id="gx-view">
+  <div class="gx-top">
+    <div>
+      <div class="kicker">Paper atlas · the ideas behind this paper</div>
+      <h1 class="gx-title" id="gx-title"></h1>
+      <div class="gx-meta" id="gx-meta"></div>
+    </div>
+    <div class="gx-tools">
+      <button class="primary" id="gx-flow">Read the paper →</button>
+      <span id="gx-tools-open"></span>
+      <button id="gx-order">Reading order</button>
+      <button id="gx-labels" aria-pressed="true">Labels</button>
+      <button class="theme">Light / dark</button>
+    </div>
+  </div>
+  <p class="gx-hint">This paper is in the centre, with the ★ frontier work it directly extends right beside it. Each shaded layer outwards moves one step back towards the basics: the areas it draws on, then specialist, core and foundation concepts. Click any circle to open its details on the side; drag circles, scroll to zoom.</p>
+  <div class="qa" id="gx-qa"></div>
+  <div id="gx-stage">
+    <svg id="gx-svg" role="img" aria-label="Mind map of the concepts behind this paper">
+      <g id="gx-world"><g id="gx-rings"></g><g id="gx-links"></g><g id="gx-pres"></g><g id="gx-pills"></g><g id="gx-nodes"></g></g>
+    </svg>
+    <div class="gx-legend" id="gx-legend"></div>
+    <div class="gx-zoom"><button id="gx-in" aria-label="Zoom in">+</button><button id="gx-out" aria-label="Zoom out">−</button><button id="gx-reset" aria-label="Reset view">⟲</button></div>
+  </div>
+</div>
+
+<div id="fl-view" hidden>
+  <div class="fl-bar">
+    <button id="fl-back">← Mind map</button>
+    <div class="seg" id="fl-mode"><button data-mode="full" aria-pressed="true">Full flow</button><button data-mode="key" aria-pressed="false">Key points</button></div>
+    <div class="seg" id="fl-hl"><span>Highlight:</span><button data-hl="novel" aria-pressed="false">★ New</button><button data-hl="caveat" aria-pressed="false">⚠ Caveats</button></div>
+    <button id="fl-openall">Open all</button>
+    <span class="spacer"></span>
+    <button class="theme">Light / dark</button>
+  </div>
+  <header class="fl-head">
+    <div class="kicker">The paper, from question to answer</div>
+    <h1 id="fl-title"></h1>
+    <div class="meta" id="fl-meta"></div>
+    <p class="tldr" id="fl-tldr"></p>
+    <div class="how">The paper reads top to bottom, from the question to the answer. Click a part to open it, and a point to unfold its details. Words with a dotted underline explain themselves.</div>
+  </header>
+  <main id="fl-full"><div class="fl-inner" id="fl-inner"><svg id="fl-wires" aria-hidden="true"></svg><div id="fl-stages"></div></div></main>
+  <main id="fl-key" hidden></main>
+</div>
+
+<div id="zoom" hidden>
+  <div class="z-bg" data-zclose></div>
+  <div class="z-card" role="dialog" aria-modal="true">
+    <div class="z-top"><button data-zback hidden>← Back</button><span class="sp"></span><button data-zclose>Close ✕</button></div>
+    <div class="z-body"></div>
+  </div>
+</div>
+<div id="warp" hidden></div>
+<div id="figbox" role="dialog" aria-modal="true" aria-label="Figure" hidden><button class="fb-x" aria-label="Close">✕</button>
+  <button class="fb-nav prev" aria-label="Previous figure">‹</button><figure><img alt=""><figcaption></figcaption></figure><button class="fb-nav next" aria-label="Next figure">›</button></div>
+<div id="term-pop" role="dialog" hidden></div>
+
+<script id="paper-data" type="application/json">__PAPER_DATA__</script>
+<script id="roots-data" type="application/json">__ROOTS_DATA__</script>
+<script>
+(function () {
+  const paper = JSON.parse(document.getElementById("paper-data").textContent);
+  const roots = JSON.parse(document.getElementById("roots-data").textContent);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const $ = (id) => document.getElementById(id);
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const LEVELS = { 1: "Foundations", 2: "Core of the field", 3: "Specialist", 4: "Frontier" };
+  const ROLES = { start: ["Start here", "var(--cite)"], deeper: ["Go deeper", "var(--s3)"],
+                  origin: ["The original", "var(--s4)"], builds_on: ["What this paper builds on", "var(--paper)"] };
+
+  // ================= learning-map data =================
+  const sections = roots.sections || [];
+  const concepts = roots.concepts || [];
+  const byId = Object.fromEntries(concepts.map((c) => [c.id, c]));
+  const readings = Object.fromEntries((roots.readings || []).map((r) => [r.id, r]));
+  const secIdx = Object.fromEntries(sections.map((s, i) => [s.key, i]));
+  const secColor = (key) => `var(--s${((secIdx[key] ?? 0) % 8) + 1})`;
+  const secOf = (key) => sections[secIdx[key]] || { key, name: key };
+  concepts.forEach((c) => { c.prereqs = (c.prereqs || []).filter((p) => byId[p]); });
+  const children = {};
+  concepts.forEach((c) => c.prereqs.forEach((p) => (children[p] ||= []).push(c.id)));
+  function ancestors(id) {
+    const out = [], seen = new Set();
+    (function visit(x) { byId[x].prereqs.forEach((p) => { if (!seen.has(p)) { seen.add(p); visit(p); out.push(p); } }); })(id);
+    return out;
+  }
+  function readingOrder() {
+    const done = new Set(), out = [];
+    const visit = (c) => { if (done.has(c.id)) return; done.add(c.id); c.prereqs.forEach((p) => visit(byId[p])); out.push(c); };
+    [...concepts].sort((a, b) => a.level - b.level || (secIdx[a.section] ?? 0) - (secIdx[b.section] ?? 0)).forEach(visit);
+    return out;
+  }
+  function readingUrl(r) {
+    if (r.url) return r.url;
+    if (r.doi) return "https://doi.org/" + r.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//, "");
+    if (r.arxiv) return "https://arxiv.org/abs/" + r.arxiv.replace(/^arxiv:/i, "");
+    return "https://scholar.google.com/scholar?q=" + encodeURIComponent((r.title || "") + " " + (r.label || ""));
+  }
+  const srcBadge = (r) => r.cited
+    ? `<span class="src cited" title="In this paper's reference list">cited [${r.cited}]</span>`
+    : `<span class="src sugg" title="Not in this paper's reference list: a suggested way in">suggested</span>`;
+  const rlink = (r) => `<a class="rlink" href="${esc(readingUrl(r))}" target="_blank" rel="noopener">${esc(r.label)} ↗</a>`;
+  const readingBlock = (r, extra) => `<div>${rlink(r)}</div><div class="r-ttl">${esc(r.title)}</div>` +
+    `<div class="r-meta"><span class="kind">${esc(r.kind)}</span>${srcBadge(r)}${extra || ""}${r.note ? ` <span class="r-ttl">· ${esc(r.note)}</span>` : ""}</div>`;
+  const startOf = (c) => (c.reads || []).find((x) => x.role === "start");
+  const mini = (id) => `<button class="mini" data-goto="${esc(id)}" style="--c:${secColor(byId[id].section)}">${esc(byId[id].name)}</button>`;
+
+  // ================= concept words: link mentions in any text =================
+  const termOf = new Map();
+  concepts.forEach((c) => (c.terms || []).forEach((t) => { if (t && !termOf.has(t)) termOf.set(t, c.id); }));
+  const variants = [];
+  termOf.forEach((id, t) => { variants.push(t); if (/^[a-z]/.test(t)) variants.push(t.charAt(0).toUpperCase() + t.slice(1)); });
+  variants.sort((a, b) => b.length - a.length);
+  const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const termRe = variants.length ? new RegExp(`(?<![\\p{L}\\p{N}])(?:${variants.map(reEsc).join("|")})(?![\\p{L}\\p{N}])`, "gu") : null;
+  const lookup = (m) => termOf.get(m) || termOf.get(m.charAt(0).toLowerCase() + m.slice(1));
+  function conceptsIn(text) {
+    const out = new Set();
+    if (termRe) for (const m of String(text || "").matchAll(termRe)) { const id = lookup(m[0]); if (id) out.add(id); }
+    return out;
+  }
+  // Escape text and turn the first mention of each concept into a clickable word.
+  function linkText(text, seen = new Set()) {
+    const s = String(text == null ? "" : text);
+    if (!termRe) return esc(s);
+    let out = "", last = 0;
+    for (const m of s.matchAll(termRe)) {
+      const id = lookup(m[0]);
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      out += esc(s.slice(last, m.index)) +
+        `<span class="term" role="button" tabindex="0" data-c="${esc(id)}" style="--tc:${secColor(byId[id].section)}">${esc(m[0])}</span>`;
+      last = m.index + m[0].length;
+    }
+    return out + esc(s.slice(last));
+  }
+
+  // ================= paper-map data =================
+  const refsById = Object.fromEntries((paper.references || []).map((r) => [r.id, r]));
+  function refUrl(r) {
+    if (r.url) return r.url;
+    if (r.doi) return "https://doi.org/" + r.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//, "");
+    if (r.arxiv) return "https://arxiv.org/abs/" + r.arxiv.replace(/^arxiv:/i, "");
+    return "https://scholar.google.com/scholar?q=" + encodeURIComponent(r.title || r.label);
+  }
+  const STAGES = [
+    { key: "question", hub: true, label: "The question", color: "var(--q)", icon: "?" },
+    { key: "why_important", label: "Why it matters", color: "var(--why)" },
+    { key: "background", label: "Background", color: "var(--bg-k)" },
+    { key: "setup", label: "Method", color: "var(--method)" },
+    { key: "results", label: "Results", color: "var(--results)" },
+    { key: "conclusion", label: "Conclusion", color: "var(--concl)" },
+    { key: "answer", hub: true, label: "The answer", color: "var(--a)", icon: "✓" },
+  ];
+  const stageOf = Object.fromEntries(STAGES.map((s) => [s.key, s]));
+  const analyses = paper.analyses || [];
+  // One or more big questions, each with its own answer; each analysis says which one it answers.
+  const QS = [{ q: paper.question || {}, a: paper.answer || {} }]
+    .concat((paper.other_questions || []).map((o) => ({ q: { short: o.short, detail: o.detail }, a: o.answer || {} })));
+  const multiQ = QS.length > 1;
+  const qOf = (a) => Math.min(Math.max((a && a.question) || 1, 1), QS.length);
+  const qTag = (n, kind = "Q") => multiQ ? `<span class="qtag" style="--tc:var(--${kind === "Q" ? "q" : "a"})">${kind}${n}</span>` : "";
+  const itemsOf = (key) => key === "setup" ? (paper.setup || paper.method || []) :
+    key === "results" && !analyses.length ? (paper.results || []) : (paper[key] || []);
+  // Every point gets an id: "<stage>:<i>", tests "t:<i>", their results "r:<i>:<j>".
+  const points = {};
+  ["why_important", "background", "setup", "conclusion"].concat(analyses.length ? [] : ["results"]).forEach((key) =>
+    itemsOf(key).forEach((it, i) => { points[`${key}:${i}`] = { pid: `${key}:${i}`, stage: key, it }; }));
+  analyses.forEach((a, i) => {
+    points[`t:${i}`] = { pid: `t:${i}`, stage: "results", it: a.method, test: i };
+    (a.results || []).forEach((r, j) => { points[`r:${i}:${j}`] = { pid: `r:${i}:${j}`, stage: "results", it: r, test: i }; });
+  });
+  const pointText = (p) => [p.it.headline, p.it.detail].join(" ");
+  const mentionsOf = {};
+  Object.values(points).forEach((p) => conceptsIn(pointText(p)).forEach((id) => (mentionsOf[id] ||= []).push(p.pid)));
+  const FLAG = { novel: "★ NEW", caveat: "⚠ CAVEAT", key: "KEY" };
+  const condColours = {};
+  const condTag = (c) => {
+    if (!c) return "";
+    if (!(c in condColours)) condColours[c] = `var(--t${(Object.keys(condColours).length % 5) + 1})`;
+    return `<span class="cond" style="--tc:${condColours[c]}">${esc(c)}</span>`;
+  };
+  const figures = (paper.figures || []).filter((f) => f.src);
+  const figsAt = (where) => figures.filter((f) => String(f.attach).split(",").map((x) => x.trim()).includes(where));
+  const equations = paper.equations || [];
+  const atList = (x, where) => String(x.attach).split(",").map((y) => y.trim()).includes(where);
+  const eqsAt = (where) => equations.filter((e) => atList(e, where));
+  // Count shown on a closed block; Results counts the plots of all its tests.
+  const within = (x, where) => String(x.attach).split(",").map((y) => y.trim())
+    .some((t) => t === where || t.startsWith(where + "#") || (where === "results" && t.startsWith("results")));
+  const figHint = (where) => {
+    const n = figures.filter((f) => within(f, where)).length;
+    const k = equations.filter((e) => within(e, where)).length;
+    return (n ? `<span class="fig-hint">· ${n} plot${n === 1 ? "" : "s"}</span>` : "") + (k ? `<span class="fig-hint">· ${k} equation${k === 1 ? "" : "s"}</span>` : "");
+  };
+
+  // ================= zoom card =================
+  const zoomEl = $("zoom"), zcard = zoomEl.querySelector(".z-card"), zbody = zoomEl.querySelector(".z-body");
+  const zback = zoomEl.querySelector("[data-zback]");
+  let zstack = [], zcur = null;
+  function rectOf(el) { const r = el && el.getBoundingClientRect(); return r && r.width ? r : null; }
+  // Details open in a panel on the right; the map (or the flow) narrows to sit beside it, so it stays in view.
+  function setPanel(open) {
+    document.body.classList.toggle("panel-open", open);
+    if (onMap()) resize(); else drawFlowWires();
+  }
+  function openZoom(view, from, fresh) {
+    hidePop();
+    const wasOpen = !zoomEl.hidden;
+    if (wasOpen && zcur && !fresh) zstack.push(zcur); else if (fresh) zstack = [];
+    zcur = view;
+    if (!wasOpen) {
+      zstack = []; zoomEl.hidden = false; setPanel(true);
+      if (!reduceMotion) zcard.animate([{ transform: "translateX(40px)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 260, easing: "cubic-bezier(.2,.8,.2,1)" });
+    }
+    renderZoom();
+  }
+  function renderZoom() {
+    zcard.style.setProperty("--c", zcur.color || "var(--paper)");
+    zbody.innerHTML = zcur.html();
+    zbody.scrollTop = 0;
+    zback.hidden = !zstack.length;
+    zbody.classList.remove("fade"); void zbody.offsetWidth; zbody.classList.add("fade");
+    if (zcur.onShow) zcur.onShow();
+    if (zbody.querySelector(".eq-tex")) typeset(zbody);
+  }
+  function zoomBack() { if (zstack.length) { zcur = zstack.pop(); renderZoom(); } }
+  function closeZoom() {
+    if (zoomEl.hidden) return;
+    zoomEl.hidden = true; zcur = null; zstack = [];
+    setPanel(false);
+    if (onMap()) highlight(null);
+  }
+  const closeZoomNow = closeZoom;
+  zoomEl.addEventListener("click", (e) => {
+    if (e.target.closest(".term")) return;
+    if (e.target.closest("[data-zclose]")) { closeZoom(); return; }
+    if (e.target.closest("[data-zback]")) { zoomBack(); return; }
+    const g = e.target.closest("[data-goto]"); if (g) { goConcept(g.dataset.goto); return; }
+    const a = e.target.closest("[data-area]"); if (a) { openZoom(areaView(a.dataset.area)); return; }
+    const f = e.target.closest("[data-find]"); if (f) { const id = f.dataset.find; closeZoomNow(); findInFlow(id); return; }
+    const m = e.target.closest("[data-map]"); if (m) { const id = m.dataset.map; closeZoomNow(); showMap(id); return; }
+    if (e.target.closest("[data-flow]")) { closeZoomNow(); warpToFlow(); return; }
+  });
+
+  // ---- card contents: the essentials up top, everything else folded ----
+  const keyBox = (label, html, color, cls = "", cites = "") => `<div class="z-box ${cls}" style="--bc:${color}"><div class="tag">${label}</div><p>${html}</p>${cites}</div>`;
+  // Citations inside a highlight: "Start with: Jacob 1999 ↗ · Introduction to Atmospheric Chemistry".
+  const cites = (label, list) => list.length ? `<div class="z-cites"><span class="lbl">${label}</span>${list.map(({ href, text, title, badge, where }) =>
+    `<span class="z-cite"><a class="cite" href="${esc(href)}" target="_blank" rel="noopener">${esc(text)} ↗</a>${badge || ""}` +
+    `<span class="r-ttl">${esc(title)}${where ? " · " + esc(where) : ""}</span></span>`).join("")}</div>` : "";
+  const fromReading = (r, where) => ({ href: readingUrl(r), text: r.label, title: r.title, badge: srcBadge(r), where });
+  const fromRef = (r) => ({ href: refUrl(r), text: r.label, title: r.title, badge: "" });
+  const fold = (title, hint, body) => `<details class="z-fold"><summary><span class="ft">${title}</span>` +
+    `<span class="fh">${hint || ""}</span><span class="chev">▸</span></summary><div class="fb">${body}</div></details>`;
+  const ladder = (reads) => `<ol class="steps">${reads.map((x, i) => {
+    const [role, rc] = ROLES[x.role] || [x.role, "var(--muted)"];
+    return `<li style="--rc:${rc}"><span class="dot">${i + 1}</span><div class="role">${esc(role)}</div>${readingBlock(readings[x.reading], x.where ? esc(x.where) : "")}</li>`;
+  }).join("")}</ol>`;
+  const names = (ids, max = 3) => ids.slice(0, max).map((id) => esc(byId[id].name)).join(", ") + (ids.length > max ? ` +${ids.length - max}` : "");
+
+  function areaView(key) {
+    const s = secOf(key);
+    return { color: secColor(key), onShow: () => { if (onMap()) highlight(areaNodes[key]); }, html: () => {
+      const list = concepts.filter((c) => c.section === key).sort((a, b) => b.level - a.level);
+      const keys = (s.key_reads || []).map((id) => readings[id]).filter(Boolean);
+      return `<span class="p-tag">Area${s.where ? " · " + esc(s.where) : ""}</span><h2>${esc(s.name)}</h2>` +
+        `<div class="z-key">` + (s.summary ? keyBox("What it is", linkText(s.summary), secColor(key), "", cites("Start with", keys.slice(0, 1).map((r) => fromReading(r)))) : "") +
+        (s.role ? keyBox("In this paper", linkText(s.role), "var(--paper)", "here", cites("Key paper", keys.slice(1, 2).map((r) => fromReading(r)))) : "") + `</div>` +
+        (keys.length > 2 ? fold("More reading", `${keys.length - 2} more`, `<ol class="steps">${keys.slice(2).map((r, i) =>
+          `<li style="--rc:var(--s3)"><span class="dot">${i + 3}</span>${readingBlock(r)}</li>`).join("")}</ol>`) : "") +
+        fold(`Concepts in this area`, `${list.length} · ${names(list.map((c) => c.id))}`, `<div class="pchips">${list.map((c) => mini(c.id)).join("")}</div>`);
+    } };
+  }
+  // Equations for a concept: the ones linked to it by hand, else those whose explanation names it.
+  const eqsFor = (id) => equations.filter((e) => Array.isArray(e.concepts) && e.concepts.length ? e.concepts.includes(id) : conceptsIn(e.meaning).has(id));
+  function conceptView(id) {
+    const c = byId[id];
+    return { color: secColor(c.section), onShow: () => { if (onMap()) highlight(nodeById[id]); }, html: () => {
+      const order = ["start", "deeper", "origin", "builds_on"];
+      const reads = (c.reads || []).filter((x) => readings[x.reading]).sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role));
+      const anc = ancestors(id), n = (mentionsOf[id] || []).length, kids = children[id] || [];
+      // Up front: where to start, and the paper this work builds on (or the original).
+      const start = reads.find((x) => x.role === "start");
+      let builds = reads.filter((x) => x.role === "builds_on").slice(0, 2), bLabel = "Builds on";
+      if (!builds.length) { builds = reads.filter((x) => x.role === "origin").slice(0, 1); bLabel = "The original"; }
+      return `<button class="mini" data-area="${esc(c.section)}" style="--c:${secColor(c.section)}">${esc(secOf(c.section).name)}</button>` +
+        `<span class="p-lvl">L${c.level} · ${LEVELS[c.level]}</span><h2>${esc(c.name)}</h2>` +
+        `<div class="z-key">${keyBox("What it is", esc(c.plain), secColor(c.section), "", cites("Start with", start ? [fromReading(readings[start.reading], start.where)] : []))}` +
+        `${keyBox("In this paper", esc(c.why_here), "var(--paper)", "here", cites(bLabel, builds.map((x) => fromReading(readings[x.reading], x.where))))}</div>` +
+        (eqsFor(id).length ? `<div class="z-eqs"><div class="tag">${eqsFor(id).length === 1 ? "The equation" : "The equations"} in this paper</div><div class="eq-list">${eqsFor(id).map(eqCard).join("")}</div></div>` : "") +
+        (n ? `<button class="primary p-btn" data-find="${esc(id)}">Show where the paper uses it (${n}) →</button>` : "") +
+        `<div class="z-folds">` +
+        (reads.length ? fold("Full reading ladder", `${reads.length} reading${reads.length === 1 ? "" : "s"}, easiest first`, ladder(reads)) : "") +
+        fold("Learn first", c.prereqs.length ? names(c.prereqs) : "nothing: a starting point",
+          c.prereqs.length ? `<div class="pchips">${c.prereqs.map(mini).join("")}</div>` : `<p class="muted">Nothing: this is a starting point.</p>`) +
+        (anc.length ? fold("Your path here", `${anc.length + 1} steps${onMap() ? ", numbered on the map" : ""}`, `<ol class="plist">${[...anc, id].map((a) => {
+          const st = startOf(byId[a]), r = st && readings[st.reading];
+          return `<li><b>${esc(byId[a].name)}</b>${r ? ` · ${rlink(r)}${st.where ? ` <span class="r-ttl">${esc(st.where)}</span>` : ""}` : ""}</li>`;
+        }).join("")}</ol>`) : "") +
+        (kids.length ? fold("Leads to", names(kids), `<div class="pchips">${kids.map(mini).join("")}</div>`) : "") +
+        `</div>` + (onMap() ? "" : `<p style="margin-top:14px"><button data-map="${esc(id)}">See it on the mind map</button></p>`);
+    } };
+  }
+  function qaHtml() {
+    return `<div class="z-key">` + QS.map(({ q, a }, i) => {
+      const ql = multiQ ? `Question ${i + 1}` : "The question", al = multiQ ? `Answer ${i + 1}` : "The answer";
+      return (q.short ? keyBox(ql, `<b>${linkText(q.short)}</b><span class="sub-d">${linkText(q.detail)}</span>`, "var(--q)") : "") +
+        (a.short ? keyBox(al, `<b>${linkText(a.short)}</b><span class="sub-d">${linkText(a.detail)}</span>`, "var(--a)") : "");
+    }).join("") + `</div>`;
+  }
+  function paperView() {
+    return { color: "var(--paper)", html: () =>
+      `<span class="p-tag">This paper</span><h2>${esc(paper.title || roots.title || "")}</h2>` +
+      `<p class="muted">${linkMeta([paper.authors, paper.year, paper.venue].filter(Boolean).join(" · "))}</p>` +
+      (paper.tldr ? `<div class="z-key">${keyBox("TL;DR", linkText(paper.tldr), "var(--paper)", "here")}</div>` : "") + qaHtml() +
+      `<p style="margin-top:16px"><button class="primary" data-flow>Read how they got there →</button></p>` };
+  }
+  function orderView() {
+    return { color: "var(--paper)", html: () => {
+      const seen = new Set();
+      return `<span class="p-tag">Reading order</span><h2>From the basics to this paper</h2>` +
+        `<p class="muted">Every concept on the map, most basic first, with its "start here" reading.</p><ol class="plist">${readingOrder().map((c) => {
+          const st = startOf(c), r = st && readings[st.reading], again = r && seen.has(r.id);
+          if (r) seen.add(r.id);
+          return `<li>${mini(c.id)} ${r ? `<span class="r-ttl">${again ? "again: " : ""}</span>${rlink(r)}${st.where ? ` <span class="r-ttl">${esc(st.where)}</span>` : ""}` : ""}</li>`;
+        }).join("")}</ol>`;
+    } };
+  }
+  function goConcept(id) { openZoom(conceptView(id)); }
+
+  // arXiv IDs and DOIs in the citation line open the paper.
+  const paperUrl = (() => {
+    const v = [paper.venue, roots.venue].join(" ");
+    const ax = v.match(/arXiv:\s*([\w.\/-]+\d)/i), doi = v.match(/\b(10\.\d{4,}\/\S+)/);
+    return ax ? "https://arxiv.org/abs/" + ax[1] : doi ? "https://doi.org/" + doi[1] : "";
+  })();
+  const linkMeta = (text) => esc(text)
+    .replace(/arXiv:\s*([\w.\/-]+\d)/gi, (m, id) => `<a class="paper-link" href="https://arxiv.org/abs/${id}" target="_blank" rel="noopener">${m} ↗</a>`)
+    .replace(/\b(10\.\d{4,}\/[^\s<]+)/g, (m) => `<a class="paper-link" href="https://doi.org/${m}" target="_blank" rel="noopener">${m} ↗</a>`);
+
+  // ================= the floating mind map =================
+  $("gx-title").textContent = paper.title || roots.title || "";
+  $("gx-meta").innerHTML = linkMeta([paper.authors || roots.authors, paper.year || roots.year, paper.venue || roots.venue].filter(Boolean).join(" · "));
+  if (paperUrl) $("gx-tools-open").outerHTML = `<a class="btn-link" href="${paperUrl}" target="_blank" rel="noopener">Open the paper ↗</a>`; else $("gx-tools-open").remove();
+  const shortAuthors = (paper.authors || roots.authors || "").split(/,| & | and /)[0].trim().split(" ").pop();
+  const qa = $("gx-qa");
+  if (QS[0].q.short && QS[0].a.short) {
+    qa.innerHTML = `<button class="min" aria-label="Minimise">–</button><button class="qa-pill">${multiQ ? `The ${QS.length} questions` : "The question"} &amp; answer${multiQ ? "s" : ""} ▸</button>` +
+      QS.map(({ q, a }, i) => `<div class="tag" style="--c:var(--q)">${multiQ ? "Question " + (i + 1) : "The question"}</div><div class="q">${esc(q.short)}</div>` +
+        `<div class="tag" style="--c:var(--a)">${multiQ ? "Answer " + (i + 1) : "The answer"}</div><div class="a">${esc(a.short)}</div>`).join("") +
+      `<button class="primary" data-qa-flow>See how they got there →</button>`;
+    qa.addEventListener("click", (e) => {
+      if (e.target.closest(".min")) qa.classList.add("mini");
+      else if (e.target.closest(".qa-pill")) qa.classList.remove("mini");
+      else if (e.target.closest("[data-qa-flow]")) warpToFlow();
+    });
+    if (innerWidth > 700) $("gx-stage").prepend(qa);
+  } else qa.remove();
+
+  const svg = $("gx-svg"), world = $("gx-world"), stage = $("gx-stage");
+  const R_AREA = 195, R_LEVEL = { 4: 112, 3: 282, 2: 357, 1: 430 }, R_CONCEPT = { 4: 27, 3: 14, 2: 16, 1: 13 };
+  // The layers, inside out: name, inner and outer radius, what they mean.
+  const BANDS = [["Frontier", 0, 152, "the recent work this paper extends"], ["Areas", 152, 240, "the big fields it draws on"],
+                 ["Specialist", 240, 320, "graduate-level ideas"], ["Core", 320, 393, "what every student of the field learns"],
+                 ["Foundations", 393, 472, "intro-textbook science"]];
+  const nodes = [], links = [];
+  const paperNode = { id: "paper", kind: "paper", r: 62, base: [0, 0] };
+  nodes.push(paperNode);
+  // Areas get a slice of the circle proportional to how many concepts they hold.
+  const counts = sections.map((s) => concepts.filter((c) => c.section === s.key).length);
+  const total = counts.reduce((a, b) => a + b + 1.5, 0);
+  let acc = 0;
+  const areaNodes = {};
+  sections.forEach((s, i) => {
+    const span = (counts[i] + 1.5) / total * Math.PI * 2;
+    const mid = -Math.PI / 2 + acc + span / 2;
+    acc += span;
+    const n = { id: "area:" + s.key, kind: "area", sec: s.key, r: 47, base: [R_AREA * Math.cos(mid), R_AREA * Math.sin(mid)] };
+    areaNodes[s.key] = n; nodes.push(n);
+    links.push({ a: paperNode, b: n, spoke: true, color: secColor(s.key) });
+    // Concepts fan out across the area's slice, one arc per level.
+    [4, 3, 2, 1].forEach((lv) => {
+      const list = concepts.filter((c) => c.section === s.key && c.level === lv);
+      list.forEach((c, j) => {
+        const width = span * 0.8;
+        const ang = list.length === 1 ? mid : mid - width / 2 + width * j / (list.length - 1);
+        const rad = R_LEVEL[lv] + (list.length > 2 && lv !== 4 ? (j % 2 ? 18 : -18) : 0);
+        const cn = { id: c.id, kind: "concept", c, sec: s.key, r: R_CONCEPT[lv], level: lv, base: [rad * Math.cos(ang), rad * Math.sin(ang)] };
+        nodes.push(cn);
+        links.push({ a: n, b: cn, color: secColor(s.key) });
+      });
+    });
+  });
+  const nodeById = Object.fromEntries(nodes.map((n) => [n.id, n]));
+
+  let sx = 1, sy = 1, vbW = 1000, vbH = 1000, pillObs = [];
+  function drawBands() {
+    let bands = "", pills = "";
+    for (let i = BANDS.length - 1; i >= 0; i--) {
+      bands += `<ellipse class="gx-band b${i % 2 ? 1 : 0}" data-band="${i}" rx="${BANDS[i][2] * sx}" ry="${BANDS[i][2] * sy}"/>`;
+    }
+    // Each layer's name runs faintly along the inside of its outer edge, at the top (where two areas meet,
+    // so the map is emptiest) and again at the bottom.
+    pillObs = [];
+    BANDS.forEach(([name, , r1], i) => {
+      const top = r1 - 15, bot = r1 - 5, w = name.length * 9.5;
+      pills += `<path id="bt${i}" d="M${-top * sx},0 A${top * sx},${top * sy} 0 0 1 ${top * sx},0" fill="none"/>` +
+        `<path id="bb${i}" d="M${-bot * sx},0 A${bot * sx},${bot * sy} 0 0 0 ${bot * sx},0" fill="none"/>` +
+        `<text class="gx-lname"><textPath href="#bt${i}" startOffset="50%" text-anchor="middle">${name}</textPath></text>` +
+        `<text class="gx-lname"><textPath href="#bb${i}" startOffset="50%" text-anchor="middle">${name}</textPath></text>`;
+      pillObs.push({ y: -(r1 - 20) * sy, hw: w / 2 }, { y: (r1 - 12) * sy, hw: w / 2 });
+    });
+    $("gx-rings").innerHTML = bands;
+    $("gx-pills").innerHTML = pills;
+  }
+  function wrap(text, max) {
+    const words = String(text).split(/\s+/), lines = [];
+    let cur = "";
+    words.forEach((w) => { if ((cur + " " + w).trim().length > max && cur) { lines.push(cur); cur = w; } else cur = (cur + " " + w).trim(); });
+    if (cur) lines.push(cur);
+    return lines;
+  }
+  const el = (tag, attrs) => { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+  const linkLayer = $("gx-links"), nodeLayer = $("gx-nodes");
+  links.forEach((l) => { l.el = el("path", { class: "gx-link" + (l.spoke ? " spoke" : ""), style: `--lc:${l.color}` }); linkLayer.appendChild(l.el); });
+  nodes.forEach((n) => {
+    const g = el("g", { class: "gx-node " + n.kind, tabindex: "0", role: "button" });
+    g.dataset.id = n.id;
+    if (n.kind === "paper") {
+      g.setAttribute("aria-label", "This paper: what it asks and answers");
+      g.appendChild(el("circle", { class: "halo", r: n.r + 9 }));
+      n.circle = el("circle", { r: n.r }); g.appendChild(n.circle);
+      [["This paper", "big", -10], [`${shortAuthors} ${paper.year || roots.year || ""}`.trim(), "", 7], ["Open ↗", "go", 25]].forEach(([t, cls, y]) => {
+        const tx = el("text", { "text-anchor": "middle", y, class: cls }); tx.textContent = t; g.appendChild(tx);
+      });
+    } else if (n.kind === "area") {
+      const s = secOf(n.sec);
+      g.style.setProperty("--nc", secColor(n.sec));
+      g.setAttribute("aria-label", "Area: " + s.name);
+      n.circle = el("circle", { r: n.r }); g.appendChild(n.circle);
+      const lines = wrap(s.name, 11);
+      lines.forEach((t, i) => { const tx = el("text", { "text-anchor": "middle", y: (i - (lines.length - 1) / 2) * 14 + 4 }); tx.textContent = t; g.appendChild(tx); });
+    } else {
+      g.style.setProperty("--nc", secColor(n.sec));
+      g.setAttribute("aria-label", "Concept: " + n.c.name);
+      if (n.c.level === 4) { g.classList.add("frontier"); g.appendChild(el("circle", { class: "glow", r: n.r + 8 })); }
+      n.circle = el("circle", { r: n.r }); g.appendChild(n.circle);
+      const lv = el("text", { class: "lv", "text-anchor": "middle", y: 4 }); lv.textContent = n.c.level === 4 ? "★" : "L" + n.c.level; g.appendChild(lv);
+      wrap(n.c.name, 17).slice(0, 3).forEach((t, i) => { const tx = el("text", { "text-anchor": "middle", y: n.r + 13 + i * 12.5 }); tx.textContent = t; g.appendChild(tx); });
+    }
+    n.g = g;
+    nodeLayer.appendChild(g);
+  });
+  $("gx-legend").innerHTML = `<div class="lg-h">Layers, inside → out</div>` +
+    BANDS.map(([name, , , what], i) => `<button data-band="${i}"><span><b>${name}</b> · ${what}</span></button>`).join("");
+
+  // ---- layout: springs to a slowly drifting home, plus collisions ----
+  nodes.forEach((n, i) => { n.x = n.y = n.vx = n.vy = 0; n.phase = i * 1.7; });
+  function homes() { nodes.forEach((n) => { n.hx = n.base[0] * sx; n.hy = n.base[1] * sy; }); }
+  let dragging = null, running = true;
+  const t0 = performance.now();
+  function step(now) {
+    physics((now - t0) / 1000);
+    draw();
+    if (running) requestAnimationFrame(step);
+  }
+  function physics(t) {
+    nodes.forEach((n) => {
+      if (n === dragging) return;
+      const drift = reduceMotion || n.kind === "paper" ? 0 : (n.kind === "area" ? 4 : 6);
+      n.vx += (n.hx + drift * Math.sin(t * 0.35 + n.phase) - n.x) * 0.012;
+      n.vy += (n.hy + drift * Math.cos(t * 0.29 + n.phase * 1.3) - n.y) * 0.012;
+    });
+    for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
+      const a = nodes[i], b = nodes[j];
+      const pad = (a.kind === "concept" ? 22 : 8) + (b.kind === "concept" ? 22 : 8);
+      // Labels sit under concept circles and are wide, so concepts keep more room side to side.
+      const wide = a.kind === "concept" && b.kind === "concept" ? 0.6 : 1;
+      const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx * wide, dy) || 0.01, min = a.r + b.r + pad;
+      if (d < min) {
+        const push = (min - d) / d * 0.25;
+        if (a !== dragging && a.kind !== "paper") { a.vx -= dx * push; a.vy -= dy * push; }
+        if (b !== dragging && b.kind !== "paper") { b.vx += dx * push; b.vy += dy * push; }
+      }
+    }
+    // Layer labels are fixed: circles (and the labels under them) slide sideways off them.
+    nodes.forEach((n) => {
+      if (n === dragging || n.kind === "paper") return;
+      const below = n.kind === "concept" ? 40 : 6;
+      pillObs.forEach((o) => {
+        const dx = n.x, dy = o.y - n.y, reach = o.hw + n.r * 0.8 + 6;
+        if (dy > -n.r - 12 && dy < n.r + below && Math.abs(dx) < reach) n.vx += Math.sign(dx || n.phase - 3) * (reach - Math.abs(dx)) * 0.08;
+      });
+    });
+    nodes.forEach((n) => { if (n !== dragging) { n.vx *= 0.86; n.vy *= 0.86; n.x += n.vx; n.y += n.vy; } });
+  }
+  function settle() {
+    nodes.forEach((n) => { n.x = n.hx; n.y = n.hy; n.vx = n.vy = 0; });
+    for (let i = 0; i < 300; i++) physics(0);
+    nodes.forEach((n) => { n.vx = n.vy = 0; });
+    draw();
+  }
+  function draw() {
+    nodes.forEach((n) => n.g.setAttribute("transform", `translate(${n.x.toFixed(1)},${n.y.toFixed(1)})`));
+    links.forEach((l) => {
+      const { a, b } = l, mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, bend = l.spoke ? 0 : 0.12;
+      l.el.setAttribute("d", `M${a.x.toFixed(1)},${a.y.toFixed(1)} Q${(mx - (b.y - a.y) * bend).toFixed(1)},${(my + (b.x - a.x) * bend).toFixed(1)} ${b.x.toFixed(1)},${b.y.toFixed(1)}`);
+    });
+    if (selected && selected.kind === "concept") drawPrereqs();
+  }
+
+  // ---- view box, pan and zoom ----
+  let zoom = 1, panX = 0, panY = 0, viewAnim = null;
+  function resize() {
+    const w = stage.clientWidth || 1000, h = stage.clientHeight || 700, a = w / h;
+    vbW = a >= 1 ? 990 * a : 990; vbH = a >= 1 ? 990 : 990 / a;
+    sx = Math.min(Math.max(a, 1), 1.55); sy = Math.min(Math.max(1 / a, 1), 1.45);
+    svg.setAttribute("viewBox", `${-vbW / 2} ${-vbH / 2} ${vbW} ${vbH}`);
+    drawBands();
+    homes();
+  }
+  function applyView() { world.setAttribute("transform", `translate(${panX},${panY}) scale(${zoom})`); }
+  function animateView(z, px, py, ms = 420) {
+    cancelAnimationFrame(viewAnim);
+    if (reduceMotion) { zoom = z; panX = px; panY = py; applyView(); return; }
+    const from = [zoom, panX, panY], start = performance.now();
+    const tick = (now) => {
+      const k = Math.min(1, (now - start) / ms), e = 1 - Math.pow(1 - k, 3);
+      zoom = from[0] + (z - from[0]) * e; panX = from[1] + (px - from[1]) * e; panY = from[2] + (py - from[2]) * e;
+      applyView();
+      if (k < 1) viewAnim = requestAnimationFrame(tick);
+    };
+    viewAnim = requestAnimationFrame(tick);
+  }
+  function toWorld(evt) {
+    const p = new DOMPoint(evt.clientX, evt.clientY).matrixTransform(svg.getScreenCTM().inverse());
+    return [(p.x - panX) / zoom, (p.y - panY) / zoom];
+  }
+  function zoomBy(f, cx = 0, cy = 0) {
+    const nz = Math.min(3, Math.max(0.5, zoom * f));
+    panX = cx - (cx - panX) * nz / zoom; panY = cy - (cy - panY) * nz / zoom; zoom = nz; applyView();
+  }
+  svg.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse());
+    zoomBy(Math.exp(-e.deltaY * 0.0015), p.x, p.y);
+  }, { passive: false });
+  $("gx-in").onclick = () => zoomBy(1.25);
+  $("gx-out").onclick = () => zoomBy(0.8);
+  $("gx-reset").onclick = () => { animateView(1, 0, 0); highlight(null); };
+
+  let press = null;
+  svg.addEventListener("pointerdown", (e) => {
+    const g = e.target.closest(".gx-node");
+    press = { x: e.clientX, y: e.clientY, node: g ? nodeById[g.dataset.id] : null, moved: false, panX, panY };
+    svg.setPointerCapture(e.pointerId);
+  });
+  svg.addEventListener("pointermove", (e) => {
+    if (!press) return;
+    if (!press.moved && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 5) press.moved = true;
+    if (!press.moved) return;
+    if (press.node && press.node.kind !== "paper") {
+      dragging = press.node;
+      const [x, y] = toWorld(e); dragging.x = x; dragging.y = y; dragging.vx = dragging.vy = 0;
+    } else {
+      svg.classList.add("panning");
+      const m = svg.getScreenCTM();
+      panX = press.panX + (e.clientX - press.x) / m.a; panY = press.panY + (e.clientY - press.y) / m.d; applyView();
+    }
+  });
+  svg.addEventListener("pointerup", () => {
+    if (press && !press.moved) { if (press.node) activate(press.node); else closeZoom(); }
+    press = null; dragging = null; svg.classList.remove("panning");
+  });
+  svg.addEventListener("keydown", (e) => {
+    const g = e.target.closest(".gx-node");
+    if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); activate(nodeById[g.dataset.id]); }
+  });
+  function activate(n) {
+    if (n.kind === "paper") { openZoom(paperView(), n.circle, true); return; }
+    openZoom(n.kind === "area" ? areaView(n.sec) : conceptView(n.id), n.circle, true);
+  }
+
+  // ---- highlighting: the chosen circle, its area, and numbered prerequisites ----
+  let selected = null;
+  const preLayer = $("gx-pres");
+  function highlight(n) {
+    selected = n;
+    svg.classList.toggle("focus", !!n);
+    nodes.forEach((x) => x.g.classList.remove("on", "sel"));
+    links.forEach((l) => l.el.classList.remove("on"));
+    preLayer.innerHTML = "";
+    nodeLayer.querySelectorAll(".gx-badge").forEach((b) => b.remove());
+    if (!n) return;
+    const on = new Set([n, paperNode]);
+    if (n.kind === "area") nodes.filter((x) => x.sec === n.sec).forEach((x) => on.add(x));
+    else {
+      on.add(areaNodes[n.sec]);
+      ancestors(n.id).forEach((id, i) => {
+        const a = nodeById[id]; on.add(a); on.add(areaNodes[a.sec]);
+        const b = el("g", { class: "gx-badge", transform: `translate(${a.r * 0.75},${-a.r * 0.75})` });
+        b.appendChild(el("circle", { r: 8 }));
+        const tx = el("text", { "text-anchor": "middle", y: 3.5 }); tx.textContent = i + 1; b.appendChild(tx);
+        a.g.appendChild(b);
+      });
+      (children[n.id] || []).forEach((id) => on.add(nodeById[id]));
+    }
+    on.forEach((x) => x.g.classList.add("on"));
+    n.g.classList.add("sel");
+    links.forEach((l) => { if (on.has(l.a) && on.has(l.b)) l.el.classList.add("on"); });
+    draw();
+  }
+  function drawPrereqs() {
+    const anc = new Set([selected.id, ...ancestors(selected.id)]), pairs = [];
+    concepts.forEach((c) => c.prereqs.forEach((p) => { if (anc.has(c.id) && anc.has(p)) pairs.push([nodeById[p], nodeById[c.id]]); }));
+    preLayer.innerHTML = pairs.map(([a, b]) => `<path class="gx-pre" d="M${a.x.toFixed(1)},${a.y.toFixed(1)} L${b.x.toFixed(1)},${b.y.toFixed(1)}"/>`).join("");
+  }
+  const legend = $("gx-legend");
+  legend.addEventListener("click", (e) => { const b = e.target.closest("[data-area]"); if (b) activate(areaNodes[b.dataset.area]); });
+  const bandHl = (i) => $("gx-rings").querySelectorAll(".gx-band").forEach((b) => b.classList.toggle("hl", b.dataset.band === String(i)));
+  legend.addEventListener("pointerover", (e) => { const b = e.target.closest("[data-band]"); bandHl(b ? b.dataset.band : null); });
+  legend.addEventListener("pointerleave", () => bandHl(null));
+  legend.addEventListener("focusin", (e) => { const b = e.target.closest("[data-band]"); bandHl(b ? b.dataset.band : null); });
+  const labelsBtn = $("gx-labels");
+  labelsBtn.onclick = () => {
+    const show = labelsBtn.getAttribute("aria-pressed") !== "true";
+    labelsBtn.setAttribute("aria-pressed", String(show)); svg.classList.toggle("nolabels", !show);
+  };
+  $("gx-order").onclick = (e) => openZoom(orderView(), e.currentTarget);
+
+  // ================= switching views =================
+  const gxView = $("gx-view"), flView = $("fl-view");
+  const onMap = () => !gxView.hidden;
+  function showFlow() {
+    hidePop(); closeZoom();
+    gxView.hidden = true; flView.hidden = false; running = false;
+    window.scrollTo(0, 0);
+    drawFlowWires();
+  }
+  // Going into the paper: its circle swells to fill the screen, then the flow appears.
+  function warpToFlow() {
+    const r = rectOf(paperNode.circle);
+    if (!r || reduceMotion || !onMap()) { showFlow(); return; }
+    const w = $("warp");
+    Object.assign(w.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+    w.hidden = false;
+    const s = Math.hypot(innerWidth, innerHeight) * 2.2 / r.width;
+    w.animate([{ transform: "scale(1)" }, { transform: `scale(${s})` }], { duration: 520, easing: "cubic-bezier(.5,0,.7,.4)", fill: "forwards" }).onfinish = () => {
+      showFlow();
+      w.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 320 }).onfinish = () => { w.hidden = true; w.getAnimations().forEach((a) => a.cancel()); };
+    };
+  }
+  function showMap(conceptId) {
+    hidePop(); closeZoom();
+    flView.hidden = true; gxView.hidden = false;
+    resize(); zoom = 1; panX = panY = 0; applyView();
+    if (!running) { running = true; requestAnimationFrame(step); }
+    highlight(null);
+    if (conceptId) setTimeout(() => activate(nodeById[conceptId]), 60);
+  }
+  $("gx-flow").onclick = warpToFlow;
+  $("fl-back").onclick = () => showMap();
+  document.querySelectorAll(".theme").forEach((b) => b.onclick = () => {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    drawFlowWires();
+  });
+
+  // ================= the paper flow =================
+  $("fl-title").textContent = paper.title || "";
+  $("fl-meta").innerHTML = linkMeta([paper.authors, paper.year, paper.venue].filter(Boolean).join(" · ")) +
+    (paperUrl ? ` <a class="btn-link small" href="${paperUrl}" target="_blank" rel="noopener">Open the paper ↗</a>` : "");
+  $("fl-tldr").innerHTML = paper.tldr ? `<b>TL;DR</b>${linkText(paper.tldr)}` : "";
+  const flagCounts = (list) => {
+    const n = list.filter((it) => it.flag === "novel").length, c = list.filter((it) => it.flag === "caveat").length;
+    return (n ? `<span class="hint novel">★ ${n}</span>` : "") + (c ? `<span class="hint caveat">⚠ ${c}</span>` : "");
+  };
+  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  const refsOf = (it) => (it.refs || []).map((id) => refsById[id]).filter(Boolean);
+  // Two questions only get their own lanes when the paper answers them with clearly separate work.
+  const splitQ = multiQ && (paper.other_questions || []).some((o) => o.separate);
+  // Figures as thumbnails; a click blows one up in place, with its caption.
+  // Figures and equations stay folded until asked for: "View figures" / "View equations".
+  // A point's parents: "results:3#1" sits in test "results:3" and block "results"; "setup#2" sits in "setup".
+  const parentsOf = (key) => key.includes("#") ? [key.split("#")[0]].concat(key.startsWith("results:") ? ["results"] : []) : [];
+  const own = (list, key) => list.filter((x) => atList(x, key) && !parentsOf(key).some((k) => atList(x, k)));
+  function extrasHtml(where) {
+    const nf = own(figures, where).length, ne = own(equations, where).length;
+    if (!nf && !ne) return "";
+    return `<div class="extras">` +
+      (nf ? `<button class="ex-btn" data-ex="fig" data-n="${nf}" aria-expanded="false">▣ View ${nf === 1 ? "figure" : "figures"} <span>${nf}</span></button>` : "") +
+      (ne ? `<button class="ex-btn" data-ex="eq" data-n="${ne}" aria-expanded="false">∑ View ${ne === 1 ? "equation" : "equations"} <span>${ne}</span></button>` : "") +
+      `</div>` + (nf ? `<div class="ex-panel" data-panel="fig" hidden>${figRow(where)}</div>` : "") +
+      (ne ? `<div class="ex-panel" data-panel="eq" hidden>${eqRow(where)}</div>` : "");
+  }
+  const eqCard = (e) =>
+    `<div class="eq"><div class="eq-tex" data-tex="${esc(e.latex)}"><code>${esc(e.latex)}</code></div>` +
+    `<div class="eq-meta">${e.number ? `<span class="eq-n">(${esc(e.number)})</span> ` : ""}${linkText(e.meaning)}` +
+    `${e.symbols ? `<div class="eq-sym">${esc(e.symbols)}</div>` : ""}</div></div>`;
+  const eqRow = (where) => `<div class="eq-list">${own(equations, where).map(eqCard).join("")}</div>`;
+  // KaTeX is fetched the first time someone opens equations; offline, the LaTeX source stays visible instead.
+  let katexLoad = null;
+  function loadKatex() {
+    if (katexLoad) return katexLoad;
+    katexLoad = new Promise((resolve, reject) => {
+      const css = document.createElement("link");
+      css.rel = "stylesheet"; css.href = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css";
+      document.head.appendChild(css);
+      const js = document.createElement("script");
+      js.src = "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js";
+      js.onload = () => resolve(window.katex); js.onerror = reject;
+      document.head.appendChild(js);
+    });
+    return katexLoad;
+  }
+  function typeset(panel) {
+    loadKatex().then((katex) => panel.querySelectorAll(".eq-tex:not(.done)").forEach((el) => {
+      try { katex.render(el.dataset.tex, el, { displayMode: true, throwOnError: false }); el.classList.add("done"); } catch (e) { /* keep the source */ }
+    })).catch(() => panel.querySelectorAll(".eq-tex").forEach((el) => el.classList.add("raw")));
+  }
+  function toggleExtra(btn) {
+    const panel = btn.parentElement.parentElement.querySelector(`:scope > .ex-panel[data-panel="${btn.dataset.ex}"]`);
+    const open = panel.hidden;
+    panel.hidden = !open;
+    btn.setAttribute("aria-expanded", String(open));
+    const one = btn.dataset.n === "1";
+    btn.firstChild.textContent = (btn.dataset.ex === "fig" ? "▣ " : "∑ ") + (open ? "Hide " : "View ") + (btn.dataset.ex === "fig" ? (one ? "figure " : "figures ") : (one ? "equation " : "equations "));
+    if (open && btn.dataset.ex === "eq") typeset(panel);
+  }
+  // Plots as thumbnails; a click opens one full-screen with its caption.
+  const figRow = (where) => {
+    const list = own(figures, where);
+    return list.length ? `<div class="fig-row">${list.map((f) => `<button class="fig-th" data-fig="${f.number}" title="Open Fig. ${f.number}"><img src="${f.src}" alt="Figure ${f.number}">` +
+      `<span class="fig-cap"><b>Fig. ${f.number}</b> ${esc(f.caption)}</span></button>`).join("")}</div>` : "";
+  };
+  const keyOfPid = (pid) => {
+    const r = pid.match(/^r:(\d+):(\d+)$/); if (r) return `results:${+r[1] + 1}#${+r[2] + 1}`;
+    const t = pid.match(/^t:(\d+)$/); if (t) return `results:${+t[1] + 1}`;
+    const [k, i] = pid.split(":"); return `${k}#${+i + 1}`;
+  };
+  // What a point shows when unfolded: the detail, its own figures and equations, the papers it builds on, the concepts behind it.
+  function moreHtml(p, withDetail = true) {
+    const cs = [...conceptsIn(pointText(p))];
+    return (withDetail ? `<p class="pt-detail">${linkText(p.it.detail)}</p>` : "") + extrasHtml(keyOfPid(p.pid)) +
+      cites("Builds on", refsOf(p.it).slice(0, 3).map(fromRef)) +
+      (cs.length ? `<details class="pt-cs"><summary><span class="lbl">Concepts behind this</span><span class="n">${cs.length}</span><span class="chev">▸</span></summary>` +
+        `<div class="pchips">${cs.map(mini).join("")}</div></details>` : "");
+  }
+  function ptHtml(pid, i) {
+    const p = points[pid], it = p.it, flag = FLAG[it.flag] ? it.flag : "none";
+    const dot = flag === "novel" ? "★" : flag === "caveat" ? "⚠" : i + 1;
+    return `<div class="pt flag-${flag}" data-pid="${pid}"><button class="pt-row" aria-expanded="false"><span class="pt-dot">${dot}</span>` +
+      `<span class="pt-txt"><span class="pt-h">${esc(it.headline)}</span>` +
+      (() => { const key = keyOfPid(pid), nf = own(figures, key).length, ne = own(equations, key).length;
+        const marks = (nf ? `<span class="pt-mark">${nf} figure${nf === 1 ? "" : "s"}</span>` : "") +
+          (ne ? `<span class="pt-mark">${ne} equation${ne === 1 ? "" : "s"}</span>` : "");
+        return flag !== "none" || it.condition || marks ? `<span class="pt-tags">${flag !== "none" ? `<span class="badge ${flag}">${FLAG[flag]}</span>` : ""}${it.condition ? condTag(it.condition) : ""}${marks}</span>` : ""; })() +
+      `</span><span class="chev">▸</span></button><div class="pt-more">${moreHtml(p)}</div></div>`;
+  }
+  function testHtml(i) {
+    const a = analyses[i], rs = a.results || [];
+    const has = (f) => rs.some((r) => r.flag === f) ? ` has-${f}` : "";
+    return `<div class="pt test${has("novel")}${has("caveat")}" data-test="${i}" data-pid="t:${i}"><button class="pt-row" aria-expanded="false"><span class="pt-dot">?</span>` +
+      `<span class="pt-txt"><span class="pt-h">${esc(a.method.headline)}</span>${flagCounts(rs) || figHint(`results:${i + 1}`) ? `<span class="pt-tags">${flagCounts(rs)}${figHint(`results:${i + 1}`)}</span>` : ""}</span><span class="chev">▸</span></button>` +
+      `<div class="pt-more"><p class="pt-detail"><b>How:</b> ${linkText(a.method.detail)}</p>${extrasHtml(`results:${i + 1}`)}${cites("Builds on", refsOf(a.method).slice(0, 3).map(fromRef))}` +
+      `<div class="found"><div class="found-h">What they found <span>${plural(rs.length, "result")}</span></div><div class="sublist">${rs.map((_, j) => ptHtml(`r:${i}:${j}`, j)).join("")}</div></div></div></div>`;
+  }
+  // Tests, grouped under the big question each one answers (side by side when the questions are separate).
+  function testsHtml() {
+    if (!multiQ) return `<div class="pts">${analyses.map((_, i) => testHtml(i)).join("")}</div>`;
+    const groups = QS.map((x, qi) => ({ qi, ids: analyses.map((a, i) => i).filter((i) => qOf(analyses[i]) === qi + 1) })).filter((g) => g.ids.length);
+    return `<div class="${splitQ ? "q-lanes" : ""}">` + groups.map((g) => `<div class="${splitQ ? "q-lane" : ""}"><div class="q-group">${qTag(g.qi + 1)} ${esc(QS[g.qi].q.short)}</div>` +
+      `<div class="pts">${g.ids.map(testHtml).join("")}</div></div>`).join("") + `</div>`;
+  }
+  // The question and answer boxes; several questions share one box unless they are answered separately.
+  function hubHtml(kind, idxs) {
+    const s = stageOf[kind], many = idxs.length > 1, isQ = kind === "question";
+    const label = many ? (isQ ? "The big questions" : "The answers") : multiQ ? `${isQ ? "Question" : "Answer"} ${idxs[0] + 1}` : s.label;
+    const icon = multiQ && !many ? (isQ ? "Q" : "A") + (idxs[0] + 1) : s.icon;
+    return `<section class="hub" data-key="${kind}" style="--c:${s.color}"><div class="hub-node${multiQ && !many ? " txt" : ""}">${icon}</div><div class="hub-text"><div class="tag">${label}</div>` +
+      idxs.map((i) => { const o = isQ ? QS[i].q : QS[i].a;
+        const re = !isQ && multiQ ? `<div class="re-q">${qTag(i + 1)} ${esc(QS[i].q.short)}</div>` : "";
+        return `<div class="hub-item">${re}<div class="big">${many ? qTag(i + 1, isQ ? "Q" : "A") + " " : ""}${linkText(o.short)}</div><div class="small">${linkText(o.detail)}</div></div>`; }).join("") +
+      `</div></section>`;
+  }
+  function stageHtml(s) {
+    const isTests = s.key === "results" && analyses.length;
+    const items = isTests ? analyses : itemsOf(s.key);
+    if (!items.length) return "";
+    const flagged = isTests ? analyses.flatMap((a) => a.results || []) : items;
+    return `<section class="st collapsed" data-key="${s.key}" style="--c:${s.color}"><button class="st-head" aria-expanded="false"><span class="st-node">${s.label}</span>` +
+      `<span class="st-info">${plural(items.length, isTests ? "test" : "point")} ${flagCounts(flagged)}${figHint(s.key)}</span><span class="chev">▸</span></button>` +
+      `<div class="st-body">${extrasHtml(s.key)}${isTests ? testsHtml() : `<div class="pts">${items.map((_, i) => ptHtml(`${s.key}:${i}`, i)).join("")}</div>`}</div></section>`;
+  }
+  const stagesEl = $("fl-stages"), inner = $("fl-inner");
+  const ROWS = [["question"], ["why_important", "background"], ["setup"], ["results"], ["conclusion"], ["answer"]];
+  stagesEl.innerHTML = ROWS.map((keys) => {
+    const parts = keys.flatMap((k) => stageOf[k].hub
+      ? (splitQ ? QS.map((_, i) => hubHtml(k, [i])) : [hubHtml(k, QS.map((_, i) => i))])
+      : [stageHtml(stageOf[k])]).filter(Boolean);
+    return parts.length ? `<div class="row n${parts.length}">${parts.join("")}</div>` : "";
+  }).join("");
+  const ptEl = (pid) => stagesEl.querySelector(`.pt[data-pid="${pid}"]`);
+  function setPt(el, open) {
+    if (!el) return;
+    el.classList.toggle("open", open);
+    el.querySelector(":scope > .pt-row").setAttribute("aria-expanded", String(open));
+  }
+  const setTest = (i, open) => setPt(ptEl(`t:${i}`), open);
+  function setStage(sec, open) {
+    if (!sec) return;
+    sec.classList.toggle("collapsed", !open);
+    sec.querySelector(".st-head").setAttribute("aria-expanded", String(open));
+  }
+  const stageSecs = () => [...stagesEl.querySelectorAll(".st")];
+  stagesEl.addEventListener("click", (e) => {
+    if (e.target.closest(".term, a")) return;
+    const g = e.target.closest("[data-goto]"); if (g) { openZoom(conceptView(g.dataset.goto), g, true); return; }
+    const f = e.target.closest(".fig-th"); if (f) { openFig(+f.dataset.fig); return; }
+    const x = e.target.closest(".ex-btn"); if (x) { toggleExtra(x); drawFlowWires(); return; }
+    const head = e.target.closest(".st-head");
+    if (head) { const sec = head.parentElement; setStage(sec, sec.classList.contains("collapsed")); syncOpenAll(); drawFlowWires(); return; }
+    const row = e.target.closest(".pt-row");
+    if (row) { const pt = row.parentElement; setPt(pt, !pt.classList.contains("open")); drawFlowWires(); }
+  });
+  const openAllBtn = $("fl-openall");
+  function syncOpenAll() { openAllBtn.textContent = stageSecs().some((s) => s.classList.contains("collapsed")) ? "Open all" : "Close all"; }
+  function openAll(open) {
+    stageSecs().forEach((s) => setStage(s, open));
+    analyses.forEach((_, i) => setTest(i, open));
+    syncOpenAll(); drawFlowWires();
+  }
+  openAllBtn.onclick = () => openAll(openAllBtn.textContent === "Open all");
+  $("fl-hl").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-hl]"); if (!b) return;
+    const on = b.getAttribute("aria-pressed") !== "true";
+    document.querySelectorAll("#fl-hl [data-hl]").forEach((x) => x.setAttribute("aria-pressed", String(x === b && on)));
+    if (on) { setMode("full"); $("fl-full").dataset.hl = b.dataset.hl; openAll(true); } else delete $("fl-full").dataset.hl;
+  });
+
+  // Dotted connectors from every block in one row to every block in the next.
+  const wires = $("fl-wires");
+  function drawFlowWires() {
+    if (flView.hidden || $("fl-full").hidden) return;
+    requestAnimationFrame(() => {
+      const m = inner.getBoundingClientRect(), css = getComputedStyle(document.documentElement);
+      const col = (el) => { const v = el.style.getPropertyValue("--c"); const k = v.match(/var\((--[\w-]+)\)/); return k ? css.getPropertyValue(k[1]).trim() : v; };
+      const P = (el, fx, fy) => { const r = el.getBoundingClientRect(); return [r.left + r.width * fx - m.left, r.top + r.height * fy - m.top]; };
+      let out = "";
+      const rows = [...stagesEl.querySelectorAll(".row")];
+      rows.forEach((row, i) => {
+        if (i + 1 >= rows.length) return;
+        const next = [...rows[i + 1].children];
+        [...row.children].forEach((a) => next.forEach((b) => {
+          const [x1, y1] = P(a, 0.5, 1), [x2, y2] = P(b, 0.5, 0), dy = (y2 - y1) * 0.5;
+          out += `<path stroke="${col(a)}" d="M${x1},${y1} C${x1},${y1 + dy} ${x2},${y2 - dy} ${x2},${y2}"/>`;
+        }));
+      });
+      wires.innerHTML = out;
+    });
+  }
+  window.addEventListener("resize", drawFlowWires);
+  if (window.ResizeObserver) new ResizeObserver(() => drawFlowWires()).observe(inner);
+
+  // ---- key points: a short path from the question(s) to the answer(s) through the key points only ----
+  const VIA = { why_important: "Why it matters", background: "What was known", setup: "What they did", results: "What they found", conclusion: "What it means" };
+  function keyItems() {
+    const order = [];
+    ["why_important", "background", "setup"].forEach((k) => itemsOf(k).forEach((it, i) => order.push(`${k}:${i}`)));
+    if (analyses.length) analyses.forEach((a, i) => (a.results || []).forEach((r, j) => order.push(`r:${i}:${j}`)));
+    else itemsOf("results").forEach((it, i) => order.push(`results:${i}`));
+    itemsOf("conclusion").forEach((it, i) => order.push(`conclusion:${i}`));
+    let picked = order.filter((pid) => points[pid] && points[pid].it.flag === "key");
+    if (picked.length < 3) picked = order.filter((pid) => points[pid] && ["key", "novel"].includes(points[pid].it.flag));
+    return picked;
+  }
+  const keyPids = keyItems();
+  const keyEl = $("fl-key");
+  (function renderKey() {
+    const hubCard = (kind) => QS.map(({ q, a }, i) => { const o = kind === "Q" ? q : a;
+      const re = kind === "A" && multiQ ? `<div class="re-q">${qTag(i + 1)} ${esc(q.short)}</div>` : "";
+      return re + `<div class="h">${qTag(i + 1, kind)} ${linkText(o.short)}</div>` + (multiQ ? "" : `<p class="muted">${linkText(o.detail)}</p>`); }).join("");
+    let prev = null;
+    const steps = keyPids.map((pid, i) => {
+      const p = points[pid], st = stageOf[p.stage], test = p.test != null ? analyses[p.test] : null;
+      const via = VIA[p.stage] || st.label, arrow = prev !== via;
+      prev = via;
+      return (arrow ? `<div class="kp-arrow" style="--c:${st.color}">↓ ${esc(via)}</div>` : "") +
+        `<li class="kp-step" style="--c:${st.color}"><span class="kp-dot">${i + 1}</span><div class="kp-card">` +
+        `<div class="tag">${test ? qTag(qOf(test)) + " " : ""}${esc(st.label)}${test ? " · " + esc(test.method.headline) : ""}</div>` +
+        `<div class="h">${esc(p.it.headline)} ${p.it.condition ? condTag(p.it.condition) : ""}</div><p>${linkText(p.it.detail)}</p>` +
+        `<div class="kp-more">${moreHtml(p, false)}</div><button class="mini" style="--c:${st.color}" data-kp>More detail</button></div></li>`;
+    }).join("");
+    keyEl.innerHTML = `<p class="kp-intro">The short version: ${keyPids.length} key points that take you from the question${multiQ ? "s" : ""} to the answer${multiQ ? "s" : ""}.</p><ol class="kp">` +
+      `<li class="kp-step hub" style="--c:var(--q)"><span class="kp-dot">?</span><div class="kp-card"><div class="tag">${multiQ ? "The big questions" : "The question"}</div>${hubCard("Q")}</div></li>` +
+      steps + `<div class="kp-arrow" style="--c:var(--a)">↓ So</div>` +
+      `<li class="kp-step hub" style="--c:var(--a)"><span class="kp-dot">✓</span><div class="kp-card"><div class="tag">${multiQ ? "The answers" : "The answer"}</div>${hubCard("A")}</div></li></ol>`;
+  })();
+  keyEl.addEventListener("click", (e) => {
+    if (e.target.closest(".term, a")) return;
+    const g = e.target.closest("[data-goto]"); if (g) { openZoom(conceptView(g.dataset.goto), g, true); return; }
+    const f = e.target.closest(".fig-th"); if (f) { openFig(+f.dataset.fig); return; }
+    const x = e.target.closest(".ex-btn"); if (x) { toggleExtra(x); return; }
+    const m = e.target.closest("[data-kp]");
+    if (m) { const card = m.closest(".kp-card"); const open = card.classList.toggle("open"); m.textContent = open ? "Less" : "More detail"; }
+  });
+  function setMode(mode) {
+    document.querySelectorAll("#fl-mode [data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+    $("fl-full").hidden = mode !== "full"; keyEl.hidden = mode !== "key";
+    if (mode === "key") { document.querySelectorAll("#fl-hl [data-hl]").forEach((x) => x.setAttribute("aria-pressed", "false")); delete $("fl-full").dataset.hl; }
+    window.scrollTo(0, 0);
+    drawFlowWires();
+  }
+  $("fl-mode").addEventListener("click", (e) => { const b = e.target.closest("[data-mode]"); if (b) setMode(b.dataset.mode); });
+
+  // From a concept: open the flow with every point that mentions it unfolded and pulsing.
+  function findInFlow(id) {
+    const pids = mentionsOf[id] || [];
+    if (!pids.length) return;
+    if (onMap()) showFlow();
+    setMode("full");
+    pids.forEach((pid) => {
+      const p = points[pid];
+      setStage(stagesEl.querySelector(`.st[data-key="${p.stage}"]`), true);
+      if (p.test != null) setTest(p.test, true);
+      setPt(ptEl(pid), true);
+    });
+    syncOpenAll(); drawFlowWires();
+    setTimeout(() => {
+      const hits = pids.map(ptEl).filter(Boolean);
+      if (hits[0]) hits[0].scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" });
+      hits.forEach((h) => { h.classList.remove("pulse"); void h.offsetWidth; h.classList.add("pulse"); });
+    }, 60);
+  }
+
+  // ================= full-screen figures =================
+  const figbox = $("figbox");
+  let figCur = -1;
+  function openFig(n) {
+    figCur = figures.findIndex((f) => f.number === n);
+    const f = figures[figCur]; if (!f) return;
+    figbox.querySelector("img").src = f.src;
+    figbox.querySelector("img").alt = `Figure ${f.number}`;
+    figbox.querySelector("figcaption").innerHTML = `<b>Fig. ${f.number}</b> · ${linkText(f.caption)}`;
+    figbox.hidden = false;
+  }
+  const stepFig = (d) => { if (figures.length) openFig(figures[(figCur + d + figures.length) % figures.length].number); };
+  figbox.addEventListener("click", (e) => {
+    if (e.target.closest(".term")) return;
+    if (e.target.closest(".fb-nav")) { stepFig(e.target.closest(".prev") ? -1 : 1); return; }
+    if (!e.target.closest("figcaption")) figbox.hidden = true;
+  });
+  document.addEventListener("keydown", (e) => {
+    if (figbox.hidden) return;
+    if (e.key === "Escape") { e.stopImmediatePropagation(); figbox.hidden = true; }
+    if (e.key === "ArrowRight") stepFig(1);
+    if (e.key === "ArrowLeft") stepFig(-1);
+  }, true);
+
+  // ================= concept-word pop-up =================
+  const pop = $("term-pop");
+  function showPop(term) {
+    const c = byId[term.dataset.c]; if (!c) return;
+    const st = startOf(c), r = st && readings[st.reading];
+    pop.style.setProperty("--c", secColor(c.section));
+    pop.innerHTML = `<button class="x" aria-label="Close" data-x>✕</button><span class="p-tag">${esc(secOf(c.section).name)}</span>` +
+      `<h4>${esc(c.name)}</h4><p>${esc(c.plain)}</p><div class="p-here"><b>Here:</b> ${esc(c.why_here)}</div>` +
+      (r ? `<p style="margin-top:8px"><b>Start here:</b> ${rlink(r)}${st.where ? ` <span class="r-ttl">${esc(st.where)}</span>` : ""} ${srcBadge(r)}</p>` : "") +
+      `<div class="row"><button data-more="${esc(c.id)}">Reading guide</button><button data-pmap="${esc(c.id)}">See it on the mind map</button></div>`;
+    pop.hidden = false;
+    pop._from = term;
+    const rect = term.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
+    pop.style.left = Math.min(Math.max(12, rect.left), innerWidth - pw - 12) + "px";
+    pop.style.top = (rect.bottom + 8 + ph < innerHeight ? rect.bottom + 8 : Math.max(12, rect.top - ph - 8)) + "px";
+  }
+  function hidePop() { pop.hidden = true; }
+  // Capture phase, so clicking a word inside a button doesn't also press the button.
+  document.addEventListener("click", (e) => {
+    const term = e.target.closest(".term[data-c]");
+    if (term) { e.stopPropagation(); e.preventDefault(); showPop(term); return; }
+    if (!pop.hidden && !e.target.closest("#term-pop")) hidePop();
+  }, true);
+  document.addEventListener("keydown", (e) => {
+    const term = e.target.closest && e.target.closest(".term[data-c]");
+    if (term && (e.key === "Enter" || e.key === " ")) { e.stopPropagation(); e.preventDefault(); showPop(term); }
+  }, true);
+  pop.addEventListener("click", (e) => {
+    if (e.target.closest("[data-x]")) hidePop();
+    const more = e.target.closest("[data-more]");
+    if (more) { const from = pop._from; hidePop(); openZoom(conceptView(more.dataset.more), from); }
+    const m = e.target.closest("[data-pmap]"); if (m) { const id = m.dataset.pmap; hidePop(); closeZoomNow(); showMap(id); }
+  });
+  window.addEventListener("scroll", () => { if (!pop.hidden) hidePop(); }, { passive: true });
+  zbody.addEventListener("scroll", () => { if (!pop.hidden) hidePop(); }, { passive: true });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!pop.hidden) hidePop(); else if (!zoomEl.hidden) closeZoom();
+  });
+
+  window.addEventListener("resize", () => { if (onMap()) resize(); });
+  resize(); applyView(); settle();
+  requestAnimationFrame(step);
+})();
+</script>
+</body>
+</html>

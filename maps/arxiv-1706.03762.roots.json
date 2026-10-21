@@ -1,0 +1,1377 @@
+{
+  "title": "Attention Is All You Need",
+  "authors": "Vaswani et al.",
+  "year": "2017",
+  "venue": "NIPS 2017 · arXiv:1706.03762",
+  "tldr": "A translation network built only from attention trains far faster than recurrent models and sets new translation records.",
+  "newcomer": "This paper sits in deep learning for language. To follow it you need how neural networks are built and trained, how earlier models read sentences one word at a time, and what 'attention' meant before this paper made it the whole model.",
+  "sections": [
+    {
+      "key": "basics",
+      "name": "Basics used throughout",
+      "where": "everywhere",
+      "summary": "The mathematics and computing every deep-learning paper takes for granted: vectors, probabilities, neural networks and how cost scales.",
+      "role": "Needed to read the equations, Table 1's complexity comparison and the training-cost numbers.",
+      "key_reads": [
+        "nielsen2015",
+        "3b1b"
+      ]
+    },
+    {
+      "key": "nets",
+      "name": "Neural network building blocks",
+      "where": "§3, §5",
+      "summary": "The standard layers and training tricks that deep networks are assembled from.",
+      "role": "The Transformer combines these familiar parts (embeddings, feed-forward layers, residuals, layer norm, dropout, Adam) around its new attention layers.",
+      "key_reads": [
+        "goodfellow2016",
+        "d2l"
+      ]
+    },
+    {
+      "key": "seq",
+      "name": "Sequence models",
+      "where": "§1–2, §4",
+      "summary": "How networks read and write sequences: recurrence, LSTMs, encoder–decoders and convolutional alternatives.",
+      "role": "The approaches the Transformer replaces, and the reason it can be trained in parallel.",
+      "key_reads": [
+        "karpathy2015",
+        "olah2015"
+      ]
+    },
+    {
+      "key": "eval",
+      "name": "Translation and evaluation",
+      "where": "§5–6",
+      "summary": "The task, data, tokenisation, decoding and scoring used to judge translation models.",
+      "role": "How the results are measured: WMT 2014, byte-pair tokens, beam search, BLEU, and Penn Treebank parsing.",
+      "key_reads": [
+        "koehn2020",
+        "jurafsky"
+      ]
+    },
+    {
+      "key": "attn",
+      "name": "Attention",
+      "where": "§3.2–3.5",
+      "summary": "Letting each word take a weighted look at other words, in place of reading them in order.",
+      "role": "The heart of the paper: scaled dot-product, multi-head self-attention and positional encodings.",
+      "key_reads": [
+        "alammar2018",
+        "rush2018"
+      ]
+    }
+  ],
+  "concepts": [
+    {
+      "id": "linalg",
+      "name": "Vectors and matrices",
+      "section": "basics",
+      "level": 1,
+      "plain": "Words become lists of numbers (vectors); a layer of a network multiplies them by a matrix of learned weights.",
+      "why_here": "Every operation in the Transformer is a matrix multiplication, which is why it runs fast on GPUs.",
+      "terms": [
+        "matrix multiplication",
+        "vectors",
+        "linear transformations",
+        "projections"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "3b1b",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "strang2016",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "prob",
+      "name": "Probability and softmax",
+      "section": "basics",
+      "level": 1,
+      "plain": "Softmax turns a list of scores into probabilities that add up to one; training maximises the probability of the right next word.",
+      "why_here": "Attention weights are a softmax over scores, and the output layer is a softmax over the vocabulary.",
+      "terms": [
+        "softmax",
+        "probabilities",
+        "perplexity"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "goodfellow2016",
+          "role": "start",
+          "where": "Ch. 3 (probability)"
+        },
+        {
+          "reading": "goodfellow2016",
+          "role": "deeper",
+          "where": "Ch. 6 (output units)"
+        }
+      ]
+    },
+    {
+      "id": "nn",
+      "name": "Neural networks and backpropagation",
+      "section": "basics",
+      "level": 1,
+      "plain": "Layers of simple units with adjustable weights, trained by nudging every weight downhill on the error (gradient descent), with gradients computed by backpropagation.",
+      "why_here": "The Transformer is a neural network; the vanishing-gradient and scaling arguments depend on how gradients flow.",
+      "terms": [
+        "neural network",
+        "neural networks",
+        "gradients"
+      ],
+      "prereqs": [
+        "linalg"
+      ],
+      "reads": [
+        {
+          "reading": "nielsen2015",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "goodfellow2016",
+          "role": "deeper",
+          "where": "Ch. 6"
+        },
+        {
+          "reading": "rumelhart1986",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "complexity",
+      "name": "Complexity and parallel computing",
+      "section": "basics",
+      "level": 1,
+      "plain": "Big-O notation says how cost grows with input size; GPUs do many identical operations at once, so work that doesn't depend on earlier steps runs much faster.",
+      "why_here": "The paper's argument is about sequential steps, path length and O(n²·d) cost, and its training cost is in GPU-days and FLOPs.",
+      "terms": [
+        "O(1)",
+        "O(n)",
+        "O(n²·d)",
+        "O(n²)",
+        "GPUs",
+        "FLOPs",
+        "parallelised"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "clrs2009",
+          "role": "start",
+          "where": "Ch. 3 (growth of functions)"
+        }
+      ]
+    },
+    {
+      "id": "embeddings",
+      "name": "Word embeddings",
+      "section": "nets",
+      "level": 2,
+      "plain": "Each word (or word piece) is mapped to a learned vector, so similar words end up close together.",
+      "why_here": "Input and output tokens are embedded into 512-dimensional vectors, sharing weights with the output layer.",
+      "terms": [
+        "embeddings",
+        "embedding"
+      ],
+      "prereqs": [
+        "nn",
+        "linalg"
+      ],
+      "reads": [
+        {
+          "reading": "jurafsky",
+          "role": "start",
+          "where": "Ch. 6 (vector semantics and embeddings)"
+        },
+        {
+          "reading": "mikolov2013",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "press2016",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "ffn",
+      "name": "Feed-forward layers and ReLU",
+      "section": "nets",
+      "level": 2,
+      "plain": "A fully connected layer applies a matrix and a simple non-linearity; ReLU keeps positive values and zeroes negatives.",
+      "why_here": "Each Transformer layer has a position-wise feed-forward network with a ReLU in between.",
+      "terms": [
+        "feed-forward",
+        "ReLU"
+      ],
+      "prereqs": [
+        "nn"
+      ],
+      "reads": [
+        {
+          "reading": "goodfellow2016",
+          "role": "start",
+          "where": "Ch. 6"
+        },
+        {
+          "reading": "nair2010",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "residual",
+      "name": "Residual connections",
+      "section": "nets",
+      "level": 2,
+      "plain": "Adding a layer's input to its output (x + f(x)) lets signals and gradients skip past layers, making very deep networks trainable.",
+      "why_here": "Every sub-layer is wrapped in a residual connection.",
+      "terms": [
+        "residual"
+      ],
+      "prereqs": [
+        "nn"
+      ],
+      "reads": [
+        {
+          "reading": "d2l",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "he2016",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "layernorm",
+      "name": "Layer normalisation",
+      "section": "nets",
+      "level": 2,
+      "plain": "Rescales each vector to zero mean and unit variance before passing it on, which keeps training stable.",
+      "why_here": "Applied after every residual connection: LayerNorm(x + Sublayer(x)).",
+      "terms": [
+        "layer normalisation",
+        "layer normalization",
+        "layer norm"
+      ],
+      "prereqs": [
+        "nn"
+      ],
+      "reads": [
+        {
+          "reading": "d2l",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "ba2016",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "regularisation",
+      "name": "Dropout and label smoothing",
+      "section": "nets",
+      "level": 2,
+      "plain": "Ways to stop a network memorising its training data: randomly switching off units (dropout), or softening the target probabilities (label smoothing).",
+      "why_here": "Both are used in training; the ablations show dropout matters.",
+      "terms": [
+        "dropout",
+        "label smoothing",
+        "over-fitting"
+      ],
+      "prereqs": [
+        "nn"
+      ],
+      "reads": [
+        {
+          "reading": "goodfellow2016",
+          "role": "start",
+          "where": "Ch. 7"
+        },
+        {
+          "reading": "srivastava2014",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "szegedy2016",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "adam",
+      "name": "Adam and learning-rate schedules",
+      "section": "nets",
+      "level": 2,
+      "plain": "Adam adapts each weight's step size from running averages of its gradients; a schedule warms the learning rate up and then decays it.",
+      "why_here": "Training uses Adam with a 4000-step warm-up and inverse-square-root decay.",
+      "terms": [
+        "Adam",
+        "learning rate",
+        "warm-up"
+      ],
+      "prereqs": [
+        "nn"
+      ],
+      "reads": [
+        {
+          "reading": "goodfellow2016",
+          "role": "start",
+          "where": "Ch. 8"
+        },
+        {
+          "reading": "kingma2015",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "cnn",
+      "name": "Convolutional networks",
+      "section": "nets",
+      "level": 2,
+      "plain": "Layers that slide the same small filter along the input, so each output sees only a local window.",
+      "why_here": "Convolutional translation models are one of the two alternatives the paper compares against.",
+      "terms": [
+        "convolution",
+        "convolutions",
+        "convolutional"
+      ],
+      "prereqs": [
+        "nn"
+      ],
+      "reads": [
+        {
+          "reading": "goodfellow2016",
+          "role": "start",
+          "where": "Ch. 9"
+        }
+      ]
+    },
+    {
+      "id": "lm",
+      "name": "Language modelling and autoregression",
+      "section": "seq",
+      "level": 2,
+      "plain": "Predicting the next word from the words so far; generating text by repeatedly feeding each prediction back in (autoregression).",
+      "why_here": "The decoder is autoregressive, which is why its self-attention must be masked.",
+      "terms": [
+        "auto-regressive",
+        "autoregressive",
+        "next-token",
+        "language modeling"
+      ],
+      "prereqs": [
+        "prob"
+      ],
+      "reads": [
+        {
+          "reading": "jurafsky",
+          "role": "start",
+          "where": "Ch. 3 (n-gram language models)"
+        },
+        {
+          "reading": "graves2013",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "rnn",
+      "name": "Recurrent neural networks",
+      "section": "seq",
+      "level": 2,
+      "plain": "Networks that read a sequence one step at a time, carrying a hidden state forward, so step t can't start before step t−1 finishes.",
+      "why_here": "The model the Transformer replaces; its sequential nature is the problem being solved.",
+      "terms": [
+        "recurrent",
+        "Recurrent",
+        "recurrence",
+        "RNN",
+        "RNNs"
+      ],
+      "prereqs": [
+        "nn",
+        "lm"
+      ],
+      "reads": [
+        {
+          "reading": "karpathy2015",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "goodfellow2016",
+          "role": "deeper",
+          "where": "Ch. 10"
+        }
+      ]
+    },
+    {
+      "id": "lstm",
+      "name": "LSTMs and long-range dependencies",
+      "section": "seq",
+      "level": 3,
+      "plain": "Gated recurrent units that keep information over longer spans; even so, signals between distant words must pass through many steps, and gradients fade along the way.",
+      "why_here": "The path-length argument for self-attention is about exactly this difficulty.",
+      "terms": [
+        "LSTM",
+        "long-range dependencies",
+        "long-term dependencies",
+        "path length"
+      ],
+      "prereqs": [
+        "rnn"
+      ],
+      "reads": [
+        {
+          "reading": "olah2015",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "hochreiter1997",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "hochreiter2001",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "chung2014",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "seq2seq",
+      "name": "Encoder–decoder (seq2seq)",
+      "section": "seq",
+      "level": 3,
+      "plain": "One network encodes the input sentence into vectors; another decodes them into the output sentence, word by word.",
+      "why_here": "The Transformer keeps this structure, building both halves from attention.",
+      "terms": [
+        "encoder–decoder",
+        "encoder-decoder",
+        "encoder",
+        "decoder"
+      ],
+      "prereqs": [
+        "rnn",
+        "embeddings"
+      ],
+      "reads": [
+        {
+          "reading": "jurafsky",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "sutskever2014",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "cho2014",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "convseq",
+      "name": "Convolutional sequence models",
+      "section": "seq",
+      "level": 4,
+      "plain": "Translation models built from convolutions (ByteNet, ConvS2S) that process all positions in parallel, but need several layers to connect distant words.",
+      "why_here": "The paper's closest competitors; ConvS2S also supplies the learned positional embeddings it compares with.",
+      "terms": [
+        "ByteNet",
+        "ConvS2S"
+      ],
+      "prereqs": [
+        "cnn",
+        "seq2seq",
+        "complexity"
+      ],
+      "reads": [
+        {
+          "reading": "gehring2017",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "kalchbrenner2017",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "mt",
+      "name": "Machine translation and WMT",
+      "section": "eval",
+      "level": 2,
+      "plain": "Automatically translating text between languages; WMT is the yearly shared benchmark with standard training and test sets.",
+      "why_here": "The main task: WMT 2014 English→German and English→French.",
+      "terms": [
+        "translation",
+        "WMT",
+        "EN→DE",
+        "EN→FR"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "koehn2020",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "wu2016",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "tokenisation",
+      "name": "Subword tokens (byte-pair encoding)",
+      "section": "eval",
+      "level": 3,
+      "plain": "Splitting words into frequent pieces so rare words can still be represented with a fixed vocabulary.",
+      "why_here": "Sentences are encoded with a 37k byte-pair vocabulary (German) or 32k word pieces (French).",
+      "terms": [
+        "byte-pair",
+        "word pieces",
+        "word-piece",
+        "tokens"
+      ],
+      "prereqs": [
+        "mt"
+      ],
+      "reads": [
+        {
+          "reading": "jurafsky",
+          "role": "start",
+          "where": "Ch. 2 (text normalisation, BPE)"
+        },
+        {
+          "reading": "sennrich2016",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "wu2016",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "beam",
+      "name": "Beam search",
+      "section": "eval",
+      "level": 3,
+      "plain": "Instead of always taking the single most likely next word, keep the few best partial translations at each step.",
+      "why_here": "Used at test time with beam size 4 and a length penalty.",
+      "terms": [
+        "beam search",
+        "beam size"
+      ],
+      "prereqs": [
+        "prob",
+        "seq2seq"
+      ],
+      "reads": [
+        {
+          "reading": "jurafsky",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "wu2016",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "bleu",
+      "name": "BLEU score",
+      "section": "eval",
+      "level": 2,
+      "plain": "An automatic translation score (0–100) based on how many word sequences overlap with human reference translations.",
+      "why_here": "All translation results are reported in BLEU.",
+      "terms": [
+        "BLEU"
+      ],
+      "prereqs": [
+        "mt"
+      ],
+      "reads": [
+        {
+          "reading": "jurafsky",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "papineni2002",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "parsing",
+      "name": "Constituency parsing",
+      "section": "eval",
+      "level": 3,
+      "plain": "Recovering the phrase structure of a sentence as a tree; the Penn Treebank's Wall Street Journal section is the standard test, scored by F1.",
+      "why_here": "The test of whether the Transformer works beyond translation.",
+      "terms": [
+        "constituency parsing",
+        "parsing",
+        "Penn Treebank",
+        "WSJ",
+        "F1"
+      ],
+      "prereqs": [
+        "seq2seq"
+      ],
+      "reads": [
+        {
+          "reading": "jurafsky",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "marcus1993",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "vinyals2015",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "qkv",
+      "name": "Queries, keys and values",
+      "section": "attn",
+      "level": 3,
+      "plain": "A soft lookup: a query is compared with every key, the scores become weights, and the output is the weighted average of the values.",
+      "why_here": "The paper defines all its attention in these terms.",
+      "terms": [
+        "queries",
+        "keys",
+        "values",
+        "query"
+      ],
+      "prereqs": [
+        "linalg",
+        "prob"
+      ],
+      "reads": [
+        {
+          "reading": "alammar2018",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "sukhbaatar2015",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "masking",
+      "name": "Masked decoder attention",
+      "section": "attn",
+      "level": 3,
+      "plain": "Hiding future positions (setting their scores to −∞) so each word can only attend to the words before it.",
+      "why_here": "Keeps the decoder autoregressive while training on whole sentences at once.",
+      "terms": [
+        "masking",
+        "masked"
+      ],
+      "prereqs": [
+        "lm",
+        "qkv"
+      ],
+      "reads": [
+        {
+          "reading": "rush2018",
+          "role": "start",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "attention",
+      "name": "Attention in translation",
+      "section": "attn",
+      "level": 4,
+      "plain": "Letting the decoder take a weighted look at all source words at each step, rather than squeezing the sentence into one vector.",
+      "why_here": "The ingredient the paper keeps while throwing away recurrence.",
+      "terms": [
+        "attention",
+        "Attention",
+        "alignment"
+      ],
+      "prereqs": [
+        "seq2seq",
+        "qkv"
+      ],
+      "reads": [
+        {
+          "reading": "olah2016",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "bahdanau2014",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "luong2015",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "selfattn",
+      "name": "Self-attention",
+      "section": "attn",
+      "level": 4,
+      "plain": "Attention within a single sequence: every word builds its new representation by attending to every other word of the same sentence.",
+      "why_here": "The core of both encoder and decoder, connecting any two words in a single step.",
+      "terms": [
+        "self-attention",
+        "Self-attention",
+        "intra-attention"
+      ],
+      "prereqs": [
+        "attention"
+      ],
+      "reads": [
+        {
+          "reading": "alammar2018",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "cheng2016",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "parikh2016",
+          "role": "builds_on",
+          "where": ""
+        },
+        {
+          "reading": "lin2017",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "scaled",
+      "name": "Scaled dot-product attention",
+      "section": "attn",
+      "level": 4,
+      "plain": "Scores are dot products of queries and keys divided by √d_k, so they don't grow with dimension and push the softmax into regions with tiny gradients.",
+      "why_here": "The paper's attention function; the scaling is its fix for large key sizes.",
+      "terms": [
+        "scaled dot-product",
+        "dot-product",
+        "√d_k",
+        "d_k"
+      ],
+      "prereqs": [
+        "selfattn"
+      ],
+      "reads": [
+        {
+          "reading": "alammar2018",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "luong2015",
+          "role": "builds_on",
+          "where": ""
+        },
+        {
+          "reading": "britz2017",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "multihead",
+      "name": "Multi-head attention",
+      "section": "attn",
+      "level": 4,
+      "plain": "Running several attention operations in parallel on different learned projections, so different heads can track different relationships.",
+      "why_here": "Uses 8 heads; ablations show 1 head is 0.9 BLEU worse.",
+      "terms": [
+        "multi-head",
+        "Multi-head",
+        "heads"
+      ],
+      "prereqs": [
+        "scaled"
+      ],
+      "reads": [
+        {
+          "reading": "alammar2018",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "rush2018",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "posenc",
+      "name": "Positional encoding",
+      "section": "attn",
+      "level": 4,
+      "plain": "Attention ignores order, so a signal giving each position's place in the sentence is added to its embedding: here, sine and cosine waves of different wavelengths.",
+      "why_here": "The paper's way of giving the model word order without recurrence.",
+      "terms": [
+        "positional encodings",
+        "positional encoding",
+        "sinusoids",
+        "sine and cosine",
+        "learned positions"
+      ],
+      "prereqs": [
+        "selfattn",
+        "embeddings"
+      ],
+      "reads": [
+        {
+          "reading": "alammar2018",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "gehring2017",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    }
+  ],
+  "readings": [
+    {
+      "id": "goodfellow2016",
+      "label": "Goodfellow, Bengio & Courville 2016",
+      "title": "Deep Learning",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://www.deeplearningbook.org",
+      "note": "free online"
+    },
+    {
+      "id": "nielsen2015",
+      "label": "Nielsen 2015",
+      "title": "Neural Networks and Deep Learning",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "http://neuralnetworksanddeeplearning.com",
+      "note": "free online, very gentle"
+    },
+    {
+      "id": "d2l",
+      "label": "Zhang, Lipton, Li & Smola",
+      "title": "Dive into Deep Learning",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://d2l.ai",
+      "note": "free online, with runnable code"
+    },
+    {
+      "id": "jurafsky",
+      "label": "Jurafsky & Martin",
+      "title": "Speech and Language Processing (3rd ed. draft)",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://web.stanford.edu/~jurafsky/slp3/",
+      "note": "free online"
+    },
+    {
+      "id": "strang2016",
+      "label": "Strang 2016",
+      "title": "Introduction to Linear Algebra (5th ed.)",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "clrs2009",
+      "label": "Cormen et al. 2009",
+      "title": "Introduction to Algorithms (3rd ed.)",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "koehn2020",
+      "label": "Koehn 2020",
+      "title": "Neural Machine Translation",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the field this paper changed"
+    },
+    {
+      "id": "3b1b",
+      "label": "3Blue1Brown",
+      "title": "Essence of Linear Algebra (video series)",
+      "kind": "notes",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://www.3blue1brown.com/topics/linear-algebra",
+      "note": "visual, no background needed"
+    },
+    {
+      "id": "alammar2018",
+      "label": "Alammar 2018",
+      "title": "The Illustrated Transformer",
+      "kind": "notes",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://jalammar.github.io/illustrated-transformer/",
+      "note": "the best picture-book walk-through of this paper"
+    },
+    {
+      "id": "rush2018",
+      "label": "Rush 2018",
+      "title": "The Annotated Transformer",
+      "kind": "notes",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://nlp.seas.harvard.edu/2018/04/03/attention.html",
+      "note": "this paper, line by line in code"
+    },
+    {
+      "id": "olah2015",
+      "label": "Olah 2015",
+      "title": "Understanding LSTM Networks",
+      "kind": "notes",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://colah.github.io/posts/2015-08-Understanding-LSTMs/",
+      "note": "the classic explainer"
+    },
+    {
+      "id": "karpathy2015",
+      "label": "Karpathy 2015",
+      "title": "The Unreasonable Effectiveness of Recurrent Neural Networks",
+      "kind": "notes",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://karpathy.github.io/2015/05/21/rnn-effectiveness/",
+      "note": ""
+    },
+    {
+      "id": "olah2016",
+      "label": "Olah & Carter 2016",
+      "title": "Attention and Augmented Recurrent Neural Networks",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://distill.pub/2016/augmented-rnns/",
+      "note": "interactive, pre-Transformer"
+    },
+    {
+      "id": "rumelhart1986",
+      "label": "Rumelhart, Hinton & Williams 1986",
+      "title": "Learning representations by back-propagating errors",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "mikolov2013",
+      "label": "Mikolov et al. 2013",
+      "title": "Efficient estimation of word representations in vector space",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "word2vec"
+    },
+    {
+      "id": "nair2010",
+      "label": "Nair & Hinton 2010",
+      "title": "Rectified linear units improve restricted Boltzmann machines",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "ReLU"
+    },
+    {
+      "id": "papineni2002",
+      "label": "Papineni et al. 2002",
+      "title": "BLEU: a method for automatic evaluation of machine translation",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "ba2016",
+      "label": "Ba, Kiros & Hinton 2016",
+      "title": "Layer normalization",
+      "kind": "paper",
+      "cited": 1,
+      "doi": "",
+      "arxiv": "1607.06450",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "bahdanau2014",
+      "label": "Bahdanau, Cho & Bengio 2014",
+      "title": "Neural machine translation by jointly learning to align and translate",
+      "kind": "classic",
+      "cited": 2,
+      "doi": "",
+      "arxiv": "1409.0473",
+      "url": "",
+      "note": "where attention began"
+    },
+    {
+      "id": "britz2017",
+      "label": "Britz et al. 2017",
+      "title": "Massive exploration of neural machine translation architectures",
+      "kind": "paper",
+      "cited": 3,
+      "doi": "",
+      "arxiv": "1703.03906",
+      "url": "",
+      "note": "why the √d_k scaling was needed"
+    },
+    {
+      "id": "cheng2016",
+      "label": "Cheng, Dong & Lapata 2016",
+      "title": "Long short-term memory-networks for machine reading",
+      "kind": "paper",
+      "cited": 4,
+      "doi": "",
+      "arxiv": "1601.06733",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "cho2014",
+      "label": "Cho et al. 2014",
+      "title": "Learning phrase representations using RNN encoder-decoder for statistical machine translation",
+      "kind": "classic",
+      "cited": 5,
+      "doi": "",
+      "arxiv": "1406.1078",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "chung2014",
+      "label": "Chung et al. 2014",
+      "title": "Empirical evaluation of gated recurrent neural networks on sequence modeling",
+      "kind": "paper",
+      "cited": 7,
+      "doi": "",
+      "arxiv": "1412.3555",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "gehring2017",
+      "label": "Gehring et al. 2017 (ConvS2S)",
+      "title": "Convolutional sequence to sequence learning",
+      "kind": "paper",
+      "cited": 9,
+      "doi": "",
+      "arxiv": "1705.03122",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "graves2013",
+      "label": "Graves 2013",
+      "title": "Generating sequences with recurrent neural networks",
+      "kind": "paper",
+      "cited": 10,
+      "doi": "",
+      "arxiv": "1308.0850",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "he2016",
+      "label": "He et al. 2016 (ResNet)",
+      "title": "Deep residual learning for image recognition",
+      "kind": "classic",
+      "cited": 11,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "hochreiter2001",
+      "label": "Hochreiter et al. 2001",
+      "title": "Gradient flow in recurrent nets: the difficulty of learning long-term dependencies",
+      "kind": "paper",
+      "cited": 12,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "hochreiter1997",
+      "label": "Hochreiter & Schmidhuber 1997",
+      "title": "Long short-term memory",
+      "kind": "classic",
+      "cited": 13,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "kalchbrenner2017",
+      "label": "Kalchbrenner et al. 2017 (ByteNet)",
+      "title": "Neural machine translation in linear time",
+      "kind": "paper",
+      "cited": 18,
+      "doi": "",
+      "arxiv": "1610.10099",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "kingma2015",
+      "label": "Kingma & Ba 2015",
+      "title": "Adam: A method for stochastic optimization",
+      "kind": "classic",
+      "cited": 20,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "lin2017",
+      "label": "Lin et al. 2017",
+      "title": "A structured self-attentive sentence embedding",
+      "kind": "paper",
+      "cited": 22,
+      "doi": "",
+      "arxiv": "1703.03130",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "luong2015",
+      "label": "Luong, Pham & Manning 2015",
+      "title": "Effective approaches to attention-based neural machine translation",
+      "kind": "paper",
+      "cited": 24,
+      "doi": "",
+      "arxiv": "1508.04025",
+      "url": "",
+      "note": "dot-product attention"
+    },
+    {
+      "id": "marcus1993",
+      "label": "Marcus et al. 1993",
+      "title": "Building a large annotated corpus of English: the Penn Treebank",
+      "kind": "classic",
+      "cited": 25,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "parikh2016",
+      "label": "Parikh et al. 2016",
+      "title": "A decomposable attention model",
+      "kind": "paper",
+      "cited": 27,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "attention without an RNN"
+    },
+    {
+      "id": "press2016",
+      "label": "Press & Wolf 2016",
+      "title": "Using the output embedding to improve language models",
+      "kind": "paper",
+      "cited": 30,
+      "doi": "",
+      "arxiv": "1608.05859",
+      "url": "",
+      "note": "the weight sharing used here"
+    },
+    {
+      "id": "sennrich2016",
+      "label": "Sennrich, Haddow & Birch 2015",
+      "title": "Neural machine translation of rare words with subword units",
+      "kind": "classic",
+      "cited": 31,
+      "doi": "",
+      "arxiv": "1508.07909",
+      "url": "",
+      "note": "byte-pair encoding"
+    },
+    {
+      "id": "srivastava2014",
+      "label": "Srivastava et al. 2014",
+      "title": "Dropout: a simple way to prevent neural networks from overfitting",
+      "kind": "classic",
+      "cited": 33,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "sukhbaatar2015",
+      "label": "Sukhbaatar et al. 2015",
+      "title": "End-to-end memory networks",
+      "kind": "paper",
+      "cited": 34,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "queries over a memory of keys and values"
+    },
+    {
+      "id": "sutskever2014",
+      "label": "Sutskever, Vinyals & Le 2014",
+      "title": "Sequence to sequence learning with neural networks",
+      "kind": "classic",
+      "cited": 35,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "szegedy2016",
+      "label": "Szegedy et al. 2015",
+      "title": "Rethinking the inception architecture for computer vision",
+      "kind": "paper",
+      "cited": 36,
+      "doi": "",
+      "arxiv": "1512.00567",
+      "url": "",
+      "note": "label smoothing"
+    },
+    {
+      "id": "vinyals2015",
+      "label": "Vinyals & Kaiser et al. 2015",
+      "title": "Grammar as a foreign language",
+      "kind": "paper",
+      "cited": 37,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "wu2016",
+      "label": "Wu et al. 2016 (GNMT)",
+      "title": "Google's neural machine translation system: bridging the gap between human and machine translation",
+      "kind": "paper",
+      "cited": 38,
+      "doi": "",
+      "arxiv": "1609.08144",
+      "url": "",
+      "note": "the state of the art it beat"
+    }
+  ],
+  "shortlist": [
+    "nielsen2015",
+    "jurafsky",
+    "olah2015",
+    "alammar2018"
+  ]
+}

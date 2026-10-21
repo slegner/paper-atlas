@@ -1,0 +1,630 @@
+{
+  "title": "Alleviating the Hubble tension with Torsion Condensation (TorC)",
+  "authors": "Legner, Handley, Barker & Ormondroyd",
+  "year": "2025 (published 2026)",
+  "venue": "JCAP 03 (2026) 003 · arXiv:2507.09228",
+  "tldr": "A gauge-theory version of gravity with an extra 'torsion' field speeds up the early Universe's expansion, which lets the CMB accept a higher Hubble constant and removes the Planck–SH0ES disagreement. The Bayesian evidence still does not prefer it over standard ΛCDM.",
+  "question": {
+    "short": "Can torsion in a gauge theory of gravity resolve the Hubble tension?",
+    "detail": "The CMB (Planck) and local supernovae (SH0ES) disagree on how fast the Universe expands today. The authors test whether Torsion Condensation, an extension of GR that contains ΛCDM as a special case, can make the two consistent."
+  },
+  "answer": {
+    "short": "Partly. TorC removes the Planck–SH0ES tension (log R: −5.6 → +0.7), but Bayesian evidence doesn't decisively favour it over ΛCDM.",
+    "detail": "Torsion acts like extra radiation early on, which shrinks the sound horizon and allows a higher H₀. The better fit is roughly cancelled by the Occam penalty for two extra parameters. With Planck alone, ΛCDM is strongly preferred."
+  },
+  "why_important": [
+    {
+      "headline": "~5σ Hubble tension in ΛCDM",
+      "detail": "The early-Universe (CMB) and late-Universe (Cepheid/supernova) measurements of H₀ disagree beyond what statistical noise can explain.",
+      "refs": [
+        1,
+        2
+      ],
+      "flag": "key"
+    },
+    {
+      "headline": "Gravity isn't a gauge theory yet",
+      "detail": "The other forces are gauge theories. Gauging the Poincaré group is a principled way to build gravity the same way, and it may help with quantisation.",
+      "refs": [
+        3
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "New physics with a deeper motivation",
+      "detail": "Unlike early dark energy, which adds a scalar field chosen for convenience, here the extra degree of freedom comes from the structure of gravity itself.",
+      "refs": [
+        7
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Upcoming surveys can test it",
+      "detail": "Euclid, Rubin, Roman, LISA and Simons Observatory will probe gravity across scales, so now is a good time to make predictions.",
+      "refs": [],
+      "flag": "none"
+    }
+  ],
+  "background": [
+    {
+      "headline": "Torsion: parallelograms that don't close",
+      "detail": "In GR spacetime only curves. Poincaré gauge theory also allows torsion, a twisting of spacetime, as a dynamical field.",
+      "refs": [],
+      "flag": "none"
+    },
+    {
+      "headline": "Ghost- and tachyon-free PGT catalogue",
+      "detail": "Earlier work used spin-projection operators to find Poincaré gauge theories without unphysical modes. TorC is the most developed model from that catalogue.",
+      "refs": [
+        3,
+        4
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Condensation recovers Einstein gravity",
+      "detail": "When torsion condenses (T² ~ M_P²), the Einstein–Hilbert term emerges, so GR is recovered without being put in by hand.",
+      "refs": [
+        5
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Maps to a two-scalar-field theory",
+      "detail": "In a homogeneous, isotropic Universe the 24 torsion components reduce to two scalar fields. That makes the cosmology tractable.",
+      "refs": [
+        5
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Earlier hint: torsion as dark radiation",
+      "detail": "Previous background-cosmology work found that torsion acts like extra early radiation, which could matter for H₀.",
+      "refs": [
+        6
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Early dark energy as a template",
+      "detail": "The standard trick: raise the early expansion rate so the sound horizon shrinks and the CMB-inferred H₀ goes up.",
+      "refs": [
+        7,
+        8
+      ],
+      "flag": "none"
+    }
+  ],
+  "setup": [
+    {
+      "headline": "Two new parameters: ΩΛ and ϖᵣ",
+      "detail": "The bare dark-energy density (no longer forced to make the densities sum to 1) and the early-Universe torsion field value. ϖᵣ = 1 gives back ΛCDM.",
+      "refs": [],
+      "flag": "none"
+    },
+    {
+      "headline": "Torsion folded into effective dark energy",
+      "detail": "The torsion terms are recast as a time-varying effective dark-energy density and pressure, fed to a modified CAMB as tabulated ρ(a), P(a). Using ρ and P directly avoids the poles in w = P/ρ, so the full (ΩΛ, ϖᵣ) space can be explored. The modified CAMB and Cobaya are public.",
+      "refs": [
+        9,
+        11
+      ],
+      "flag": "novel"
+    },
+    {
+      "headline": "Modified CAMB, background only",
+      "detail": "CAMB reads tabulated ρ(a) and P(a). Perturbations are kept as in ΛCDM; TorC perturbation theory doesn't exist yet.",
+      "refs": [
+        9
+      ],
+      "flag": "caveat"
+    },
+    {
+      "headline": "TorC fitted to full Planck + SH0ES data",
+      "detail": "Earlier TorC work (Barker et al. 2020b) analysed the background cosmology. Here the model is run through a Boltzmann code and fitted to the Planck 2018 TT/TE/EE + lensing likelihoods plus SH0ES (H₀ = 73.04 ± 1.04 km/s/Mpc).",
+      "refs": [
+        6,
+        13,
+        2
+      ],
+      "flag": "novel"
+    },
+    {
+      "headline": "PolyChord nested sampling via Cobaya",
+      "detail": "8 parameters with uniform priors, 1000 live points. This gives both posteriors and Bayesian evidence.",
+      "refs": [
+        10,
+        11
+      ],
+      "flag": "none"
+    }
+  ],
+  "analyses": [
+    {
+      "method": {
+        "headline": "What do the two new parameters do?",
+        "detail": "change ΩΛ or ϖᵣ one at a time in modified CAMB; compare the Hubble horizon and CMB spectrum.",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "Faster early expansion, smaller sound horizon",
+          "detail": "Torsion acts like extra radiation early on (w = 1/3). The sound horizon shrinks, CMB peaks move to higher ℓ and grow. This is the same lever early dark energy pulls.",
+          "refs": [
+            7
+          ],
+          "flag": "key",
+          "condition": "ϖᵣ < 1"
+        },
+        {
+          "headline": "Peaks shift to lower ℓ, grow taller",
+          "detail": "Bare dark energy mainly changes late-time expansion; decoupling happens earlier.",
+          "refs": [],
+          "flag": "none",
+          "condition": "lower ΩΛ"
+        }
+      ]
+    },
+    {
+      "method": {
+        "headline": "What H₀ do the data allow in TorC?",
+        "detail": "nested-sampling fit of all 8 parameters, on Planck alone and on Planck + SH0ES.",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "H₀ allowed higher by broadening, not shifting",
+          "detail": "The H₀ posterior widens upward so SH0ES is no longer an outlier, but its peak can stay below the SH0ES value. The tension eases because the uncertainty grows, not because the CMB now prefers 73.",
+          "refs": [],
+          "flag": "caveat",
+          "condition": "Planck only"
+        },
+        {
+          "headline": "H₀ rises as ϖᵣ falls and ΩΛ rises",
+          "detail": "More early torsion and more bare dark energy both push H₀ up.",
+          "refs": [],
+          "flag": "none",
+          "condition": "Planck only"
+        },
+        {
+          "headline": "One fit consistent with both datasets",
+          "detail": "The joint posterior sits comfortably with both Planck and SH0ES (and TRGB). The CMB spectrum stays very close to Planck's ΛCDM best fit.",
+          "refs": [
+            2
+          ],
+          "flag": "none",
+          "condition": "Planck + SH0ES"
+        },
+        {
+          "headline": "S₈ nudged toward KiDS-1000",
+          "detail": "Lower S₈ allowed, but TorC perturbations are missing, so this isn't reliable. KiDS-Legacy now agrees with Planck anyway.",
+          "refs": [
+            16
+          ],
+          "flag": "caveat",
+          "condition": "Planck + SH0ES"
+        }
+      ]
+    },
+    {
+      "method": {
+        "headline": "Do Planck and SH0ES agree?",
+        "detail": "R-statistic, computed within each model (log R < 0 means tension).",
+        "refs": [
+          14
+        ],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "log R = −5.60 ± 0.28: strong tension",
+          "detail": "The familiar Hubble tension.",
+          "refs": [],
+          "flag": "none",
+          "condition": "ΛCDM"
+        },
+        {
+          "headline": "log R = +0.70 ± 0.27: consistent",
+          "detail": "With torsion, the two datasets no longer disagree.",
+          "refs": [],
+          "flag": "key",
+          "condition": "TorC"
+        }
+      ]
+    },
+    {
+      "method": {
+        "headline": "Is TorC preferred over ΛCDM?",
+        "detail": "Bayes factor Δlog Z = log Z_TorC − log Z_ΛCDM = fit gain − Occam penalty.",
+        "refs": [
+          10
+        ],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "Δlog Z = −5.63: ΛCDM strongly preferred",
+          "detail": "Fit improves only slightly (+0.42) and the penalty (−6.04) dominates.",
+          "refs": [],
+          "flag": "key",
+          "condition": "Planck only"
+        },
+        {
+          "headline": "Δlog Z = +0.73: roughly a draw",
+          "detail": "Fit improves a lot (+6.79), but the same penalty (−6.07) nearly cancels it. TorC is not decisively favoured.",
+          "refs": [],
+          "flag": "key",
+          "condition": "Planck + SH0ES"
+        }
+      ]
+    },
+    {
+      "method": {
+        "headline": "Does Big Bang nucleosynthesis change anything?",
+        "detail": "validation run feeding torsion's extra ΔN_eff into the helium abundance (Appendix C).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "Conclusions unchanged",
+          "detail": "Including torsion's effect on primordial helium doesn't significantly change the results.",
+          "refs": [],
+          "flag": "none"
+        }
+      ]
+    }
+  ],
+  "conclusion": [
+    {
+      "headline": "A physically motivated route to higher H₀",
+      "detail": "TorC makes Planck and SH0ES statistically compatible using torsion that comes from gauging gravity, not an ad-hoc field.",
+      "refs": [],
+      "flag": "key"
+    },
+    {
+      "headline": "Not favoured over ΛCDM yet",
+      "detail": "Two extra parameters cost about as much evidence as the better fit gains.",
+      "refs": [],
+      "flag": "none"
+    },
+    {
+      "headline": "Caveat: background only",
+      "detail": "Perturbations are borrowed from GR, so S₈ and detailed CMB predictions are provisional. BBN effects were checked and don't change the conclusions.",
+      "refs": [],
+      "flag": "caveat"
+    },
+    {
+      "headline": "Caveat: quantum consistency open",
+      "detail": "Ghost/tachyon conditions are known only around zero torsion, not for the condensed phase. Strong coupling is a possible problem.",
+      "refs": [],
+      "flag": "caveat"
+    },
+    {
+      "headline": "Next: DESI BAO, curvature, torsional Λ",
+      "detail": "Add DESI data, let torsion itself drive acceleration (λ ≠ 0), allow spatial curvature, and build perturbation theory.",
+      "refs": [
+        17
+      ],
+      "flag": "none"
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Hubble tension",
+      "meaning": "The CMB predicts H₀ ≈ 67 km/s/Mpc while local distance-ladder measurements give ≈ 73; the gap is about 5σ."
+    },
+    {
+      "term": "Torsion",
+      "meaning": "A twist of spacetime: carry two vectors along each other and the parallelogram they trace doesn't close. GR sets it to zero."
+    },
+    {
+      "term": "Poincaré gauge theory (PGT)",
+      "meaning": "Gravity built like the other forces, by making spacetime translations and rotations local symmetries. Curvature and torsion are the field strengths."
+    },
+    {
+      "term": "Torsion condensation",
+      "meaning": "The torsion field settles to a large constant value (ϖ → 1), which makes the theory behave like GR. ϖᵣ ≠ 1 means the early Universe was different."
+    },
+    {
+      "term": "Sound horizon (r*, θ_s)",
+      "meaning": "How far sound travelled in the early plasma before the CMB formed. Its angular size is measured precisely, which ties H₀ to the early expansion rate."
+    },
+    {
+      "term": "Bayes factor (Δlog Z)",
+      "meaning": "Evidence ratio between two models. It rewards good fit and penalises extra parameters (the KL-divergence term)."
+    },
+    {
+      "term": "R-statistic",
+      "meaning": "Measures whether two datasets agree within a model. log R < 0 means tension, log R > 0 means consistency."
+    },
+    {
+      "term": "Nested sampling",
+      "meaning": "A sampling algorithm (here PolyChord) that computes posteriors and the Bayesian evidence at the same time."
+    }
+  ],
+  "references": [
+    {
+      "id": 1,
+      "label": "Verde, Treu & Riess 2019",
+      "title": "Tensions between the Early and the Late Universe",
+      "doi": "",
+      "arxiv": "1907.10625"
+    },
+    {
+      "id": 2,
+      "label": "Riess et al. 2021 (SH0ES)",
+      "title": "Cosmic Distances Calibrated to 1% Precision with Gaia EDR3 Parallaxes and HST Photometry of 75 Milky Way Cepheids Confirm Tension with ΛCDM",
+      "doi": "",
+      "arxiv": "2012.08534"
+    },
+    {
+      "id": 3,
+      "label": "Lin, Hobson & Lasenby 2019",
+      "title": "Ghost and tachyon free Poincaré gauge theories: A systematic approach",
+      "doi": "",
+      "arxiv": "1812.02675"
+    },
+    {
+      "id": 4,
+      "label": "Lin, Hobson & Lasenby 2020",
+      "title": "Power-counting renormalizable, ghost-and-tachyon-free Poincaré gauge theories",
+      "doi": "",
+      "arxiv": "1910.14197"
+    },
+    {
+      "id": 5,
+      "label": "Barker et al. 2020a",
+      "title": "Mapping Poincaré gauge cosmology to Horndeski theory for emergent dark energy",
+      "doi": "",
+      "arxiv": "2006.03581"
+    },
+    {
+      "id": 6,
+      "label": "Barker et al. 2020b",
+      "title": "Systematic study of background cosmology in unitary Poincaré gauge theories with application to emergent dark radiation and H0 tension",
+      "doi": "",
+      "arxiv": "2003.02690"
+    },
+    {
+      "id": 7,
+      "label": "Poulin et al. 2019",
+      "title": "Early Dark Energy Can Resolve The Hubble Tension",
+      "doi": "",
+      "arxiv": "1811.04083"
+    },
+    {
+      "id": 8,
+      "label": "Kamionkowski & Riess 2023",
+      "title": "The Hubble Tension and Early Dark Energy",
+      "doi": "",
+      "arxiv": "2211.04492"
+    },
+    {
+      "id": 9,
+      "label": "Lewis, Challinor & Lasenby 2000 (CAMB)",
+      "title": "Efficient computation of CMB anisotropies in closed FRW models",
+      "doi": "",
+      "arxiv": "astro-ph/9911177"
+    },
+    {
+      "id": 10,
+      "label": "Handley et al. 2015 (PolyChord)",
+      "title": "PolyChord: next-generation nested sampling",
+      "doi": "",
+      "arxiv": "1506.00171"
+    },
+    {
+      "id": 11,
+      "label": "Torrado & Lewis 2021 (Cobaya)",
+      "title": "Cobaya: Code for Bayesian Analysis of hierarchical physical models",
+      "doi": "",
+      "arxiv": "2005.05290"
+    },
+    {
+      "id": 12,
+      "label": "Planck 2018 VI",
+      "title": "Planck 2018 results. VI. Cosmological parameters",
+      "doi": "",
+      "arxiv": "1807.06209"
+    },
+    {
+      "id": 13,
+      "label": "Planck 2018 V",
+      "title": "Planck 2018 results. V. CMB power spectra and likelihoods",
+      "doi": "",
+      "arxiv": "1907.12875"
+    },
+    {
+      "id": 14,
+      "label": "Handley & Lemos 2019",
+      "title": "Quantifying tensions in cosmological parameters: Interpreting the DES evidence ratio",
+      "doi": "",
+      "arxiv": "1902.04029"
+    },
+    {
+      "id": 15,
+      "label": "Handley 2019 (anesthetic)",
+      "title": "anesthetic: nested sampling visualisation",
+      "doi": "",
+      "arxiv": "1905.04768"
+    },
+    {
+      "id": 16,
+      "label": "KiDS-Legacy 2025",
+      "title": "KiDS-Legacy: Cosmological constraints from cosmic shear with the complete KiloDegree Survey",
+      "doi": "",
+      "arxiv": "2503.19441"
+    },
+    {
+      "id": 17,
+      "label": "DESI DR2 2025",
+      "title": "DESI DR2 results. II. Measurements of baryon acoustic oscillations and cosmological constraints",
+      "doi": "",
+      "arxiv": "2503.14738"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "Curvature versus torsion: with torsion, a small parallelogram of transported vectors fails to close.",
+      "attach": "background,background#1"
+    },
+    {
+      "number": 9,
+      "caption": "Particle spectrum of TorC from PSALTer, the check for ghosts and tachyons around zero torsion.",
+      "attach": "background,background#2"
+    },
+    {
+      "number": 10,
+      "caption": "The same spectrum for the post-Riemannian form of TorC.",
+      "attach": "background,background#2"
+    },
+    {
+      "number": 4,
+      "caption": "Densities and effective equations of state through cosmic history: ΛCDM against TorC, where torsion acts as an effective dark-energy fluid.",
+      "attach": "setup,setup#2,background#5"
+    },
+    {
+      "number": 2,
+      "caption": "Changing ΩΛ: its effect on the comoving Hubble horizon and the CMB power spectrum.",
+      "attach": "results:1,results:1#2"
+    },
+    {
+      "number": 3,
+      "caption": "Changing ϖᵣ: torsion speeds early expansion and shifts the CMB peaks.",
+      "attach": "results:1,results:1#1"
+    },
+    {
+      "number": 11,
+      "caption": "Density evolution and effective dark-energy w for different ΩΛ.",
+      "attach": "results:1,results:1#2"
+    },
+    {
+      "number": 5,
+      "caption": "Full posteriors for ΛCDM (Planck) and TorC (Planck; Planck + SH0ES).",
+      "attach": "results:2,results:2#2"
+    },
+    {
+      "number": 6,
+      "caption": "Ωm–H₀ contours: the tension in ΛCDM, and how TorC reaches the SH0ES and TRGB values.",
+      "attach": "why_important,results:2,conclusion,why_important#1,results:2#1,results:2#3,conclusion#1"
+    },
+    {
+      "number": 7,
+      "caption": "Posterior CMB temperature spectra in TorC against Planck data.",
+      "attach": "results:2,results:2#3"
+    },
+    {
+      "number": 12,
+      "caption": "Posterior expansion history H(a) at late times in TorC.",
+      "attach": "results:2,results:2#3"
+    },
+    {
+      "number": 13,
+      "caption": "Priors against posteriors for ΩΛ and ϖᵣ.",
+      "attach": "results:2,results:2#2"
+    },
+    {
+      "number": 8,
+      "caption": "Bayes factors (left) and R-statistics (right) for ΛCDM and TorC.",
+      "attach": "results:3,results:4,conclusion,results:3#1,results:3#2,results:4#1,results:4#2,conclusion#2"
+    }
+  ],
+  "equations": [
+    {
+      "latex": "\\begin{aligned}\\mathcal{L}_{\\rm TorC} = {}& -\\tfrac{4M_{\\rm P}^2}{9}\\mathcal{T}_\\mu\\mathcal{T}^\\mu - \\tfrac{\\mu}{6}\\Big[\\lambda\\mathcal{T}_{\\mu\\nu\\sigma}\\big(\\mathcal{T}^{\\mu\\nu\\sigma}-2\\mathcal{T}^{\\nu\\mu\\sigma}\\big)\\\\&+ 12\\mathcal{R}_{\\mu\\nu}\\big(\\mathcal{R}^{[\\mu\\nu]}-\\mathcal{R}^{\\mu\\nu}\\big) - 2\\mathcal{R}_{\\mu\\nu\\sigma\\rho}\\big(\\mathcal{R}^{\\mu\\nu\\sigma\\rho}-4\\mathcal{R}^{\\mu\\sigma\\nu\\rho}-5\\mathcal{R}^{\\sigma\\rho\\mu\\nu}\\big)\\Big]\\\\&+ 2\\nu\\mathcal{R}_{[\\mu\\nu]}\\mathcal{R}^{[\\mu\\nu]} - M_{\\rm P}^2\\Lambda + \\mathcal{L}_{\\rm M}\\end{aligned}",
+      "meaning": "The TorC theory itself: terms built from torsion and from curvature, with no Einstein–Hilbert term put in by hand.",
+      "symbols": "𝒯 = torsion tensor, ℛ = curvature, M_P = Planck mass, μ, ν, λ = coupling constants, Λ = cosmological constant, ℒ_M = matter.",
+      "number": "1",
+      "attach": "background,background#3",
+      "concepts": [
+        "torc",
+        "pgt"
+      ]
+    },
+    {
+      "latex": "\\lambda \\ge 0,\\qquad \\mu < 0,\\qquad (\\nu+2\\mu)(\\nu-\\mu) > 0",
+      "meaning": "The conditions for no ghosts or tachyons, derived around zero torsion; the paper then sets λ = 0.",
+      "symbols": "",
+      "number": "2",
+      "attach": "background,background#2",
+      "concepts": [
+        "ghosts"
+      ]
+    },
+    {
+      "latex": "\\begin{aligned}\\mathcal{L}^{\\rm ST}_{\\rm TorC} = {}& M_{\\rm P}^2\\Big[-\\tfrac{2}{3}\\Big(1-\\tfrac{\\varpi^2}{4}\\Big)R + g^{\\mu\\nu}\\partial_\\mu\\varpi\\,\\partial_\\nu\\varpi - \\tfrac{4}{3}\\sqrt{|J_\\mu J^\\mu|} - \\phi^2 + \\phi^2\\varpi^2\\Big] - M_{\\rm P}^2\\Lambda + \\mathcal{L}_{\\rm M},\\\\J_\\mu \\equiv {}& 4\\varpi^3\\partial_\\mu(\\phi/\\varpi) + \\partial_\\mu\\phi\\end{aligned}",
+      "meaning": "In a uniform universe TorC is equivalent to a theory of two scalar fields; ϖ = 1 gives back ordinary GR with Λ.",
+      "symbols": "ϖ, φ = scalar fields carried by torsion, R = ordinary curvature.",
+      "number": "5",
+      "attach": "background,background#4",
+      "concepts": [
+        "horndeski"
+      ]
+    },
+    {
+      "latex": "H^2 = H_0^2\\left(\\Omega_{\\rm r}a^{-4} + \\Omega_{\\rm m}a^{-3}\\right) + \\frac{\\rho_\\Lambda^{\\rm eff}(t)}{3M_{\\rm P}^2}",
+      "meaning": "The modified Friedmann equation: all of torsion's effect is collected into an effective dark-energy density.",
+      "symbols": "H = expansion rate, a = scale factor, Ω_r, Ω_m = radiation and matter densities.",
+      "number": "14",
+      "attach": "setup,setup#2",
+      "concepts": [
+        "friedmann",
+        "effde"
+      ]
+    },
+    {
+      "latex": "\\rho_\\Lambda^{\\rm eff} \\equiv \\frac{3M_{\\rm P}^2}{\\varpi^2}\\Big[H_0^2\\Omega_\\Lambda - H_0^2(\\varpi^2-1)\\left(\\Omega_{\\rm r}a^{-4}+\\Omega_{\\rm m}a^{-3}\\right) - 2H\\varpi\\dot\\varpi - \\frac{(1+3\\varpi^2)\\,\\dot\\varpi^2}{3(\\varpi^2-1)}\\Big]",
+      "meaning": "The effective dark-energy density, tabulated and fed to CAMB; ϖ = 1 makes it a plain cosmological constant.",
+      "symbols": "Ω_Λ = bare dark-energy density (a free parameter here), ϖ̇ = time derivative of ϖ.",
+      "number": "15",
+      "attach": "setup,setup#1,setup#2",
+      "concepts": [
+        "effde"
+      ]
+    },
+    {
+      "latex": "\\dot\\rho = -3H(\\rho + P)",
+      "meaning": "The continuity equation, used to get the effective dark-energy pressure from its density.",
+      "symbols": "ρ = density, P = pressure.",
+      "number": "16",
+      "attach": "setup,setup#2",
+      "concepts": [
+        "eos"
+      ]
+    },
+    {
+      "latex": "\\mathcal{Z} = \\int \\mathcal{L}(\\theta)\\,\\pi(\\theta)\\,\\mathrm{d}\\theta,\\qquad \\log\\mathcal{Z} = \\langle\\log\\mathcal{L}(\\theta)\\rangle_{\\mathcal{P}} - \\mathcal{D}_{\\rm KL}",
+      "meaning": "The Bayesian evidence: how well a model fits on average, minus a penalty for how much its parameters had to be narrowed (Occam's razor).",
+      "symbols": "ℒ = likelihood, π = prior, 𝒫 = posterior, 𝒟_KL = Kullback–Leibler divergence from prior to posterior.",
+      "number": "19–20",
+      "attach": "results:4,results:4#1,results:4#2",
+      "concepts": [
+        "evidence"
+      ]
+    },
+    {
+      "latex": "\\Delta\\log\\mathcal{Z} = \\log\\mathcal{Z}_{\\rm TorC} - \\log\\mathcal{Z}_{\\Lambda{\\rm CDM}} = \\Delta\\langle\\log\\mathcal{L}\\rangle_{\\mathcal{P}} - \\Delta\\mathcal{D}_{\\rm KL}",
+      "meaning": "The Bayes factor splits into a fit gain and an Occam penalty, which is how the paper explains the near-draw.",
+      "symbols": "",
+      "number": "24",
+      "attach": "results:4,conclusion,results:4#1,results:4#2,conclusion#2",
+      "concepts": [
+        "evidence"
+      ]
+    },
+    {
+      "latex": "R = \\frac{\\mathcal{Z}_{AB}}{\\mathcal{Z}_A\\mathcal{Z}_B} = \\frac{P(A\\,|\\,B)}{P(A)}",
+      "meaning": "The R-statistic: how much one dataset raises our confidence in the other; log R < 0 means tension.",
+      "symbols": "A, B = Planck and SH0ES; 𝒵_AB = evidence for both together.",
+      "number": "25",
+      "attach": "results:3,results:3#1,results:3#2",
+      "concepts": [
+        "rstat"
+      ]
+    }
+  ]
+}

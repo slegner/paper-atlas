@@ -1,0 +1,1585 @@
+{
+  "title": "Alleviating the Hubble tension with Torsion Condensation (TorC)",
+  "authors": "Legner, Handley, Barker & Ormondroyd",
+  "year": "2025",
+  "venue": "JCAP 03 (2026) 003 · arXiv:2507.09228",
+  "tldr": "A gauge-theory extension of gravity with a torsion field speeds up early expansion, letting the CMB accept a higher H₀ and removing the Planck–SH0ES tension, though the Bayesian evidence doesn't prefer it over ΛCDM.",
+  "newcomer": "This paper joins three fields: cosmology (how the Universe expands and what the CMB tells us), gravitational theory (building gravity as a gauge theory, which brings in torsion), and Bayesian statistics (comparing models by their evidence). Each part of the argument leans on a different one.",
+  "sections": [
+    {
+      "key": "basics",
+      "name": "Basics used throughout",
+      "where": "§I–II",
+      "summary": "Cosmology's starting points: an expanding universe described by general relativity and the ΛCDM recipe.",
+      "role": "Needed to read any equation, parameter or plot in the paper.",
+      "key_reads": [
+        "ryden2016",
+        "dodelson2020"
+      ]
+    },
+    {
+      "key": "tension",
+      "name": "The Hubble tension",
+      "where": "§I, §IV",
+      "summary": "Early-Universe (CMB) and late-Universe (distance ladder) measurements disagree on how fast the Universe expands today.",
+      "role": "The problem TorC is tested against, and the data it is fitted to.",
+      "key_reads": [
+        "verde2019",
+        "kamionkowski2023"
+      ]
+    },
+    {
+      "key": "gravity",
+      "name": "Gravity as a gauge theory",
+      "where": "§I–II, App. A",
+      "summary": "Building gravity like the other forces, by gauging a symmetry, brings in torsion as a new field.",
+      "role": "Where TorC comes from: a ghost-free Poincaré gauge theory whose torsion condenses into GR.",
+      "key_reads": [
+        "hehl1976",
+        "blagojevic2002"
+      ]
+    },
+    {
+      "key": "torcos",
+      "name": "TorC cosmology",
+      "where": "§II–III, App. B–C",
+      "summary": "What torsion does to the expansion history: extra early radiation, recast as an effective dark-energy fluid.",
+      "role": "How the theory is turned into something a Boltzmann code and the data can test.",
+      "key_reads": [
+        "barker2020b"
+      ]
+    },
+    {
+      "key": "codes",
+      "name": "Boltzmann codes and perturbations",
+      "where": "§III",
+      "summary": "Computing CMB spectra from a model needs a Boltzmann code and perturbation theory.",
+      "role": "A modified CAMB produces TorC's predictions; missing TorC perturbations are the main caveat.",
+      "key_reads": [
+        "dodelson2020",
+        "camb2000"
+      ]
+    },
+    {
+      "key": "stats",
+      "name": "Bayesian model comparison",
+      "where": "§III–IV",
+      "summary": "Fitting models, comparing them with the Bayesian evidence, and measuring tension between datasets.",
+      "role": "Gives the headline numbers: log R for the tension and Δlog Z for TorC versus ΛCDM.",
+      "key_reads": [
+        "trotta2008",
+        "handley2019tension"
+      ]
+    }
+  ],
+  "concepts": [
+    {
+      "id": "expansion",
+      "name": "Expanding universe and H₀",
+      "section": "basics",
+      "level": 1,
+      "plain": "Galaxies recede from us faster the further away they are; the Hubble constant H₀ is today's expansion rate, in km/s per megaparsec.",
+      "why_here": "The whole paper is about what value H₀ has.",
+      "terms": [
+        "H₀",
+        "Hubble constant",
+        "expansion rate"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "ryden2016",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "hogg1999",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "hubble1929",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "gr",
+      "name": "General relativity",
+      "section": "basics",
+      "level": 1,
+      "plain": "Einstein's theory: gravity is the curvature of spacetime, set by the matter and energy in it.",
+      "why_here": "TorC is an extension of GR, and reduces to it when torsion condenses.",
+      "terms": [
+        "GR",
+        "general relativity",
+        "Einstein gravity",
+        "Einstein–Hilbert"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "schutz2009",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "carroll2004",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "friedmann",
+      "name": "Friedmann equations and ΛCDM",
+      "section": "basics",
+      "level": 2,
+      "plain": "Applying GR to a uniform universe gives the Friedmann equations, which say how fast space expands given its contents. ΛCDM is the standard recipe: cold dark matter, ordinary matter, radiation and a cosmological constant Λ.",
+      "why_here": "ΛCDM is the model TorC is compared against, and TorC contains it as a special case (ϖᵣ = 1).",
+      "terms": [
+        "ΛCDM",
+        "Friedmann"
+      ],
+      "prereqs": [
+        "gr",
+        "expansion"
+      ],
+      "reads": [
+        {
+          "reading": "ryden2016",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "dodelson2020",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "planck2018vi",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "eos",
+      "name": "Density, pressure and w",
+      "section": "basics",
+      "level": 2,
+      "plain": "Each ingredient of the universe has an energy density ρ and pressure P; their ratio w = P/ρ sets how it dilutes as space expands (radiation w = 1/3, matter 0, Λ −1).",
+      "why_here": "Torsion is recast as a dark-energy fluid with its own ρ(a) and P(a), and early on it behaves like radiation (w = 1/3).",
+      "terms": [
+        "w = P/ρ",
+        "w = 1/3",
+        "pressure"
+      ],
+      "prereqs": [
+        "friedmann"
+      ],
+      "reads": [
+        {
+          "reading": "ryden2016",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "linder2003",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "ladder",
+      "name": "The distance ladder (SH0ES)",
+      "section": "tension",
+      "level": 2,
+      "plain": "Local H₀ comes from a chain of distance indicators: parallaxes calibrate Cepheid stars, Cepheids calibrate type Ia supernovae, and supernovae reach far enough to see the expansion. The tip of the red giant branch (TRGB) is an alternative rung.",
+      "why_here": "SH0ES gives H₀ = 73.04 ± 1.04 km/s/Mpc, the late-Universe side of the tension.",
+      "terms": [
+        "SH0ES",
+        "Cepheid",
+        "supernovae",
+        "TRGB",
+        "distance ladder"
+      ],
+      "prereqs": [
+        "expansion"
+      ],
+      "reads": [
+        {
+          "reading": "freedman2010",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "riess2021",
+          "role": "builds_on",
+          "where": ""
+        },
+        {
+          "reading": "freedman2020",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "cmb",
+      "name": "CMB power spectrum",
+      "section": "tension",
+      "level": 2,
+      "plain": "The cosmic microwave background is light from 380,000 years after the Big Bang. Its temperature and polarisation ripples (TT, TE, EE) show a series of acoustic peaks whose positions and heights encode the cosmological parameters.",
+      "why_here": "Planck's CMB data are the early-Universe side of the tension, and the main data TorC is fitted to.",
+      "terms": [
+        "CMB",
+        "Planck",
+        "acoustic peaks",
+        "TT/TE/EE"
+      ],
+      "prereqs": [
+        "friedmann"
+      ],
+      "reads": [
+        {
+          "reading": "hu2002",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "dodelson2020",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "page2003",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "planck2018v",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "sound",
+      "name": "Sound horizon",
+      "section": "tension",
+      "level": 3,
+      "plain": "Before the CMB was released, sound waves crossed the hot plasma; the distance they travelled (the sound horizon, ~150 Mpc) is a standard ruler. The CMB measures its angle on the sky, so a smaller ruler means a closer CMB and a higher H₀.",
+      "why_here": "This is TorC's lever: torsion speeds early expansion, shrinks the sound horizon and lets H₀ rise.",
+      "terms": [
+        "sound horizon",
+        "Hubble horizon"
+      ],
+      "prereqs": [
+        "cmb",
+        "friedmann"
+      ],
+      "reads": [
+        {
+          "reading": "hu2002",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "kamionkowski2023",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "eisenstein1998",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "tension",
+      "name": "The Hubble tension",
+      "section": "tension",
+      "level": 3,
+      "plain": "CMB data analysed with ΛCDM predict H₀ ≈ 67 km/s/Mpc, while the local distance ladder measures ≈ 73; the gap is about 5σ.",
+      "why_here": "The problem the paper sets out to address.",
+      "terms": [
+        "Hubble tension"
+      ],
+      "prereqs": [
+        "ladder",
+        "cmb"
+      ],
+      "reads": [
+        {
+          "reading": "verde2019",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "divalentino2021",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "riess2021",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "ede",
+      "name": "Early dark energy",
+      "section": "tension",
+      "level": 3,
+      "plain": "A proposed fix: an extra energy component that matters briefly before recombination, speeding up expansion and shrinking the sound horizon.",
+      "why_here": "TorC pulls the same lever as early dark energy, but with an extra field that comes from the structure of gravity rather than being added by hand.",
+      "terms": [
+        "early dark energy"
+      ],
+      "prereqs": [
+        "sound"
+      ],
+      "reads": [
+        {
+          "reading": "kamionkowski2023",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "poulin2019",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "s8",
+      "name": "S₈ and cosmic shear",
+      "section": "tension",
+      "level": 3,
+      "plain": "S₈ measures how clumpy matter is today. Weak-lensing surveys such as KiDS measure it from the distortion of galaxy shapes; some found lower values than Planck.",
+      "why_here": "TorC allows lower S₈, but the paper flags this as unreliable without TorC perturbations.",
+      "terms": [
+        "S₈",
+        "KiDS-1000",
+        "KiDS-Legacy"
+      ],
+      "prereqs": [
+        "cmb"
+      ],
+      "reads": [
+        {
+          "reading": "kilbinger2015",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "kids1000",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "kidslegacy",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "bao",
+      "name": "BAO and DESI",
+      "section": "tension",
+      "level": 3,
+      "plain": "The same sound waves leave a preferred separation between galaxies (baryon acoustic oscillations), measured by surveys like DESI as a ruler at later times.",
+      "why_here": "Adding DESI BAO data is listed as the next step.",
+      "terms": [
+        "DESI",
+        "BAO"
+      ],
+      "prereqs": [
+        "sound"
+      ],
+      "reads": [
+        {
+          "reading": "eisenstein2005",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "desi2025",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "gauge",
+      "name": "Gauge theories",
+      "section": "gravity",
+      "level": 2,
+      "plain": "In the Standard Model, forces arise by demanding that physics stays the same under symmetry transformations made differently at each point (local symmetry); each such symmetry brings a force-carrying field.",
+      "why_here": "Gravity isn't yet built this way; gauging the Poincaré group is the motivation for TorC.",
+      "terms": [
+        "gauge theory",
+        "gauge theories",
+        "gauging"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "griffiths2008",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "yangmills1954",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "tetrad",
+      "name": "Tetrads and the spin connection",
+      "section": "gravity",
+      "level": 3,
+      "plain": "An alternative way to describe spacetime with a local set of axes (tetrad) at each point and a spin connection that relates neighbouring axes; with torsion allowed this is Einstein–Cartan theory.",
+      "why_here": "These are the gauge fields of Poincaré gauge theory, the variables TorC is built from.",
+      "terms": [
+        "spin connection",
+        "tetrad",
+        "Einstein–Cartan"
+      ],
+      "prereqs": [
+        "gr",
+        "gauge"
+      ],
+      "reads": [
+        {
+          "reading": "carroll2004",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "hehl1976",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "kibble1961",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "sciama1964",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "torsion",
+      "name": "Torsion",
+      "section": "gravity",
+      "level": 3,
+      "plain": "A second way spacetime can be shaped besides curvature: a twisting, so that infinitesimal parallelograms fail to close. GR sets it to zero; other theories let it be a field of its own.",
+      "why_here": "TorC's extra degrees of freedom are torsion.",
+      "terms": [
+        "torsion",
+        "Torsion"
+      ],
+      "prereqs": [
+        "tetrad"
+      ],
+      "reads": [
+        {
+          "reading": "hehl1976",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "blagojevic2002",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "pgt",
+      "name": "Poincaré gauge theory",
+      "section": "gravity",
+      "level": 3,
+      "plain": "Gravity built as a gauge theory of the Poincaré group (translations and Lorentz rotations), with both curvature and torsion dynamical.",
+      "why_here": "TorC is one Poincaré gauge theory, picked from a catalogue of healthy ones.",
+      "terms": [
+        "Poincaré gauge theory",
+        "Poincaré gauge theories",
+        "PGT",
+        "Poincaré group"
+      ],
+      "prereqs": [
+        "gauge",
+        "tetrad",
+        "torsion"
+      ],
+      "reads": [
+        {
+          "reading": "blagojevic2002",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "hehl1976",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "utiyama1956",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "kibble1961",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "ghosts",
+      "name": "Ghosts, tachyons and particle spectra",
+      "section": "gravity",
+      "level": 3,
+      "plain": "A healthy theory must not contain ghosts (negative-energy modes) or tachyons (faster-than-light modes); the particle spectrum around a background tells you whether it does.",
+      "why_here": "TorC comes from a ghost- and tachyon-free catalogue, but those checks hold only around zero torsion, which the paper lists as an open caveat.",
+      "terms": [
+        "ghost",
+        "tachyon",
+        "Ghost",
+        "strong coupling"
+      ],
+      "prereqs": [
+        "pgt"
+      ],
+      "reads": [
+        {
+          "reading": "lin2019",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "lin2020",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "barker2025psalter",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "horndeski",
+      "name": "Scalar–tensor theories (Horndeski)",
+      "section": "gravity",
+      "level": 3,
+      "plain": "Theories that add scalar fields to gravity; Horndeski's is the most general with second-order equations, so it stays free of the Ostrogradsky ghost.",
+      "why_here": "In a uniform universe TorC's torsion reduces to two scalar fields, which makes its cosmology tractable.",
+      "terms": [
+        "two scalar fields",
+        "two-scalar-field",
+        "scalar field",
+        "Horndeski"
+      ],
+      "prereqs": [
+        "gr"
+      ],
+      "reads": [
+        {
+          "reading": "clifton2012",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "horndeski1974",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "barker2020a",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "torc",
+      "name": "Torsion condensation (TorC)",
+      "section": "gravity",
+      "level": 4,
+      "plain": "A Poincaré gauge theory in which the torsion field condenses to a value of order the Planck mass; the Einstein–Hilbert term of GR then emerges rather than being put in by hand.",
+      "why_here": "The theory being tested.",
+      "terms": [
+        "TorC",
+        "Torsion Condensation",
+        "condenses",
+        "condensation"
+      ],
+      "prereqs": [
+        "pgt",
+        "horndeski",
+        "ghosts"
+      ],
+      "reads": [
+        {
+          "reading": "barker2021thesis",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "barker2020a",
+          "role": "builds_on",
+          "where": ""
+        },
+        {
+          "reading": "barker2020b",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "darkrad",
+      "name": "Torsion as dark radiation",
+      "section": "torcos",
+      "level": 4,
+      "plain": "When the torsion field starts away from its ΛCDM value (ϖᵣ < 1), it behaves like extra radiation in the early Universe.",
+      "why_here": "This is what speeds early expansion and lets H₀ rise.",
+      "terms": [
+        "dark radiation",
+        "extra radiation",
+        "ϖᵣ"
+      ],
+      "prereqs": [
+        "torc",
+        "eos",
+        "sound"
+      ],
+      "reads": [
+        {
+          "reading": "barker2020b",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "kamionkowski2023",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "effde",
+      "name": "Torsion as effective dark energy in CAMB",
+      "section": "torcos",
+      "level": 4,
+      "plain": "The torsion terms in the Friedmann equations are rewritten as a time-varying dark-energy density ρ(a) and pressure P(a), tabulated and fed to the Boltzmann code. Using ρ and P directly avoids the poles that w = P/ρ would have.",
+      "why_here": "This implementation is the paper's own technical step, letting the full (ΩΛ, ϖᵣ) space be fitted to Planck.",
+      "terms": [
+        "effective dark-energy",
+        "effective dark energy",
+        "ΩΛ",
+        "poles"
+      ],
+      "prereqs": [
+        "eos",
+        "boltzmann",
+        "torc"
+      ],
+      "reads": [
+        {
+          "reading": "linder2003",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "legnercamb",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "bbn",
+      "name": "Big Bang nucleosynthesis and N_eff",
+      "section": "torcos",
+      "level": 3,
+      "plain": "In the first minutes, light elements formed; how much helium appears depends on the expansion rate, often expressed as an effective number of neutrino species N_eff.",
+      "why_here": "Torsion's extra early radiation shifts N_eff; the appendix checks this doesn't change the conclusions.",
+      "terms": [
+        "Big Bang nucleosynthesis",
+        "nucleosynthesis",
+        "BBN",
+        "helium",
+        "ΔN_eff"
+      ],
+      "prereqs": [
+        "eos"
+      ],
+      "reads": [
+        {
+          "reading": "steigman2007",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "cyburt2016",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "cooke2024bbn",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "boltzmann",
+      "name": "Boltzmann codes (CAMB)",
+      "section": "codes",
+      "level": 3,
+      "plain": "Programs that evolve the universe's ingredients and their perturbations to predict the CMB and matter power spectra for given parameters.",
+      "why_here": "A modified CAMB computes TorC's CMB spectra.",
+      "terms": [
+        "CAMB",
+        "Boltzmann code"
+      ],
+      "prereqs": [
+        "cmb",
+        "friedmann"
+      ],
+      "reads": [
+        {
+          "reading": "dodelson2020",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "seljak1996",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "camb2000",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "perts",
+      "name": "Cosmological perturbation theory",
+      "section": "codes",
+      "level": 3,
+      "plain": "The theory of small ripples on the uniform background: how density and metric fluctuations grow and imprint the CMB and large-scale structure.",
+      "why_here": "TorC's perturbations aren't worked out yet, so the paper keeps ΛCDM's: the main caveat.",
+      "terms": [
+        "perturbation theory",
+        "perturbations",
+        "Perturbations"
+      ],
+      "prereqs": [
+        "friedmann",
+        "gr"
+      ],
+      "reads": [
+        {
+          "reading": "dodelson2020",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "ma1995",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "bayes",
+      "name": "Bayesian inference",
+      "section": "stats",
+      "level": 2,
+      "plain": "Updating beliefs with data: the posterior probability of parameters is the likelihood of the data times the prior, normalised.",
+      "why_here": "All constraints are Bayesian posteriors with stated priors.",
+      "terms": [
+        "posterior",
+        "posteriors",
+        "priors",
+        "Bayesian"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "sivia2006",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "trotta2008",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "nested",
+      "name": "Nested sampling (PolyChord)",
+      "section": "stats",
+      "level": 3,
+      "plain": "An algorithm that shrinks a cloud of 'live points' through nested likelihood contours, giving both posterior samples and the Bayesian evidence.",
+      "why_here": "PolyChord, run through Cobaya with 1000 live points, does every fit here.",
+      "terms": [
+        "nested sampling",
+        "PolyChord",
+        "Cobaya",
+        "live points"
+      ],
+      "prereqs": [
+        "bayes"
+      ],
+      "reads": [
+        {
+          "reading": "ashton2022",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "skilling2006",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "polychord2015",
+          "role": "builds_on",
+          "where": ""
+        },
+        {
+          "reading": "cobaya2021",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "evidence",
+      "name": "Bayesian evidence and Occam's razor",
+      "section": "stats",
+      "level": 3,
+      "plain": "The evidence Z is the probability of the data under a model, averaged over its prior. It rewards fit but penalises extra parameters (log Z = fit − Kullback–Leibler 'Occam penalty').",
+      "why_here": "Δlog Z decides whether TorC beats ΛCDM: the fit gain of +6.8 is almost cancelled by a penalty of −6.1.",
+      "terms": [
+        "Bayesian evidence",
+        "Bayes factor",
+        "Δlog Z",
+        "log Z",
+        "Occam"
+      ],
+      "prereqs": [
+        "bayes",
+        "nested"
+      ],
+      "reads": [
+        {
+          "reading": "trotta2008",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "mackay2003",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "kl1951",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "handley2019dim",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "rstat",
+      "name": "Tension statistics (R)",
+      "section": "stats",
+      "level": 3,
+      "plain": "The R-statistic compares the evidence for two datasets fitted together with fitting them separately; log R < 0 signals tension.",
+      "why_here": "Shows Planck and SH0ES go from strong tension in ΛCDM (log R = −5.6) to consistent in TorC (+0.7).",
+      "terms": [
+        "R-statistic",
+        "log R"
+      ],
+      "prereqs": [
+        "evidence"
+      ],
+      "reads": [
+        {
+          "reading": "handley2019tension",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "marshall2006",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    }
+  ],
+  "readings": [
+    {
+      "id": "ryden2016",
+      "label": "Ryden 2016",
+      "title": "Introduction to Cosmology (2nd ed.)",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the gentlest full course"
+    },
+    {
+      "id": "dodelson2020",
+      "label": "Dodelson & Schmidt 2020",
+      "title": "Modern Cosmology (2nd ed.)",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the standard graduate text"
+    },
+    {
+      "id": "schutz2009",
+      "label": "Schutz 2009",
+      "title": "A First Course in General Relativity (2nd ed.)",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "first course"
+    },
+    {
+      "id": "carroll2004",
+      "label": "Carroll 2004",
+      "title": "Spacetime and Geometry: An Introduction to General Relativity",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://arxiv.org/abs/gr-qc/9712019",
+      "note": "lecture-note version free online"
+    },
+    {
+      "id": "griffiths2008",
+      "label": "Griffiths 2008",
+      "title": "Introduction to Elementary Particles (2nd ed.)",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "gauge symmetry explained gently"
+    },
+    {
+      "id": "blagojevic2002",
+      "label": "Blagojević 2002",
+      "title": "Gravitation and Gauge Symmetries",
+      "kind": "textbook",
+      "cited": 20,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the Poincaré gauge theory book"
+    },
+    {
+      "id": "sivia2006",
+      "label": "Sivia & Skilling 2006",
+      "title": "Data Analysis: A Bayesian Tutorial (2nd ed.)",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "short and readable"
+    },
+    {
+      "id": "mackay2003",
+      "label": "MacKay 2003",
+      "title": "Information Theory, Inference, and Learning Algorithms",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "free online from the author; chapter on Occam's razor"
+    },
+    {
+      "id": "barker2021thesis",
+      "label": "Barker 2021",
+      "title": "Gauge theories of gravity (PhD thesis)",
+      "kind": "notes",
+      "cited": 37,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the fullest introduction to TorC"
+    },
+    {
+      "id": "hogg1999",
+      "label": "Hogg 1999",
+      "title": "Distance measures in cosmology",
+      "kind": "notes",
+      "cited": 61,
+      "doi": "",
+      "arxiv": "astro-ph/9905116",
+      "url": "",
+      "note": "short reference notes"
+    },
+    {
+      "id": "verde2019",
+      "label": "Verde, Treu & Riess 2019",
+      "title": "Tensions between the Early and the Late Universe",
+      "kind": "review",
+      "cited": 6,
+      "doi": "",
+      "arxiv": "1907.10625",
+      "url": "",
+      "note": "short overview"
+    },
+    {
+      "id": "divalentino2021",
+      "label": "Di Valentino et al. 2021",
+      "title": "In the realm of the Hubble tension — a review of solutions",
+      "kind": "review",
+      "cited": 7,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "catalogue of proposed fixes"
+    },
+    {
+      "id": "kamionkowski2023",
+      "label": "Kamionkowski & Riess 2023",
+      "title": "The Hubble Tension and Early Dark Energy",
+      "kind": "review",
+      "cited": 60,
+      "doi": "",
+      "arxiv": "2211.04492",
+      "url": "",
+      "note": "clear on why early fixes work"
+    },
+    {
+      "id": "freedman2010",
+      "label": "Freedman & Madore 2010",
+      "title": "The Hubble Constant",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "how the distance ladder works"
+    },
+    {
+      "id": "hu2002",
+      "label": "Hu & Dodelson 2002",
+      "title": "Cosmic Microwave Background Anisotropies",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the classic CMB review"
+    },
+    {
+      "id": "kilbinger2015",
+      "label": "Kilbinger 2015",
+      "title": "Cosmology with cosmic shear observations: a review",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "hehl1976",
+      "label": "Hehl et al. 1976",
+      "title": "General Relativity with Spin and Torsion: Foundations and Prospects",
+      "kind": "review",
+      "cited": 19,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the classic torsion review"
+    },
+    {
+      "id": "clifton2012",
+      "label": "Clifton et al. 2012",
+      "title": "Modified Gravity and Cosmology",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "map of modified-gravity theories"
+    },
+    {
+      "id": "trotta2008",
+      "label": "Trotta 2008",
+      "title": "Bayes in the sky: Bayesian inference and model selection in cosmology",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "written for cosmologists"
+    },
+    {
+      "id": "ashton2022",
+      "label": "Ashton et al. 2022",
+      "title": "Nested sampling for physical scientists",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "modern primer"
+    },
+    {
+      "id": "steigman2007",
+      "label": "Steigman 2007",
+      "title": "Primordial Nucleosynthesis in the Precision Cosmology Era",
+      "kind": "review",
+      "cited": 86,
+      "doi": "",
+      "arxiv": "0712.1100",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "cyburt2016",
+      "label": "Cyburt et al. 2016",
+      "title": "Big Bang Nucleosynthesis: 2015",
+      "kind": "review",
+      "cited": 4,
+      "doi": "",
+      "arxiv": "1505.01076",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "hubble1929",
+      "label": "Hubble 1929",
+      "title": "A relation between distance and radial velocity among extra-galactic nebulae",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "yangmills1954",
+      "label": "Yang & Mills 1954",
+      "title": "Conservation of isotopic spin and isotopic gauge invariance",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the first non-abelian gauge theory"
+    },
+    {
+      "id": "utiyama1956",
+      "label": "Utiyama 1956",
+      "title": "Invariant theoretical interpretation of interaction",
+      "kind": "classic",
+      "cited": 16,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "first attempt to gauge gravity"
+    },
+    {
+      "id": "kibble1961",
+      "label": "Kibble 1961",
+      "title": "Lorentz invariance and the gravitational field",
+      "kind": "classic",
+      "cited": 17,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "gauging the Poincaré group"
+    },
+    {
+      "id": "sciama1964",
+      "label": "Sciama 1964",
+      "title": "The Physical Structure of General Relativity",
+      "kind": "classic",
+      "cited": 18,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "horndeski1974",
+      "label": "Horndeski 1974",
+      "title": "Second-order scalar-tensor field equations in a four-dimensional space",
+      "kind": "classic",
+      "cited": 39,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "kl1951",
+      "label": "Kullback & Leibler 1951",
+      "title": "On Information and Sufficiency",
+      "kind": "classic",
+      "cited": 70,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "skilling2006",
+      "label": "Skilling 2006",
+      "title": "Nested sampling for general Bayesian computation",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "where nested sampling began"
+    },
+    {
+      "id": "seljak1996",
+      "label": "Seljak & Zaldarriaga 1996",
+      "title": "A line-of-sight integration approach to cosmic microwave background anisotropies",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "CMBFAST, the ancestor of CAMB"
+    },
+    {
+      "id": "ma1995",
+      "label": "Ma & Bertschinger 1995",
+      "title": "Cosmological perturbation theory in the synchronous and conformal Newtonian gauges",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "marshall2006",
+      "label": "Marshall, Rajguru & Slosar 2006",
+      "title": "Bayesian evidence as a tool for comparing datasets",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the idea behind the R-statistic"
+    },
+    {
+      "id": "eisenstein1998",
+      "label": "Eisenstein & Hu 1998",
+      "title": "Baryonic features in the matter transfer function",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "eisenstein2005",
+      "label": "Eisenstein et al. 2005",
+      "title": "Detection of the baryon acoustic peak in the large-scale correlation function of SDSS luminous red galaxies",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "first BAO detection"
+    },
+    {
+      "id": "linder2003",
+      "label": "Linder 2003",
+      "title": "Exploring the expansion history of the universe",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the w₀–wₐ dark-energy fluid"
+    },
+    {
+      "id": "page2003",
+      "label": "Page et al. 2003 (WMAP)",
+      "title": "First year WMAP observations: interpretation of the TT and TE angular power spectrum peaks",
+      "kind": "paper",
+      "cited": 3,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "poulin2019",
+      "label": "Poulin et al. 2019",
+      "title": "Early Dark Energy Can Resolve The Hubble Tension",
+      "kind": "paper",
+      "cited": 59,
+      "doi": "",
+      "arxiv": "1811.04083",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "riess2021",
+      "label": "Riess et al. 2021 (SH0ES)",
+      "title": "Cosmic Distances Calibrated to 1% Precision with Gaia EDR3 Parallaxes and HST Photometry of 75 Milky Way Cepheids Confirm Tension with ΛCDM",
+      "kind": "paper",
+      "cited": 50,
+      "doi": "",
+      "arxiv": "2012.08534",
+      "url": "",
+      "note": "the SH0ES prior used here"
+    },
+    {
+      "id": "freedman2020",
+      "label": "Freedman et al. 2020",
+      "title": "Calibration of the Tip of the Red Giant Branch (TRGB)",
+      "kind": "paper",
+      "cited": 72,
+      "doi": "",
+      "arxiv": "2002.01550",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "planck2018vi",
+      "label": "Planck 2018 VI",
+      "title": "Planck 2018 results. VI. Cosmological parameters",
+      "kind": "paper",
+      "cited": 51,
+      "doi": "",
+      "arxiv": "1807.06209",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "planck2018v",
+      "label": "Planck 2018 V",
+      "title": "Planck 2018 results. V. CMB power spectra and likelihoods",
+      "kind": "paper",
+      "cited": 67,
+      "doi": "",
+      "arxiv": "1907.12875",
+      "url": "",
+      "note": "the likelihoods used here"
+    },
+    {
+      "id": "kids1000",
+      "label": "Asgari et al. 2021 (KiDS-1000)",
+      "title": "KiDS-1000 Cosmology: Cosmic shear constraints and comparison between two point statistics",
+      "kind": "paper",
+      "cited": 74,
+      "doi": "",
+      "arxiv": "2007.15633",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "kidslegacy",
+      "label": "Wright et al. 2025 (KiDS-Legacy)",
+      "title": "KiDS-Legacy: Cosmological constraints from cosmic shear with the complete KiloDegree Survey",
+      "kind": "paper",
+      "cited": 75,
+      "doi": "",
+      "arxiv": "2503.19441",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "desi2025",
+      "label": "DESI DR2 2025",
+      "title": "DESI DR2 results. II. Measurements of baryon acoustic oscillations and cosmological constraints",
+      "kind": "paper",
+      "cited": 76,
+      "doi": "",
+      "arxiv": "2503.14738",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "lin2019",
+      "label": "Lin, Hobson & Lasenby 2019",
+      "title": "Ghost and tachyon free Poincaré gauge theories: A systematic approach",
+      "kind": "paper",
+      "cited": 21,
+      "doi": "",
+      "arxiv": "1812.02675",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "lin2020",
+      "label": "Lin, Hobson & Lasenby 2020",
+      "title": "Power-counting renormalizable, ghost-and-tachyon-free Poincaré gauge theories",
+      "kind": "paper",
+      "cited": 22,
+      "doi": "",
+      "arxiv": "1910.14197",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "barker2025psalter",
+      "label": "Barker, Marzo & Rigouzzo 2025",
+      "title": "Particle spectrum for any tensor Lagrangian",
+      "kind": "paper",
+      "cited": 82,
+      "doi": "",
+      "arxiv": "2406.09500",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "barker2020a",
+      "label": "Barker et al. 2020a",
+      "title": "Mapping Poincaré gauge cosmology to Horndeski theory for emergent dark energy",
+      "kind": "paper",
+      "cited": 35,
+      "doi": "",
+      "arxiv": "2006.03581",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "barker2020b",
+      "label": "Barker et al. 2020b",
+      "title": "Systematic study of background cosmology in unitary Poincaré gauge theories with application to emergent dark radiation and H0 tension",
+      "kind": "paper",
+      "cited": 36,
+      "doi": "",
+      "arxiv": "2003.02690",
+      "url": "",
+      "note": "the background-cosmology paper this one extends"
+    },
+    {
+      "id": "camb2000",
+      "label": "Lewis, Challinor & Lasenby 2000 (CAMB)",
+      "title": "Efficient computation of CMB anisotropies in closed FRW models",
+      "kind": "paper",
+      "cited": 54,
+      "doi": "",
+      "arxiv": "astro-ph/9911177",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "legnercamb",
+      "label": "Legner, Handley & Barker (modified CAMB)",
+      "title": "Supplemental materials: modified CAMB for TorC",
+      "kind": "paper",
+      "cited": 58,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://github.com/slegner/CAMB",
+      "note": "this paper's code"
+    },
+    {
+      "id": "polychord2015",
+      "label": "Handley, Hobson & Lasenby 2015 (PolyChord)",
+      "title": "PolyChord: nested sampling for cosmology",
+      "kind": "paper",
+      "cited": 52,
+      "doi": "",
+      "arxiv": "1502.01856",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "cobaya2021",
+      "label": "Torrado & Lewis 2021 (Cobaya)",
+      "title": "Cobaya: Code for Bayesian Analysis of hierarchical physical models",
+      "kind": "paper",
+      "cited": 53,
+      "doi": "",
+      "arxiv": "2005.05290",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "handley2019tension",
+      "label": "Handley & Lemos 2019",
+      "title": "Quantifying tensions in cosmological parameters: Interpreting the DES evidence ratio",
+      "kind": "paper",
+      "cited": 55,
+      "doi": "",
+      "arxiv": "1902.04029",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "handley2019dim",
+      "label": "Handley & Lemos 2019b",
+      "title": "Quantifying dimensionality: Bayesian cosmological model complexities",
+      "kind": "paper",
+      "cited": 69,
+      "doi": "",
+      "arxiv": "1903.06682",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "cooke2024bbn",
+      "label": "Cooke 2024",
+      "title": "Big Bang Nucleosynthesis",
+      "kind": "review",
+      "cited": 87,
+      "doi": "",
+      "arxiv": "2409.06015",
+      "url": "",
+      "note": ""
+    }
+  ],
+  "shortlist": [
+    "ryden2016",
+    "verde2019",
+    "hehl1976",
+    "trotta2008"
+  ]
+}

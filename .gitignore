@@ -1,0 +1,7 @@
+__pycache__/
+.DS_Store
+# cropped figures are embedded in the atlas pages and can be re-cropped with --pdf
+maps/*.figs/
+# intermediate standalone outputs; the atlas pages are the published ones
+maps/arxiv-*[0-9].html
+maps/*.roots.html

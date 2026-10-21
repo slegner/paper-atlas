@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Observational Evidence from Supernovae for an Accelerating Universe and a Cosmological Constant</title>
+<style>
+  :root {
+    --bg: #f7f6f2; --card: #ffffff; --ink: #1d1d1b; --muted: #6b6a65; --line: #d9d6cc;
+    --q: #2f5d8a; --a: #2e7d4f;
+    --why: #b5562b; --bg-k: #7a5aa6; --method: #2a7f8f; --results: #b08419; --concl: #4b7a2c;
+    --novel: #b0307a; --warn: #c0392b;
+    --t1: #2f5d8a; --t2: #a4501f; --t3: #6a4a9e; --t4: #2e7d4f; --t5: #8a6d00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17181a; --card: #222427; --ink: #ecebe6; --muted: #9c9b95; --line: #3a3c40;
+      --q: #7fb0e0; --a: #77c79a;
+      --why: #e08a5f; --bg-k: #b39ae0; --method: #6cc3d1; --results: #e2bf5a; --concl: #9fcb7a;
+      --novel: #f07ab8; --warn: #ff7b6b;
+      --t1: #8dbbe8; --t2: #f0a070; --t3: #c0a6ee; --t4: #7fd0a0; --t5: #e6c65c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17181a; --card: #222427; --ink: #ecebe6; --muted: #9c9b95; --line: #3a3c40;
+    --q: #7fb0e0; --a: #77c79a;
+    --why: #e08a5f; --bg-k: #b39ae0; --method: #6cc3d1; --results: #e2bf5a; --concl: #9fcb7a;
+      --novel: #f07ab8; --warn: #ff7b6b;
+      --t1: #8dbbe8; --t2: #f0a070; --t3: #c0a6ee; --t4: #7fd0a0; --t5: #e6c65c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  a { color: inherit; }
+  header { max-width: 1400px; margin: 0 auto; padding: 28px 24px 8px; }
+  header h1 { font-size: 22px; line-height: 1.25; margin: 0 0 4px; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .tldr { margin: 12px 0 0; font-size: 16px; max-width: 900px; }
+  .tldr b { color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; margin-right: 6px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  button {
+    font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  }
+
+  /* ---- the map ---- */
+  .map {
+    position: relative; max-width: 1240px; margin: 0 auto; padding: 24px;
+    display: flex; flex-direction: column; gap: 44px;
+  }
+  #wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  #wires path { fill: none; stroke-width: 2; opacity: .55; }
+  .hub {
+    position: relative; background: var(--card); border-radius: 14px; padding: 16px 18px;
+    border: 2px solid var(--c); box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    align-self: center; width: min(760px, 100%);
+  }
+  .hub .tag { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--c); }
+  .hub .big { font-size: 17px; font-weight: 600; margin: 6px 0 8px; line-height: 1.3; }
+  .hub .small { font-size: 13px; color: var(--muted); }
+  #question { --c: var(--q); }
+  #answer { --c: var(--a); }
+
+  .map > *, .branch > * { min-width: 0; }
+  .chip, .hub, dd, li { overflow-wrap: anywhere; }
+  .branches { display: grid; grid-template-columns: 1fr 1fr; gap: 44px 20px; position: relative; align-items: start; }
+  .branch.wide { grid-column: 1 / -1; }
+  .branch {
+    display: grid; grid-template-columns: 1fr; gap: 10px; align-items: start; padding: 12px 14px 14px;
+    background: color-mix(in srgb, var(--c) 8%, var(--bg));
+    border: 1px solid color-mix(in srgb, var(--c) 25%, transparent); border-radius: 14px;
+  }
+  .branch-label {
+    justify-self: start; text-align: center; font-weight: 700; font-size: 13px; color: #fff;
+    background: var(--c); border-radius: 10px; padding: 8px 6px; position: relative;
+  }
+  :root[data-theme="dark"] .branch-label { color: #111; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .branch-label { color: #111; } }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; position: relative; padding: 2px 0; }
+  .chip {
+    background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--c);
+    border-radius: 10px; padding: 7px 11px; cursor: pointer; max-width: 340px; font-size: 14px;
+    transition: box-shadow .15s;
+  }
+  .chip:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .chip .h { font-weight: 600; }
+  .chip .d { display: none; color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .chip.open .d { display: block; }
+  .chip.open { max-width: 460px; }
+  .refs { display: inline; }
+  .refs a {
+    display: inline-block; font-size: 11.5px; margin: 4px 4px 0 0; padding: 1px 7px; border-radius: 999px;
+    border: 1px solid var(--c); color: var(--c); text-decoration: none; white-space: nowrap;
+  }
+  .refs a:hover { background: var(--c); color: var(--card); }
+
+  /* ---- collapsible sections ---- */
+  .branch-head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 0; margin: 0;
+                 background: none; border: 0; border-radius: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+  .branch-head .count { font-size: 12.5px; color: var(--muted); }
+  .branch-head .hint, .test-head .hint { font-size: 11px; font-weight: 800; padding: 0 6px; border-radius: 4px; color: var(--card); }
+  .hint.novel { background: var(--novel); } .hint.caveat { background: var(--warn); }
+  .branch-head .chev { margin-left: auto; color: var(--c); font-size: 20px; line-height: 1; transition: transform .15s; }
+  .branch:not(.collapsed) > .branch-head .chev { transform: rotate(90deg); }
+  .branch.collapsed .branch-body { display: none; }
+  .branch.collapsed { padding-bottom: 12px; }
+  .branch.collapsed:hover { background: color-mix(in srgb, var(--c) 14%, var(--bg)); }
+  .branch-body { display: flex; flex-direction: column; gap: 10px; }
+
+  /* ---- results: one card per test ---- */
+  .tests { display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 12px; align-items: start; }
+  .test { --edge: color-mix(in srgb, var(--c) 50%, var(--line));
+          background: color-mix(in srgb, var(--c) 20%, var(--card)); border: 1.5px solid var(--edge); border-radius: 12px; }
+  .test-head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 14px; margin: 0;
+               background: none; border: 0; border-radius: 12px; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+  .test-head:hover { background: color-mix(in srgb, var(--c) 24%, var(--card)); }
+  .test-q { font-weight: 700; font-size: 15.5px; line-height: 1.3; }
+  .test-head .hints { margin-left: auto; white-space: nowrap; }
+  .test-head .chev { color: var(--c); font-size: 18px; line-height: 1; transition: transform .15s; }
+  .test:not(.collapsed) .test-head .chev { transform: rotate(90deg); }
+  .test.collapsed .test-body { display: none; }
+  .test-body { padding: 0 14px 12px; }
+  .test-how { font-size: 13px; color: var(--muted); padding-top: 8px; margin: 0 0 8px;
+              border-top: 1px solid color-mix(in srgb, var(--c) 25%, transparent); }
+  .test-how b { font-weight: 700; color: var(--ink); }
+  .test .chip.row { display: grid; grid-template-columns: 118px 1fr; column-gap: 10px; align-items: baseline;
+                    max-width: none; margin-top: 6px; border-width: 1.5px; border-style: solid; border-color: var(--edge); }
+  .test .chip.row.flag-novel { border-color: var(--novel); }
+  .test .chip.row.flag-caveat { border-color: var(--warn); border-style: dashed; }
+  .test .chip.row.flag-key { border-color: var(--c); }
+  .test .chip.row.nocond { grid-template-columns: 1fr; }
+  .test .chip.row .cond { margin: 0; }
+  .cond { display: block; width: fit-content; max-width: 100%; font-size: 11px; font-weight: 700; padding: 0 7px; margin-bottom: 4px;
+          border-radius: 999px; color: var(--tc); border: 1.5px solid var(--tc);
+          background: color-mix(in srgb, var(--tc) 10%, var(--card)); }
+
+  /* ---- flagged chips ---- */
+  .badge { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .05em; margin-right: 6px;
+           padding: 0 6px; border-radius: 4px; vertical-align: 1px; color: var(--card); background: var(--bc); }
+  .chip.flag-novel { --bc: var(--novel); background: color-mix(in srgb, var(--novel) 10%, var(--card)); border-color: var(--novel); }
+  .chip.flag-caveat { --bc: var(--warn); background: color-mix(in srgb, var(--warn) 9%, var(--card)); border-color: var(--warn); border-style: dashed; border-left-style: solid; }
+  .chip.flag-key { --bc: var(--c); border-color: var(--c); box-shadow: 0 0 0 1px var(--c); }
+  .chip.flag-key .h { font-weight: 700; }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-left: 8px; }
+  .filters span { font-size: 12px; color: var(--muted); }
+  .filters button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .map[data-filter] .chip { opacity: .25; }
+  .map[data-filter="novel"] .chip.flag-novel, .map[data-filter="caveat"] .chip.flag-caveat,
+  .map[data-filter="key"] .chip.flag-key { opacity: 1; }
+
+  /* ---- below the map ---- */
+  .extras { max-width: 1400px; margin: 0 auto; padding: 8px 24px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .extras section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; }
+  .extras h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+  dl { margin: 0; } dt { font-weight: 600; margin-top: 8px; } dd { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+  ol { margin: 0; padding-left: 20px; font-size: 14px; } li { margin: 5px 0; }
+  li .t { color: var(--muted); }
+  .empty { color: var(--muted); font-size: 14px; }
+
+  @media (max-width: 900px) {
+    header { padding: 20px 16px 4px; }
+    .map { gap: 26px; padding: 16px; }
+    .branches { grid-template-columns: 1fr; gap: 26px; }
+    #wires { display: none; }
+    .branch { grid-template-columns: 1fr; gap: 8px; padding: 10px 12px; }
+    .tests { grid-template-columns: 1fr; }
+    .test .chip.row { grid-template-columns: 1fr; row-gap: 4px; }
+    .chip, .chip.open { max-width: none; }
+    .extras { grid-template-columns: 1fr; padding: 8px 16px 32px; }
+    .filters { margin-left: 0; }
+    .branch, .hub { position: relative; }
+    .branch:not(:last-child)::after, #question::after {
+      content: "↓"; position: absolute; left: 50%; bottom: -23px; color: var(--muted); }
+  }
+  @media print { .toolbar { display: none; } .chip .d { display: block; } .branch.collapsed .branch-body { display: flex; } .test.collapsed .test-body { display: block; } }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title"></h1>
+  <div class="meta" id="meta"></div>
+  <p class="tldr" id="tldr"></p>
+  <div class="toolbar">
+    <button id="open-all">Open all sections</button>
+    <button id="toggle-all">Show all details</button>
+    <button id="theme">Light / dark</button>
+    <div class="filters" id="filters">
+      <span>Show:</span>
+      <button data-filter="" aria-pressed="true">All</button>
+      <button data-filter="novel" aria-pressed="false">★ New</button>
+      <button data-filter="caveat" aria-pressed="false">⚠ Caveats</button>
+      <button data-filter="key" aria-pressed="false">Key points</button>
+    </div>
+  </div>
+</header>
+
+
+<main class="map" id="map">
+  <svg id="wires" aria-hidden="true"></svg>
+  <div class="hub" id="question"></div>
+  <div class="branches" id="branches"></div>
+  <div class="hub" id="answer"></div>
+</main>
+
+<div class="extras">
+  <section><h2>Jargon, decoded</h2><dl id="glossary"></dl></section>
+  <section><h2>Key references</h2><ol id="references"></ol></section>
+</div>
+
+<script id="paper-data" type="application/json">{"title": "Observational Evidence from Supernovae for an Accelerating Universe and a Cosmological Constant", "authors": "Riess et al. (High-z Supernova Search Team)", "year": "1998", "venue": "The Astronomical Journal 116, 1009", "tldr": "Distant exploding stars look fainter than they should, which means the expansion of the Universe is speeding up, not slowing down.", "question": {"short": "Is the expansion of the Universe slowing down, as gravity predicts?", "detail": "With matter alone, gravity should decelerate cosmic expansion. Measuring how much it has slowed tells us the Universe's contents and fate."}, "answer": {"short": "No: expansion is accelerating, implying a cosmological constant (Ω_Λ > 0 at >99.7% confidence).", "detail": "Distant supernovae are 10-15% farther than a low-density, matter-only universe allows. The authors are confident but flag dust and evolution as the main systematics to rule out."}, "why_important": [{"headline": "Decides the fate of the Universe", "detail": "Deceleration vs acceleration determines whether expansion ever stops.", "refs": []}, {"headline": "Tests whether Einstein's Λ is real", "detail": "A non-zero cosmological constant would mean empty space carries energy.", "refs": []}, {"headline": "Age-of-Universe tension", "detail": "Matter-only models gave an age younger than the oldest stars; acceleration could fix this.", "refs": []}], "background": [{"headline": "Type Ia supernovae as standard candles", "detail": "These explosions have nearly uniform peak brightness, so apparent brightness gives distance.", "refs": [1]}, {"headline": "Brighter ones fade more slowly", "detail": "The light-curve shape vs luminosity relation lets each supernova be calibrated to ~7% in distance.", "refs": [1, 2]}, {"headline": "Earlier high-z hints", "detail": "A first small sample of distant supernovae had suggested a high-matter, decelerating universe.", "refs": [3]}, {"headline": "Nearby calibration sample", "detail": "Well-measured low-redshift supernovae anchor the distance scale.", "refs": [4]}], "method": [{"headline": "16 distant + 34 nearby supernovae", "detail": "High-redshift (0.16 < z < 0.97) SNe Ia found with CTIO, followed up with HST and Keck.", "refs": [5]}, {"headline": "Two light-curve fitting methods", "detail": "MLCS and a template-fitting method independently convert light curves into distances.", "refs": [2]}, {"headline": "Compare distance vs redshift", "detail": "Fit the Hubble diagram to cosmological models with different Ω_M and Ω_Λ.", "refs": []}, {"headline": "Check dust, evolution, selection", "detail": "Colour-based extinction corrections and tests for systematic differences between near and far samples.", "refs": []}], "results": [{"headline": "Distant SNe 10-15% too far", "detail": "They are fainter than expected for a low-density universe with Λ = 0.", "refs": []}, {"headline": "Ω_Λ > 0 at 3.0-4.0σ", "detail": "Depending on method and sample, a positive cosmological constant is strongly preferred.", "refs": []}, {"headline": "Deceleration parameter q₀ < 0", "detail": "Current expansion is accelerating, at 2.8σ-3.9σ.", "refs": []}, {"headline": "Age ≈ 14.2 ± 1.7 Gyr", "detail": "Consistent with ages of the oldest stars, easing the earlier tension.", "refs": []}], "conclusion": [{"headline": "Universe is accelerating", "detail": "Something with negative pressure, like a cosmological constant, dominates today.", "refs": []}, {"headline": "Caveat: dust or SN evolution", "detail": "Grey dust or brighter-in-the-past supernovae could mimic the signal; no evidence for either yet.", "refs": []}, {"headline": "Small sample, more needed", "detail": "Only 16 high-z objects; independent confirmation (e.g. CMB) is needed.", "refs": [6]}], "glossary": [{"term": "Standard candle", "meaning": "An object of known true brightness, so how bright it looks tells you how far away it is."}, {"term": "Redshift (z)", "meaning": "How much light is stretched by cosmic expansion; a proxy for distance and look-back time."}, {"term": "Cosmological constant (Λ)", "meaning": "Energy of empty space that pushes expansion to speed up."}, {"term": "Ω_M, Ω_Λ", "meaning": "Fractions of the critical density in matter and in Λ."}, {"term": "MLCS", "meaning": "Multicolour Light Curve Shape: a method to standardise each supernova's brightness."}], "references": [{"id": 1, "label": "Phillips 1993", "title": "The absolute magnitudes of Type Ia supernovae", "doi": "", "arxiv": ""}, {"id": 2, "label": "Riess, Press & Kirshner 1996", "title": "A Precise Distance Indicator: Type Ia Supernova Multicolor Light-Curve Shapes", "doi": "", "arxiv": ""}, {"id": 3, "label": "Perlmutter et al. 1997", "title": "Measurements of the Cosmological Parameters Omega and Lambda from the First Seven Supernovae at z >= 0.35", "doi": "", "arxiv": ""}, {"id": 4, "label": "Hamuy et al. 1996", "title": "The Absolute Luminosities of the Calan/Tololo Type Ia Supernovae", "doi": "", "arxiv": ""}, {"id": 5, "label": "Schmidt et al. 1998", "title": "The High-Z Supernova Search: Measuring Cosmic Deceleration and Global Curvature of the Universe Using Type Ia Supernovae", "doi": "", "arxiv": ""}, {"id": 6, "label": "Lineweaver 1998", "title": "The Cosmic Microwave Background and Observational Convergence in the Omega_M - Omega_Lambda Plane", "doi": "", "arxiv": ""}]}</script>
+<script>
+(function () {
+  const data = JSON.parse(document.getElementById("paper-data").textContent);
+  const BRANCHES = [
+    ["why_important", "Why it matters", "--why"],
+    ["background", "Background", "--bg-k"],
+    ["method", "Method", "--method"],
+    ["results", "Results", "--results"],
+    ["conclusion", "Conclusion", "--concl"],
+  ];
+  const map = document.getElementById("map");
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  const refsById = {};
+  (data.references || []).forEach((r) => { refsById[r.id] = r; });
+  function refUrl(r) {
+    if (r.url) return r.url;
+    if (r.doi) return "https://doi.org/" + r.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//, "");
+    if (r.arxiv) return "https://arxiv.org/abs/" + r.arxiv.replace(/^arxiv:/i, "");
+    return "https://scholar.google.com/scholar?q=" + encodeURIComponent(r.title || r.label);
+  }
+  const refLink = (r) =>
+    `<a href="${esc(refUrl(r))}" target="_blank" rel="noopener" title="${esc(r.title || r.label)}">${esc(r.label)} ↗</a>`;
+
+  document.getElementById("title").textContent = data.title || "Untitled paper";
+  document.getElementById("meta").textContent = [data.authors, data.year, data.venue].filter(Boolean).join(" · ");
+  document.getElementById("tldr").innerHTML = data.tldr ? `<b>TL;DR</b>${esc(data.tldr)}` : "";
+
+  const hub = (tag, o) => `<div class="tag">${tag}</div><div class="big">${esc(o && o.short)}</div><div class="small">${esc(o && o.detail)}</div>`;
+  document.getElementById("question").innerHTML = hub("The question", data.question);
+  document.getElementById("answer").innerHTML = hub("The answer", data.answer);
+
+  const BADGES = {
+    novel: '<span class="badge">★ NEW</span>',
+    caveat: '<span class="badge">⚠ CAVEAT</span>',
+    key: '<span class="badge">KEY</span>',
+  };
+
+  // Same condition text -> same tag colour everywhere, so "Planck only" vs "Planck + SH0ES" reads at a glance.
+  const condColours = {};
+  const condTag = (c) => {
+    if (!c) return "";
+    if (!(c in condColours)) condColours[c] = `var(--t${(Object.keys(condColours).length % 5) + 1})`;
+    return `<span class="cond" style="--tc:${condColours[c]}">${esc(c)}</span>`;
+  };
+  function chip(it) {
+    const refs = (it.refs || []).map((id) => refsById[id]).filter(Boolean);
+    const flag = BADGES[it.flag] ? it.flag : "none";
+    return `<div class="chip flag-${flag}" tabindex="0">${condTag(it.condition)}<div class="h">${BADGES[flag] || ""}${esc(it.headline)}</div><div class="d">${esc(it.detail)}${
+      refs.length ? `<div class="refs">${refs.map(refLink).join("")}</div>` : ""}</div></div>`;
+  }
+
+  // A result row: condition on the left, outcome (click for detail) on the right.
+  function resultRow(it) {
+    const refs = (it.refs || []).map((id) => refsById[id]).filter(Boolean);
+    const flag = BADGES[it.flag] ? it.flag : "none";
+    return `<div class="chip row flag-${flag}${it.condition ? "" : " nocond"}" tabindex="0">${condTag(it.condition)}<div>` +
+      `<div class="h">${BADGES[flag] || ""}${esc(it.headline)}</div><div class="d">${esc(it.detail)}${
+      refs.length ? `<div class="refs">${refs.map(refLink).join("")}</div>` : ""}</div></div></div>`;
+  }
+
+  const branchesEl = document.getElementById("branches");
+  // Tiers drive the top-down wiring: question -> context row -> each later panel -> answer.
+  let tier = 0;
+  function addPanel(label, color, inner, key, count) {
+    const row = document.createElement("div");
+    const context = key === "why_important" || key === "background";
+    row.className = context ? "branch" : "branch wide";
+    if (!context || key === "why_important" || !branchesEl.querySelector('[data-key="why_important"]')) tier++;
+    row.dataset.tier = tier;
+    row.dataset.key = key;
+    row.style.setProperty("--c", `var(${color})`);
+    row.dataset.color = color;
+    row.classList.add("collapsed");
+    row.innerHTML = `<button class="branch-head" aria-expanded="false"><span class="branch-label">${label}</span>` +
+      `<span class="count">${count}</span><span class="hints"></span><span class="chev">▸</span></button>` +
+      `<div class="branch-body">${inner}</div>`;
+    // Collapsed headers still say how many ★ / ⚠ points are inside, so caveats can't hide.
+    const nNew = row.querySelectorAll(".chip.flag-novel").length;
+    const nCav = row.querySelectorAll(".chip.flag-caveat").length;
+    row.querySelector(".hints").innerHTML =
+      (nNew ? `<span class="hint novel">★ ${nNew}</span> ` : "") + (nCav ? `<span class="hint caveat">⚠ ${nCav}</span>` : "");
+    branchesEl.appendChild(row);
+  }
+  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  const analyses = data.analyses || [];
+  BRANCHES.forEach(([key, label, color]) => {
+    // Maps with `analyses`: Method shows the shared setup, then one panel ties each analysis to its results.
+    if (analyses.length && key === "method") {
+      const setup = data.setup || [];
+      if (setup.length) addPanel("Method", "--method", `<div class="chips">${setup.map(chip).join("")}</div>`, key, plural(setup.length, "item"));
+      return;
+    }
+    if (analyses.length && key === "results") {
+      // Each card: the question this test answers, how it was done, then one row per case.
+      addPanel("Results", "--results", `<div class="tests">${
+        analyses.map((a) => {
+          const refs = (a.method.refs || []).map((id) => refsById[id]).filter(Boolean);
+          const res = a.results || [];
+          const nNew = res.filter((r) => r.flag === "novel").length, nCav = res.filter((r) => r.flag === "caveat").length;
+          // Folded by default: only the question shows until the card is clicked.
+          return `<div class="test collapsed"><button class="test-head" aria-expanded="false">` +
+            `<span class="test-q">${esc(a.method.headline)}</span><span class="hints">` +
+            (nNew ? `<span class="hint novel">★ ${nNew}</span> ` : "") + (nCav ? `<span class="hint caveat">⚠ ${nCav}</span>` : "") +
+            `</span><span class="chev">▸</span></button><div class="test-body">` +
+            `<div class="test-how"><b>How:</b> ${esc(a.method.detail)}${
+              refs.length ? ` <span class="refs">${refs.map(refLink).join("")}</span>` : ""}</div>` +
+            res.map(resultRow).join("") + `</div></div>`;
+        }).join("")
+      }</div>`, key, plural(analyses.length, "test"));
+      return;
+    }
+    const items = data[key] || [];
+    if (!items.length) return;
+    addPanel(label, color, `<div class="chips">${items.map(chip).join("")}</div>`, key, plural(items.length, "point"));
+  });
+  // A lone context panel (only one of why/background present) takes the full width.
+  const ctx = branchesEl.querySelectorAll(".branch:not(.wide)");
+  if (ctx.length === 1) ctx[0].classList.add("wide");
+  document.getElementById("question").dataset.tier = 0;
+  document.getElementById("answer").dataset.tier = tier + 1;
+
+  const gl = data.glossary || [];
+  document.getElementById("glossary").innerHTML = gl.length
+    ? gl.map((g) => `<dt>${esc(g.term)}</dt><dd>${esc(g.meaning)}</dd>`).join("")
+    : '<span class="empty">No jargon listed.</span>';
+  const refs = data.references || [];
+  document.getElementById("references").innerHTML = refs.length
+    ? refs.map((r) => `<li>${refLink(r)} <span class="t">${esc(r.title)}</span></li>`).join("")
+    : '<span class="empty">No references extracted.</span>';
+
+  // ---- interactions ----
+  function setOpen(el, open) {
+    el.classList.toggle("collapsed", !open);
+    el.querySelector(":scope > .branch-head, :scope > .test-head").setAttribute("aria-expanded", String(open));
+  }
+  // Sections and result cards fold the same way; "open all" and filters open both.
+  const rows = () => branchesEl.querySelectorAll(".branch, .test");
+  branchesEl.addEventListener("click", (e) => {
+    if (e.target.closest("a")) return;
+    const head = e.target.closest(".branch-head, .test-head");
+    if (head) { const row = head.parentElement; setOpen(row, row.classList.contains("collapsed")); syncOpenAll(); drawWires(); return; }
+    const chip = e.target.closest(".chip");
+    if (chip) { chip.classList.toggle("open"); drawWires(); }
+  });
+  branchesEl.addEventListener("keydown", (e) => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("chip")) {
+      e.preventDefault(); e.target.classList.toggle("open"); drawWires();
+    }
+  });
+  const openAllBtn = document.getElementById("open-all");
+  function syncOpenAll() {
+    const anyClosed = [...rows()].some((r) => r.classList.contains("collapsed"));
+    openAllBtn.textContent = anyClosed ? "Open all sections" : "Close all sections";
+  }
+  openAllBtn.addEventListener("click", () => {
+    const open = openAllBtn.textContent === "Open all sections";
+    rows().forEach((r) => setOpen(r, open));
+    syncOpenAll(); drawWires();
+  });
+  const toggleBtn = document.getElementById("toggle-all");
+  toggleBtn.addEventListener("click", () => {
+    const open = toggleBtn.textContent === "Show all details";
+    document.querySelectorAll(".chip").forEach((c) => c.classList.toggle("open", open));
+    if (open) rows().forEach((r) => setOpen(r, true));
+    toggleBtn.textContent = open ? "Hide all details" : "Show all details";
+    syncOpenAll(); drawWires();
+  });
+  document.getElementById("filters").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    document.querySelectorAll("#filters button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    if (b.dataset.filter) {
+      map.dataset.filter = b.dataset.filter;
+      rows().forEach((r) => setOpen(r, true));  // matches must be visible
+      syncOpenAll(); drawWires();
+    } else delete map.dataset.filter;
+  });
+  document.getElementById("theme").addEventListener("click", () => {
+    const root = document.documentElement;
+    const dark = root.dataset.theme
+      ? root.dataset.theme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    drawWires();
+  });
+
+  // ---- connector curves, top-down: each tier to the next ----
+  const svg = document.getElementById("wires");
+  function drawWires() {
+    const m = map.getBoundingClientRect();
+    if (getComputedStyle(svg).display === "none") return;
+    const css = getComputedStyle(document.documentElement);
+    const tiers = [];
+    map.querySelectorAll("[data-tier]").forEach((el) => { (tiers[+el.dataset.tier] ||= []).push(el); });
+    const curve = (x1, y1, x2, y2) => {
+      const dy = (y2 - y1) * 0.5;
+      return `M${x1},${y1} C${x1},${y1 + dy} ${x2},${y2 - dy} ${x2},${y2}`;
+    };
+    let paths = "";
+    for (let t = 0; t + 1 < tiers.length; t++) {
+      (tiers[t] || []).forEach((a) => (tiers[t + 1] || []).forEach((b) => {
+        const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+        // Colour each wire by the panel it touches (the source panel, or the target if the source is the question).
+        const color = css.getPropertyValue((a.dataset.color || b.dataset.color || "--q")).trim();
+        const ax = (ra.left + ra.right) / 2 - m.left, bx = (rb.left + rb.right) / 2 - m.left;
+        paths += `<path stroke="${color}" d="${curve(ax, ra.bottom - m.top, bx, rb.top - m.top)}"/>`;
+      }));
+    }
+    svg.innerHTML = paths;
+  }
+  window.addEventListener("resize", drawWires);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawWires);
+  drawWires();
+})();
+</script>
+</body>
+</html>

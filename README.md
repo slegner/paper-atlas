@@ -1,94 +1,138 @@
 # paper-map
 
-Turns a research paper into a one-page, top-down HTML map:
+Turns a research paper into an interactive **paper atlas**: a single HTML page that shows what the paper asks
+and finds, how it gets there, and what a newcomer needs to learn first, with a reading list for every concept.
 
-**Question ↓ [Why it matters | Background] ↓ Method ↓ Results ↓ Conclusion ↓ Answer**
+The example used throughout is the TorC paper, *Alleviating the Hubble tension with Torsion Condensation*
+(Legner, Handley, Barker & Ormondroyd, [arXiv:2507.09228](https://arxiv.org/abs/2507.09228)):
+open [`maps/arxiv-2507.09228.atlas.html`](maps/arxiv-2507.09228.atlas.html) in a browser.
 
-Sections start collapsed, so first you see only the question and the answer; each header shows how many
-points it holds and how many are ★ new or ⚠ caveats. Click a header to open it, or use *Open all sections*.
+## What the atlas shows
 
-Method lists the shared setup. Results has one card per test: the question it answers, how it was done,
-then one row per case with its condition on the left (e.g. `Planck only` vs `Planck + SH0ES`), so the contrast
-is visible side by side.
+### 1. The mind map: the ideas behind the paper
 
-Blocks carry ★ NEW (what this paper adds over prior work), ⚠ CAVEAT (assumptions, missing physics, weak
-statistics) and KEY badges, and the *Show* buttons fade out everything else.
+![TorC mind map](docs/torc-mindmap.png)
 
-Click any block to expand it. Background points link to the cited papers (DOI/arXiv when the
-paper prints one, otherwise a Google Scholar search). A jargon glossary and reference list sit below the map.
+The paper sits in the centre, with its question and answer in a card beside it. Around it are the big **areas**
+it draws on (for TorC: the Hubble tension, gravity as a gauge theory, TorC cosmology, Boltzmann codes,
+Bayesian model comparison, and the basics), and further out their **concepts**, in shaded layers: the further
+out, the more basic.
 
-## Use
+| Layer | Meaning | TorC examples |
+|---|---|---|
+| Frontier ★ | the recent work this paper directly extends | torsion condensation, torsion as dark radiation, torsion as effective dark energy in CAMB |
+| Areas | the fields it draws on | the Hubble tension, gravity as a gauge theory |
+| Specialist | graduate-level ideas | Poincaré gauge theory, nested sampling, the R-statistic |
+| Core | what every student of the field learns | the CMB power spectrum, Friedmann equations, gauge theories |
+| Foundations | intro-textbook science | the expanding universe and H₀, general relativity |
 
-```sh
-export ANTHROPIC_API_KEY=sk-ant-...        # once
-python3 paper_map.py ~/Downloads/paper.pdf --open
-python3 paper_map.py 1706.03762 --open     # arXiv ID or URL works too
-```
+Circles float and can be dragged; scroll to zoom.
 
-Writes `paper.json` (the extracted structure) and `paper.html` next to the PDF (or into `--out-dir`).
-Edit the JSON by hand if you like, then re-render without calling the API:
+### 2. Concept cards: what it is, why it's here, where to read
 
-```sh
-python3 paper_map.py --from-json paper.json
-```
+![TorC concept card](docs/torc-concept.png)
 
-`--effort low|medium|high|xhigh|max` trades speed/cost against depth (default `high`).
+Clicking a concept opens a card on the side (the map narrows so it stays visible). Each card has:
+- **What it is**, in plain words, with the most basic reading to start with.
+- **In this paper**, with the paper(s) this work builds on.
+- **The equation in this paper**, typeset, when one belongs to the concept (above: the R-statistic, Eq. 25).
+- Folded sections: the full reading ladder (*Start here → Go deeper → The original → What this paper builds on*),
+  what to learn first, and the path from the basics, which is also numbered on the map.
 
-## Without an API key
+Readings come from the paper's own reference list where possible (tagged `cited [N]`). Basic textbooks and
+reviews it doesn't cite are tagged `suggested`, e.g. Ryden's *Introduction to Cosmology* for the expanding
+universe or Sivia & Skilling for Bayesian inference. *Reading order* lists every concept from the basics up.
 
-Ask Claude Code: *"Read paper.pdf and write a JSON map following the SCHEMA in paper_map.py, then run
-`--from-json` on it."* `examples/riess1998.json` is a hand-written example.
+### 3. The paper view: from question to answer
 
-## Atlas (atlas.py): mind map + paper flow in one page
+![TorC paper view](docs/torc-paper.png)
 
-Opens on a floating mind map: this paper in the centre (its question and answer float in a card beside it),
-the big areas it draws on around it, and their concepts further out in five shaded, numbered layers:
-frontier, areas, specialist, core, foundations. Clicking a circle opens its details in a panel on the right, with
-the map narrowing beside it so it stays in view: areas say why they matter, what they contribute to the paper and the best way in;
-concepts give a plain explanation, a reading ladder, and their prerequisites, numbered on the map.
+*Read the paper* lays the paper out top to bottom: **The question → [Why it matters | Background] → Method →
+Results → Conclusion → The answer**. Parts open on click; each point unfolds in place with its detail, the papers
+it builds on, and the concepts behind it.
 
-*Read the paper* lays the paper out top to bottom, like the original map: The question → [Why it matters |
-Background] → Method → Results → Conclusion → The answer, joined by dotted connectors. Each part is a tinted
-block led by its circle; it opens on click, and each point unfolds its details in place (the papers it builds
-on and the concepts behind it). A paper with more than one big question (`other_questions`) shows them together
-in one "The big questions" box and groups its tests by question; only questions marked `separate` (answered by
-clearly distinct work) get their own side-by-side boxes and result lanes. *Key points* shows a short top-to-bottom path through the key points only
-Words naming a concept are
-dotted-underlined: click for a short explainer and where to read more. Each block keeps its figures and key equations folded behind *View figures* / *View equations* buttons (equations come
-from the map's `equations` list and are typeset with KaTeX, loaded only when opened; offline they show as LaTeX). Plots appear as thumbnails
-(a figure's or equation's `attach` can list several places: a block such as `setup`, a test `results:2`, or a single
-point, `setup#2` for the 2nd Method point or `results:3#1` for the 1st finding of test 3; points then get their own buttons); clicking one opens it full-screen with its
-caption, with arrows to step through all figures. The arXiv ID / DOI in the citation line, and an *Open the paper* button, link to the paper. Jargon and reference lists are
-left out, since that information is in the explainers and zoom cards.
+- **Results** has one entry per test (*Do Planck and SH0ES agree?*, *Is TorC preferred over ΛCDM?*, ...), each with
+  how it was done and a highlighted *What they found* panel, one finding per dataset or model
+  (`ΛCDM` vs `TorC`, `Planck only` vs `Planck + SH0ES`).
+- **★ NEW** marks what the paper adds (for TorC: recasting torsion as an effective dark-energy ρ(a), P(a) in CAMB,
+  and the first full Planck + SH0ES fit). **⚠ CAVEAT** marks what a referee would worry about (background only,
+  no TorC perturbations yet; ghost-freedom shown only around zero torsion). *Highlight* fades everything else.
+- **View figures / View equations** buttons in each part, test or point reveal the paper's plots (click one to
+  open it full-screen) and key equations, with a plain explanation of each.
+- Words with a **dotted underline** (*R-statistic*, *SH0ES*, *torsion*, ...) open a short explainer with where
+  to start reading.
+- *Key points* gives the short version: question → the key points → answer.
+- The arXiv ID and *Open the paper* link go to the paper itself.
 
-```sh
-python3 atlas.py ~/Downloads/paper.pdf --open        # both extractions, then the atlas
-python3 atlas.py --map maps/arxiv-2610.18864.json --roots maps/arxiv-2610.18864.roots.json
-```
+## Making an atlas
 
-## Learning map (roots_map.py)
-
-The paper map shows a paper as it is written. The learning map traces it back to its roots, for a reader
-new to the field: every concept the introduction, methods, results and discussion rely on, arranged as a
-ladder from foundations (level 1) to the frontier this paper extends (level 4), each with a reading ladder:
-**Start here** (an intro textbook chapter or readable review), **Go deeper**, **The original** paper, and
-**What this paper builds on**. Readings from the paper's own reference list are tagged `cited [N]`; basic
-textbooks it doesn't cite are tagged `suggested`.
+With an Anthropic API key, from a PDF or an arXiv ID:
 
 ```sh
-python3 roots_map.py ~/Downloads/paper.pdf --open        # or an arXiv ID
-python3 roots_map.py --from-json maps/arxiv-2610.18864.roots.json
+export ANTHROPIC_API_KEY=sk-ant-...
+python3 atlas.py 2507.09228 --open
 ```
 
-Three views: *Ladder* (click a concept to highlight, in reading order, everything to learn first),
-*By paper section*, and *Bookshelf* (a shortlist, a reading order for the whole map, and every reading by type).
-Without an API key, ask Claude Code to write `<name>.roots.json` following `SCHEMA` in `roots_map.py`.
+This makes two Claude calls (the paper map and the learning map), crops the figures from the PDF, and writes
+`arxiv-2507.09228.json`, `arxiv-2507.09228.roots.json`, and the self-contained `arxiv-2507.09228.atlas.html`.
+`--effort low|medium|high|xhigh|max` trades speed and cost against depth (default `high`).
+
+To rebuild from saved maps, e.g. after editing them by hand (`--pdf` re-crops the figures):
+
+```sh
+python3 atlas.py --map maps/arxiv-2507.09228.json --roots maps/arxiv-2507.09228.roots.json --pdf 2507.09228
+```
+
+**Without an API key**, ask Claude Code: *"Read this paper and write `<name>.json` following `SCHEMA` in
+`paper_map.py` and `<name>.roots.json` following `SCHEMA` in `roots_map.py`, then run `atlas.py` on them."*
+That is how the three maps in `maps/` were made.
+
+Figure cropping needs PyMuPDF (`pip install pymupdf`); equations are typeset with KaTeX, loaded from a CDN the
+first time they are opened (offline they show as LaTeX source). Everything else works offline.
+
+## The two maps behind an atlas
+
+**The paper map** (`<name>.json`, schema in `paper_map.py`) is the paper as written: `question` and `answer`
+(plus `other_questions` if it answers more than one big question), `why_important`, `background`, `setup`,
+`analyses` (each a test with its results and their conditions), `conclusion`, `figures`, `equations` and
+`references`. Each point has a `flag`: `novel`, `caveat`, `key` or `none`.
+
+Figures and equations say where they belong with `attach`, which may list several places:
+
+| `attach` | Shown in |
+|---|---|
+| `background`, `setup`, `conclusion`, ... | that part |
+| `results:3` | the 3rd test |
+| `setup#2` | the 2nd point of Method |
+| `results:3#1` | the 1st finding of the 3rd test |
+
+For TorC, Eq. 25 (the R-statistic) has `"attach": "results:3"` and `"concepts": ["rstat"]`, so it appears in
+the *Do Planck and SH0ES agree?* test and on the R-statistic concept card.
+
+**The learning map** (`<name>.roots.json`, schema in `roots_map.py`) is what a newcomer needs: `sections` (the
+areas, each with what it is, its part in the paper and the best way in), `concepts` (each with a level from 1
+foundations to 4 frontier, a plain explanation, why the paper needs it, `prereqs`, the words the paper uses for
+it, and a reading ladder) and `readings`.
+
+## Other outputs
+
+- `paper_map.py paper.pdf` makes the paper map alone as a standalone page (`template.html`).
+- `roots_map.py paper.pdf` makes the learning map alone, with *Ladder*, *By paper section* and *Bookshelf* views
+  (`roots_template.html`).
+
+## Examples
+
+| Paper | Atlas |
+|---|---|
+| Legner et al., *Alleviating the Hubble tension with Torsion Condensation (TorC)*, arXiv:2507.09228 | [`maps/arxiv-2507.09228.atlas.html`](maps/arxiv-2507.09228.atlas.html) |
+| Kumar & Cooke, *Simulations of the Evolving Ozone Layer*, arXiv:2610.18864 (two big questions) | [`maps/arxiv-2610.18864.atlas.html`](maps/arxiv-2610.18864.atlas.html) |
+| Vaswani et al., *Attention Is All You Need*, arXiv:1706.03762 | [`maps/arxiv-1706.03762.atlas.html`](maps/arxiv-1706.03762.atlas.html) |
 
 ## Files
 
-- `paper_map.py`: fetches the PDF, asks Claude (`claude-opus-5-5`, structured JSON output) for the map, renders it
-- `template.html`: self-contained mind-map page; the JSON is embedded, so the output works offline
-- `roots_map.py`, `roots_template.html`: the learning map (reuses `load_pdf`/`extract` from `paper_map.py`)
-- `atlas.py`, `atlas_template.html`: the combined atlas page
-
-A copy of the tool from before the learning map was added is in `../paper-map-backup-2026-10-21/`.
+- `atlas.py`, `atlas_template.html`: the atlas (mind map, concept cards, paper view)
+- `paper_map.py`, `template.html`: the paper map, PDF/arXiv loading and the Claude call (`claude-opus-5-5`, structured output)
+- `roots_map.py`, `roots_template.html`: the learning map
+- `figures.py`: crops numbered figures out of a PDF
+- `maps/`: the example maps and atlases; `examples/`: a hand-written paper map (Riess et al. 1998)
+- `docs/`: the screenshots above

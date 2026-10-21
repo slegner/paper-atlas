@@ -1,0 +1,58 @@
+{
+  "title": "Observational Evidence from Supernovae for an Accelerating Universe and a Cosmological Constant",
+  "authors": "Riess et al. (High-z Supernova Search Team)",
+  "year": "1998",
+  "venue": "The Astronomical Journal 116, 1009",
+  "tldr": "Distant exploding stars look fainter than they should, which means the expansion of the Universe is speeding up, not slowing down.",
+  "question": {
+    "short": "Is the expansion of the Universe slowing down, as gravity predicts?",
+    "detail": "With matter alone, gravity should decelerate cosmic expansion. Measuring how much it has slowed tells us the Universe's contents and fate."
+  },
+  "answer": {
+    "short": "No: expansion is accelerating, implying a cosmological constant (Ω_Λ > 0 at >99.7% confidence).",
+    "detail": "Distant supernovae are 10-15% farther than a low-density, matter-only universe allows. The authors are confident but flag dust and evolution as the main systematics to rule out."
+  },
+  "why_important": [
+    {"headline": "Decides the fate of the Universe", "detail": "Deceleration vs acceleration determines whether expansion ever stops.", "refs": []},
+    {"headline": "Tests whether Einstein's Λ is real", "detail": "A non-zero cosmological constant would mean empty space carries energy.", "refs": []},
+    {"headline": "Age-of-Universe tension", "detail": "Matter-only models gave an age younger than the oldest stars; acceleration could fix this.", "refs": []}
+  ],
+  "background": [
+    {"headline": "Type Ia supernovae as standard candles", "detail": "These explosions have nearly uniform peak brightness, so apparent brightness gives distance.", "refs": [1]},
+    {"headline": "Brighter ones fade more slowly", "detail": "The light-curve shape vs luminosity relation lets each supernova be calibrated to ~7% in distance.", "refs": [1, 2]},
+    {"headline": "Earlier high-z hints", "detail": "A first small sample of distant supernovae had suggested a high-matter, decelerating universe.", "refs": [3]},
+    {"headline": "Nearby calibration sample", "detail": "Well-measured low-redshift supernovae anchor the distance scale.", "refs": [4]}
+  ],
+  "method": [
+    {"headline": "16 distant + 34 nearby supernovae", "detail": "High-redshift (0.16 < z < 0.97) SNe Ia found with CTIO, followed up with HST and Keck.", "refs": [5]},
+    {"headline": "Two light-curve fitting methods", "detail": "MLCS and a template-fitting method independently convert light curves into distances.", "refs": [2]},
+    {"headline": "Compare distance vs redshift", "detail": "Fit the Hubble diagram to cosmological models with different Ω_M and Ω_Λ.", "refs": []},
+    {"headline": "Check dust, evolution, selection", "detail": "Colour-based extinction corrections and tests for systematic differences between near and far samples.", "refs": []}
+  ],
+  "results": [
+    {"headline": "Distant SNe 10-15% too far", "detail": "They are fainter than expected for a low-density universe with Λ = 0.", "refs": []},
+    {"headline": "Ω_Λ > 0 at 3.0-4.0σ", "detail": "Depending on method and sample, a positive cosmological constant is strongly preferred.", "refs": []},
+    {"headline": "Deceleration parameter q₀ < 0", "detail": "Current expansion is accelerating, at 2.8σ-3.9σ.", "refs": []},
+    {"headline": "Age ≈ 14.2 ± 1.7 Gyr", "detail": "Consistent with ages of the oldest stars, easing the earlier tension.", "refs": []}
+  ],
+  "conclusion": [
+    {"headline": "Universe is accelerating", "detail": "Something with negative pressure, like a cosmological constant, dominates today.", "refs": []},
+    {"headline": "Caveat: dust or SN evolution", "detail": "Grey dust or brighter-in-the-past supernovae could mimic the signal; no evidence for either yet.", "refs": []},
+    {"headline": "Small sample, more needed", "detail": "Only 16 high-z objects; independent confirmation (e.g. CMB) is needed.", "refs": [6]}
+  ],
+  "glossary": [
+    {"term": "Standard candle", "meaning": "An object of known true brightness, so how bright it looks tells you how far away it is."},
+    {"term": "Redshift (z)", "meaning": "How much light is stretched by cosmic expansion; a proxy for distance and look-back time."},
+    {"term": "Cosmological constant (Λ)", "meaning": "Energy of empty space that pushes expansion to speed up."},
+    {"term": "Ω_M, Ω_Λ", "meaning": "Fractions of the critical density in matter and in Λ."},
+    {"term": "MLCS", "meaning": "Multicolour Light Curve Shape: a method to standardise each supernova's brightness."}
+  ],
+  "references": [
+    {"id": 1, "label": "Phillips 1993", "title": "The absolute magnitudes of Type Ia supernovae", "doi": "", "arxiv": ""},
+    {"id": 2, "label": "Riess, Press & Kirshner 1996", "title": "A Precise Distance Indicator: Type Ia Supernova Multicolor Light-Curve Shapes", "doi": "", "arxiv": ""},
+    {"id": 3, "label": "Perlmutter et al. 1997", "title": "Measurements of the Cosmological Parameters Omega and Lambda from the First Seven Supernovae at z >= 0.35", "doi": "", "arxiv": ""},
+    {"id": 4, "label": "Hamuy et al. 1996", "title": "The Absolute Luminosities of the Calan/Tololo Type Ia Supernovae", "doi": "", "arxiv": ""},
+    {"id": 5, "label": "Schmidt et al. 1998", "title": "The High-Z Supernova Search: Measuring Cosmic Deceleration and Global Curvature of the Universe Using Type Ia Supernovae", "doi": "", "arxiv": ""},
+    {"id": 6, "label": "Lineweaver 1998", "title": "The Cosmic Microwave Background and Observational Convergence in the Omega_M - Omega_Lambda Plane", "doi": "", "arxiv": ""}
+  ]
+}

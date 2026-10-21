@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__PAGE_TITLE__</title>
+<style>
+  :root {
+    --bg: #f7f6f2; --card: #ffffff; --ink: #1d1d1b; --muted: #6b6a65; --line: #d9d6cc;
+    --paper: #2f5d8a; --hi: #b0307a; --cite: #2e7d4f; --sugg: #8a6d00;
+    --s1: #6b6a65; --s2: #a4501f; --s3: #2a7f8f; --s4: #6a4a9e; --s5: #2f5d8a; --s6: #2e7d4f; --s7: #b0307a; --s8: #8a6d00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17181a; --card: #222427; --ink: #ecebe6; --muted: #9c9b95; --line: #3a3c40;
+      --paper: #7fb0e0; --hi: #f07ab8; --cite: #77c79a; --sugg: #e6c65c;
+      --s1: #a9a8a2; --s2: #f0a070; --s3: #6cc3d1; --s4: #c0a6ee; --s5: #8dbbe8; --s6: #7fd0a0; --s7: #f07ab8; --s8: #e6c65c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17181a; --card: #222427; --ink: #ecebe6; --muted: #9c9b95; --line: #3a3c40;
+    --paper: #7fb0e0; --hi: #f07ab8; --cite: #77c79a; --sugg: #e6c65c;
+    --s1: #a9a8a2; --s2: #f0a070; --s3: #6cc3d1; --s4: #c0a6ee; --s5: #8dbbe8; --s6: #7fd0a0; --s7: #f07ab8; --s8: #e6c65c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  a { color: inherit; }
+  header { max-width: 1300px; margin: 0 auto; padding: 28px 24px 8px; }
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--paper); }
+  header h1 { font-size: 22px; line-height: 1.25; margin: 4px 0 4px; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .tldr { margin: 12px 0 0; font-size: 15.5px; max-width: 900px; }
+  .tldr b, .newcomer b { color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; margin-right: 6px; }
+  .newcomer { margin: 10px 0 0; max-width: 900px; font-size: 14.5px; padding: 10px 14px; border-radius: 10px;
+              background: color-mix(in srgb, var(--paper) 8%, var(--card)); border: 1px solid color-mix(in srgb, var(--paper) 30%, var(--line)); }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
+  button {
+    font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  }
+  .tabs button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 12px; font-size: 12.5px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); display: inline-block; }
+  .hint { font-size: 12.5px; color: var(--muted); margin: 8px 0 0; }
+
+  main { max-width: 1300px; margin: 0 auto; padding: 12px 24px 48px; }
+  .view[hidden] { display: none; }
+
+  /* ---- ladder ---- */
+  .ladder { position: relative; display: flex; flex-direction: column; gap: 34px; }
+  #wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  #wires path { fill: none; stroke: var(--muted); stroke-width: 1.3; opacity: .22; transition: opacity .15s; }
+  #wires path.up { stroke: var(--hi); opacity: .9; stroke-width: 2.2; }
+  #wires path.down { stroke: var(--paper); opacity: .55; stroke-width: 1.6; }
+  .ladder.focus #wires path:not(.up):not(.down) { opacity: .06; }
+  .tier { position: relative; padding: 10px 12px 12px; border-radius: 14px; border: 1px dashed var(--line); }
+  .tier-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .tier-label small { font-weight: 500; letter-spacing: 0; text-transform: none; margin-left: 6px; }
+  .nodes { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .node {
+    position: relative; z-index: 1; background: var(--card); border: 1.5px solid color-mix(in srgb, var(--c) 45%, var(--line));
+    border-left: 5px solid var(--c); border-radius: 10px; padding: 6px 10px; cursor: pointer; font-size: 13.5px;
+    max-width: 230px; text-align: left; color: var(--ink); line-height: 1.3; transition: opacity .15s, box-shadow .15s;
+  }
+  .node:hover { box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+  .node .n { font-weight: 600; }
+  .node .r { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .ladder.focus .node { opacity: .3; }
+  .ladder.focus .node.anc, .ladder.focus .node.desc, .ladder.focus .node.sel { opacity: 1; }
+  .node.anc { box-shadow: 0 0 0 2px var(--hi); }
+  .node.sel { box-shadow: 0 0 0 3px var(--hi); background: color-mix(in srgb, var(--hi) 10%, var(--card)); }
+  .anc-n { position: absolute; top: -8px; right: -8px; font-size: 10.5px; font-weight: 800; min-width: 18px; height: 18px; line-height: 18px;
+           text-align: center; border-radius: 9px; background: var(--hi); color: var(--card); padding: 0 4px; display: none; }
+  .node.anc .anc-n { display: block; }
+  #paper-node { align-self: center; position: relative; z-index: 1; width: min(640px, 100%); background: var(--card);
+                border: 2px solid var(--paper); border-radius: 14px; padding: 12px 16px; text-align: center; }
+  #paper-node .tag { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--paper); }
+  #paper-node .big { font-weight: 600; margin-top: 4px; }
+
+  /* ---- by section ---- */
+  .sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 14px; align-items: start; }
+  .sec { background: color-mix(in srgb, var(--c) 8%, var(--bg)); border: 1px solid color-mix(in srgb, var(--c) 28%, transparent);
+         border-radius: 14px; padding: 12px 14px; }
+  .sec-head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 0; background: none; border: 0; border-radius: 0;
+              text-align: left; cursor: pointer; color: inherit; font: inherit; }
+  .sec-label { font-weight: 700; font-size: 13px; color: #fff; background: var(--c); border-radius: 9px; padding: 6px 10px; }
+  :root[data-theme="dark"] .sec-label { color: #111; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .sec-label { color: #111; } }
+  .sec-head .count { font-size: 12.5px; color: var(--muted); }
+  .sec-head .chev { margin-left: auto; color: var(--c); font-size: 20px; transition: transform .15s; }
+  .sec:not(.collapsed) .chev { transform: rotate(90deg); }
+  .sec.collapsed .sec-body { display: none; }
+  .sec-body { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .ccard { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 10px; padding: 8px 11px;
+           cursor: pointer; text-align: left; font: inherit; color: inherit; width: 100%; }
+  .ccard:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .ccard .n { font-weight: 600; }
+  .ccard .p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .ccard .start { font-size: 12.5px; margin-top: 5px; }
+  .ccard .start b { color: var(--muted); font-weight: 600; }
+  .lvl { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 0 6px; border-radius: 4px; margin-left: 6px; vertical-align: 1px;
+         border: 1px solid var(--line); color: var(--muted); }
+
+  /* ---- bookshelf ---- */
+  .shelf h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 22px 0 10px; }
+  .shelf h2:first-child { margin-top: 4px; }
+  .short { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .book { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 13px; }
+  .book .t { font-weight: 600; }
+  .book .who { font-size: 13px; color: var(--muted); }
+  .book .covers { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .mini { font: inherit; font-size: 11.5px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--c); color: var(--ink);
+          background: color-mix(in srgb, var(--c) 10%, var(--card)); cursor: pointer; }
+  ol.path { margin: 0; padding-left: 22px; } ol.path li { margin: 7px 0; }
+  ol.path .cn { font-weight: 600; }
+  ol.path .rd { color: var(--muted); font-size: 13.5px; }
+  .shelf-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 10px; }
+  .shelf-filter { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .shelf-filter button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* ---- badges ---- */
+  .kind { display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 0 6px;
+          border-radius: 4px; border: 1px solid var(--line); color: var(--muted); margin-right: 5px; vertical-align: 1px; }
+  .src { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 0 6px; border-radius: 4px; vertical-align: 1px; margin-right: 5px; }
+  .src.cited { color: var(--cite); border: 1px solid var(--cite); }
+  .src.sugg { color: var(--sugg); border: 1px dashed var(--sugg); }
+  .rlink { font-weight: 600; text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--ink) 30%, transparent); }
+  .rlink:hover { border-bottom-color: var(--ink); }
+
+  /* ---- detail drawer ---- */
+  #drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100%); z-index: 10; background: var(--card);
+            border-left: 1px solid var(--line); box-shadow: -6px 0 24px rgba(0,0,0,.12); overflow-y: auto; padding: 18px 20px 30px;
+            transform: translateX(105%); transition: transform .2s; }
+  #drawer.on { transform: none; }
+  @media (min-width: 1100px) { body.drawer-open main, body.drawer-open header { margin-right: 440px; } }
+  #drawer .close { position: sticky; top: 0; float: right; }
+  #drawer h2 { margin: 2px 0 6px; font-size: 19px; line-height: 1.25; }
+  #drawer .sectag { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 1px 8px; border-radius: 999px; color: var(--c);
+                    border: 1.5px solid var(--c); background: color-mix(in srgb, var(--c) 10%, var(--card)); }
+  #drawer h3 { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
+  #drawer p { margin: 6px 0; }
+  .here { font-size: 14px; padding: 8px 10px; border-radius: 8px; background: color-mix(in srgb, var(--paper) 8%, var(--card));
+          border-left: 3px solid var(--paper); }
+  .steps { list-style: none; margin: 0; padding: 0; }
+  .steps li { position: relative; padding: 0 0 12px 30px; margin: 0; }
+  .steps li::before { content: ""; position: absolute; left: 10px; top: 22px; bottom: 0; width: 2px; background: var(--line); }
+  .steps li:last-child::before { display: none; }
+  .steps .dot { position: absolute; left: 0; top: 0; width: 22px; height: 22px; border-radius: 11px; font-size: 11px; font-weight: 800;
+                display: flex; align-items: center; justify-content: center; color: var(--card); background: var(--rc); }
+  .steps .role { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--rc); }
+  .steps .ttl { font-size: 13.5px; color: var(--muted); }
+  .steps .wh { font-size: 12.5px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .path-list { margin: 0; padding-left: 20px; font-size: 13.5px; } .path-list li { margin: 4px 0; }
+  .empty { color: var(--muted); font-size: 13.5px; }
+
+  @media (max-width: 700px) {
+    header { padding: 20px 16px 4px; }
+    main { padding: 10px 16px 40px; }
+    #wires { display: none; }
+    .ladder { gap: 18px; }
+    .tier { padding: 8px; }
+    .node { max-width: none; flex: 1 1 140px; }
+    .sections, .shelf-list { grid-template-columns: 1fr; }
+    #drawer { top: auto; height: 82vh; width: 100%; border-left: 0; border-top: 1px solid var(--line); border-radius: 16px 16px 0 0;
+              transform: translateY(105%); }
+  }
+  @media print { #drawer, .toolbar { display: none; } .view[hidden] { display: block; } .sec.collapsed .sec-body { display: flex; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">Learning map · what to read before this paper</div>
+  <h1 id="title"></h1>
+  <div class="meta" id="meta"></div>
+  <p class="tldr" id="tldr"></p>
+  <p class="newcomer" id="newcomer"></p>
+  <div class="toolbar">
+    <div class="tabs" id="tabs">
+      <button data-view="ladder" aria-pressed="true">Ladder</button>
+      <button data-view="bysec" aria-pressed="false">By paper section</button>
+      <button data-view="shelf" aria-pressed="false">Bookshelf</button>
+    </div>
+    <button id="theme">Light / dark</button>
+  </div>
+  <div class="legend" id="legend"></div>
+  <p class="hint" id="hint">Foundations at the top, this paper at the bottom. Click a concept: pink marks what to learn first (numbered in reading order), blue what it leads to.</p>
+</header>
+
+<main>
+  <section class="view" id="v-ladder">
+    <div class="ladder" id="ladder">
+      <svg id="wires" aria-hidden="true"></svg>
+      <div id="tiers" style="display:contents"></div>
+      <div id="paper-node"><div class="tag">This paper</div><div class="big" id="paper-title"></div></div>
+    </div>
+  </section>
+  <section class="view" id="v-bysec" hidden><div class="sections" id="sections"></div></section>
+  <section class="view shelf" id="v-shelf" hidden></section>
+</main>
+
+<aside id="drawer" aria-label="Concept details"></aside>
+
+<script id="paper-data" type="application/json">__PAPER_DATA__</script>
+<script>
+(function () {
+  const data = JSON.parse(document.getElementById("paper-data").textContent);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const LEVELS = {
+    1: ["Level 1 · Foundations", "general science you can learn from any intro textbook"],
+    2: ["Level 2 · Core of the field", "what every student in the field learns"],
+    3: ["Level 3 · Specialist", "graduate-level tools and ideas"],
+    4: ["Level 4 · The frontier", "the recent work this paper directly extends"],
+  };
+  const ROLES = {
+    start: ["Start here", "var(--cite)"],
+    deeper: ["Go deeper", "var(--s3)"],
+    origin: ["The original", "var(--s4)"],
+    builds_on: ["What this paper builds on", "var(--paper)"],
+  };
+
+  const concepts = data.concepts || [];
+  const byId = Object.fromEntries(concepts.map((c) => [c.id, c]));
+  const readings = Object.fromEntries((data.readings || []).map((r) => [r.id, r]));
+  const sections = data.sections || [];
+  const secIdx = Object.fromEntries(sections.map((s, i) => [s.key, i]));
+  const secColor = (key) => `var(--s${((secIdx[key] ?? 0) % 8) + 1})`;
+  const secName = (key) => (sections[secIdx[key]] || {}).name || key;
+  concepts.forEach((c) => { c.prereqs = (c.prereqs || []).filter((p) => byId[p]); });
+  const children = {};
+  concepts.forEach((c) => c.prereqs.forEach((p) => (children[p] ||= []).push(c.id)));
+
+  // All prerequisites of a concept, in an order you could read them (deepest first).
+  function ancestors(id) {
+    const out = [], seen = new Set();
+    (function visit(x) {
+      byId[x].prereqs.forEach((p) => { if (!seen.has(p)) { seen.add(p); visit(p); out.push(p); } });
+    })(id);
+    return out;
+  }
+  function descendants(id) {
+    const seen = new Set(), stack = [...(children[id] || [])];
+    while (stack.length) { const x = stack.pop(); if (!seen.has(x)) { seen.add(x); stack.push(...(children[x] || [])); } }
+    return seen;
+  }
+  // A full reading order for the whole map: level first, then prereqs before dependents, then paper order.
+  function readingOrder() {
+    const done = new Set(), out = [];
+    const sorted = [...concepts].sort((a, b) => a.level - b.level || (secIdx[a.section] ?? 0) - (secIdx[b.section] ?? 0));
+    const visit = (c) => { if (done.has(c.id)) return; done.add(c.id); c.prereqs.forEach((p) => visit(byId[p])); out.push(c); };
+    sorted.forEach(visit);
+    return out;
+  }
+
+  function readingUrl(r) {
+    if (r.url) return r.url;
+    if (r.doi) return "https://doi.org/" + r.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//, "");
+    if (r.arxiv) return "https://arxiv.org/abs/" + r.arxiv.replace(/^arxiv:/i, "");
+    return "https://scholar.google.com/scholar?q=" + encodeURIComponent((r.title || "") + " " + (r.label || ""));
+  }
+  const srcBadge = (r) => r.cited
+    ? `<span class="src cited" title="In this paper's reference list">cited [${r.cited}]</span>`
+    : `<span class="src sugg" title="Not in this paper's reference list: a suggested way in">suggested</span>`;
+  const readingLine = (r) =>
+    `<a class="rlink" href="${esc(readingUrl(r))}" target="_blank" rel="noopener">${esc(r.label)} ↗</a>`;
+  const startOf = (c) => (c.reads || []).find((x) => x.role === "start");
+
+  document.getElementById("title").textContent = data.title || "Untitled paper";
+  document.getElementById("paper-title").textContent = data.title || "";
+  document.getElementById("meta").textContent = [data.authors, data.year, data.venue].filter(Boolean).join(" · ");
+  document.getElementById("tldr").innerHTML = data.tldr ? `<b>The paper</b>${esc(data.tldr)}` : "";
+  const nc = document.getElementById("newcomer");
+  if (data.newcomer) nc.innerHTML = `<b>If you're new here</b>${esc(data.newcomer)}`; else nc.remove();
+  document.getElementById("legend").innerHTML = sections.map((s) =>
+    `<span style="--c:${secColor(s.key)}"><i></i>${esc(s.name)}${s.where ? ` <small>(${esc(s.where)})</small>` : ""}</span>`).join("");
+
+  // ---- ladder view ----
+  const tiersEl = document.getElementById("tiers");
+  [1, 2, 3, 4].forEach((lv) => {
+    const list = concepts.filter((c) => c.level === lv)
+      .sort((a, b) => (secIdx[a.section] ?? 0) - (secIdx[b.section] ?? 0));
+    if (!list.length) return;
+    const t = document.createElement("div");
+    t.className = "tier";
+    t.innerHTML = `<div class="tier-label">${LEVELS[lv][0]}<small>${LEVELS[lv][1]}</small></div><div class="nodes">${
+      list.map((c) => `<button class="node" data-id="${esc(c.id)}" style="--c:${secColor(c.section)}">` +
+        `<span class="anc-n"></span><span class="n">${esc(c.name)}</span>` +
+        `<span class="r">${esc(secName(c.section))} · ${(c.reads || []).length} to read</span></button>`).join("")}</div>`;
+    tiersEl.appendChild(t);
+  });
+  const ladder = document.getElementById("ladder");
+  const nodeEl = (id) => ladder.querySelector(`.node[data-id="${CSS.escape(id)}"]`);
+
+  // Concepts nothing else builds on feed straight into the paper.
+  const leaves = concepts.filter((c) => !(children[c.id] || []).length).map((c) => c.id);
+  const svg = document.getElementById("wires");
+  let selected = null;
+  function drawWires() {
+    if (document.getElementById("v-ladder").hidden || getComputedStyle(svg).display === "none") return;
+    const m = ladder.getBoundingClientRect();
+    const anc = selected ? new Set([selected, ...ancestors(selected)]) : new Set();
+    const desc = selected ? new Set([selected, ...descendants(selected)]) : new Set();
+    const curve = (a, b) => {
+      const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      const x1 = (ra.left + ra.right) / 2 - m.left, y1 = ra.bottom - m.top;
+      const x2 = (rb.left + rb.right) / 2 - m.left, y2 = rb.top - m.top;
+      const dy = Math.max(30, (y2 - y1) * 0.5);
+      return `M${x1},${y1} C${x1},${y1 + dy} ${x2},${y2 - dy} ${x2},${y2}`;
+    };
+    let out = "";
+    concepts.forEach((c) => c.prereqs.forEach((p) => {
+      const a = nodeEl(p), b = nodeEl(c.id);
+      if (!a || !b) return;
+      const cls = anc.has(c.id) && anc.has(p) ? "up" : desc.has(c.id) && desc.has(p) ? "down" : "";
+      out += `<path class="${cls}" d="${curve(a, b)}"/>`;
+    }));
+    const paper = document.getElementById("paper-node");
+    leaves.forEach((id) => {
+      const a = nodeEl(id);
+      if (a) out += `<path class="${desc.has(id) ? "down" : ""}" d="${curve(a, paper)}"/>`;
+    });
+    svg.innerHTML = out;
+  }
+
+  function highlight(id) {
+    selected = id;
+    ladder.classList.toggle("focus", !!id);
+    ladder.querySelectorAll(".node").forEach((n) => n.classList.remove("anc", "desc", "sel"));
+    if (id) {
+      ancestors(id).forEach((a, i) => { const n = nodeEl(a); n.classList.add("anc"); n.querySelector(".anc-n").textContent = i + 1; });
+      descendants(id).forEach((d) => nodeEl(d).classList.add("desc"));
+      nodeEl(id).classList.add("sel");
+    }
+    drawWires();
+  }
+
+  // ---- detail drawer ----
+  const drawer = document.getElementById("drawer");
+  const miniChip = (id) => `<button class="mini" data-goto="${esc(id)}" style="--c:${secColor(byId[id].section)}">${esc(byId[id].name)}</button>`;
+  function openConcept(id) {
+    const c = byId[id];
+    const reads = (c.reads || []).filter((x) => readings[x.reading]);
+    const order = ["start", "deeper", "origin", "builds_on"];
+    reads.sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role));
+    const anc = ancestors(id);
+    drawer.style.setProperty("--c", secColor(c.section));
+    drawer.innerHTML = `<button class="close" id="close">Close ✕</button>` +
+      `<span class="sectag">${esc(secName(c.section))}</span> <span class="lvl">${esc(LEVELS[c.level][0])}</span>` +
+      `<h2>${esc(c.name)}</h2><p>${esc(c.plain)}</p>` +
+      `<div class="here"><b>In this paper:</b> ${esc(c.why_here)}</div>` +
+      `<h3>Reading ladder</h3>` + (reads.length ? `<ol class="steps">${reads.map((x, i) => {
+        const r = readings[x.reading], [role, rc] = ROLES[x.role] || [x.role, "var(--muted)"];
+        return `<li style="--rc:${rc}"><span class="dot">${i + 1}</span><div class="role">${esc(role)}</div>` +
+          `<div>${readingLine(r)}</div><div class="ttl">${esc(r.title)}</div>` +
+          `<div class="wh"><span class="kind">${esc(r.kind)}</span>${srcBadge(r)}${x.where ? esc(x.where) : ""}${
+            r.note ? ` <span class="ttl">· ${esc(r.note)}</span>` : ""}</div></li>`;
+      }).join("")}</ol>` : `<p class="empty">No readings listed.</p>`) +
+      `<h3>Learn first</h3>` + (c.prereqs.length ? `<div class="chips">${c.prereqs.map(miniChip).join("")}</div>` : `<p class="empty">Nothing - this is a starting point.</p>`) +
+      (anc.length ? `<h3>Your full path here (${anc.length + 1} steps)</h3><ol class="path-list">${[...anc, id].map((a) => {
+        const s = startOf(byId[a]), r = s && readings[s.reading];
+        return `<li><b>${esc(byId[a].name)}</b>${r ? ` · ${readingLine(r)}${s.where ? ` <span class="ttl">${esc(s.where)}</span>` : ""}` : ""}</li>`;
+      }).join("")}</ol>` : "") +
+      `<h3>Leads to</h3>` + ((children[id] || []).length ? `<div class="chips">${children[id].map(miniChip).join("")}</div>` : `<p class="empty">Used directly by the paper.</p>`);
+    drawer.classList.add("on");
+    document.body.classList.add("drawer-open");
+    drawer.scrollTop = 0;
+    if (!document.getElementById("v-ladder").hidden) highlight(id);
+  }
+  function closeDrawer() { drawer.classList.remove("on"); document.body.classList.remove("drawer-open"); highlight(null); }
+  drawer.addEventListener("click", (e) => {
+    if (e.target.closest("#close")) { closeDrawer(); return; }
+    const g = e.target.closest("[data-goto]");
+    if (g) openConcept(g.dataset.goto);
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer(); });
+  ladder.addEventListener("click", (e) => {
+    const n = e.target.closest(".node");
+    if (n) { selected === n.dataset.id ? closeDrawer() : openConcept(n.dataset.id); }
+  });
+
+  // ---- by-section view ----
+  document.getElementById("sections").innerHTML = sections.map((s) => {
+    const list = concepts.filter((c) => c.section === s.key).sort((a, b) => a.level - b.level);
+    if (!list.length) return "";
+    return `<div class="sec collapsed" style="--c:${secColor(s.key)}"><button class="sec-head" aria-expanded="false">` +
+      `<span class="sec-label">${esc(s.name)}</span><span class="count">${s.where ? esc(s.where) + " · " : ""}${list.length} concept${list.length === 1 ? "" : "s"}</span>` +
+      `<span class="chev">▸</span></button><div class="sec-body">${list.map((c) => {
+        const st = startOf(c), r = st && readings[st.reading];
+        return `<button class="ccard" data-goto="${esc(c.id)}"><div class="n">${esc(c.name)}<span class="lvl">L${c.level}</span></div>` +
+          `<div class="p">${esc(c.plain)}</div>${r ? `<div class="start"><b>Start:</b> ${esc(r.label)}${st.where ? ", " + esc(st.where) : ""}</div>` : ""}</button>`;
+      }).join("")}</div></div>`;
+  }).join("");
+  document.getElementById("sections").addEventListener("click", (e) => {
+    const h = e.target.closest(".sec-head");
+    if (h) { const s = h.parentElement; const open = s.classList.toggle("collapsed") === false; h.setAttribute("aria-expanded", String(open)); return; }
+    const g = e.target.closest("[data-goto]");
+    if (g) openConcept(g.dataset.goto);
+  });
+
+  // ---- bookshelf view ----
+  const covers = {};
+  concepts.forEach((c) => (c.reads || []).forEach((x) => (covers[x.reading] ||= new Set()).add(c.id)));
+  const KIND_ORDER = [["textbook", "Textbooks"], ["notes", "Lecture notes"], ["popular", "Popular books"], ["review", "Reviews"],
+                      ["classic", "Classic papers"], ["paper", "Papers this one builds on"]];
+  const bookCard = (r) => `<div class="book" data-cited="${r.cited ? 1 : 0}"><div><span class="kind">${esc(r.kind)}</span>${srcBadge(r)}</div>` +
+    `<div class="t">${readingLine(r)}</div><div class="who">${esc(r.title)}${r.note ? " · " + esc(r.note) : ""}</div>` +
+    `<div class="covers">${[...(covers[r.id] || [])].map(miniChip).join("")}</div></div>`;
+  const seenStart = new Set();
+  const path = readingOrder().map((c) => {
+    const st = startOf(c), r = st && readings[st.reading];
+    const again = r && seenStart.has(r.id);
+    if (r) seenStart.add(r.id);
+    return `<li><button class="mini" data-goto="${esc(c.id)}" style="--c:${secColor(c.section)}">${esc(c.name)}</button> ` +
+      (r ? `<span class="rd">${again ? "again: " : ""}${readingLine(r)}${st.where ? " · " + esc(st.where) : ""}</span>` : "") + `</li>`;
+  }).join("");
+  const shortlist = (data.shortlist || []).map((id) => readings[id]).filter(Boolean);
+  const all = Object.values(readings);
+  const nCited = all.filter((r) => r.cited).length;
+  document.getElementById("v-shelf").innerHTML =
+    (shortlist.length ? `<h2>If you read only ${shortlist.length}</h2><div class="short">${shortlist.map(bookCard).join("")}</div>` : "") +
+    `<h2>A reading order for the whole map</h2><p class="hint" style="margin-top:0">Every concept from the most basic up, each with its "start here" reading.</p><ol class="path">${path}</ol>` +
+    `<h2>Everything, by type</h2><div class="shelf-filter">${all.length} readings · ${nCited} cited in the paper, ${all.length - nCited} suggested.` +
+    ` <button data-f="all" aria-pressed="true">All</button><button data-f="cited" aria-pressed="false">Cited in paper</button>` +
+    `<button data-f="sugg" aria-pressed="false">Suggested only</button></div>` +
+    KIND_ORDER.map(([k, label]) => {
+      const list = all.filter((r) => r.kind === k).sort((a, b) => (covers[b.id] || new Set()).size - (covers[a.id] || new Set()).size);
+      return list.length ? `<h2>${label}</h2><div class="shelf-list">${list.map(bookCard).join("")}</div>` : "";
+    }).join("");
+  const shelf = document.getElementById("v-shelf");
+  shelf.addEventListener("click", (e) => {
+    const f = e.target.closest("[data-f]");
+    if (f) {
+      shelf.querySelectorAll("[data-f]").forEach((b) => b.setAttribute("aria-pressed", String(b === f)));
+      shelf.querySelectorAll(".shelf-list .book").forEach((b) => {
+        b.hidden = (f.dataset.f === "cited" && b.dataset.cited !== "1") || (f.dataset.f === "sugg" && b.dataset.cited === "1");
+      });
+      return;
+    }
+    const g = e.target.closest("[data-goto]");
+    if (g) openConcept(g.dataset.goto);
+  });
+
+  // ---- tabs, theme ----
+  const hint = document.getElementById("hint");
+  document.getElementById("tabs").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    document.querySelectorAll("#tabs button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    ["ladder", "bysec", "shelf"].forEach((v) => { document.getElementById("v-" + v).hidden = v !== b.dataset.view; });
+    hint.hidden = b.dataset.view !== "ladder";
+    drawWires();
+  });
+  document.getElementById("theme").addEventListener("click", () => {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+  });
+  window.addEventListener("resize", drawWires);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawWires);
+  drawWires();
+})();
+</script>
+</body>
+</html>

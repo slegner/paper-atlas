@@ -1,0 +1,616 @@
+{
+  "title": "Attention Is All You Need",
+  "authors": "Vaswani, Shazeer, Parmar, Uszkoreit, Jones, Gomez, Kaiser & Polosukhin",
+  "year": "2017",
+  "venue": "NIPS 2017 · arXiv:1706.03762",
+  "tldr": "A translation network built only from attention, with no recurrence or convolution, trains far faster in parallel and beats the best previous models on English–German and English–French translation.",
+  "question": {
+    "short": "Can a sequence model built only from attention beat recurrent and convolutional models?",
+    "detail": "Translation models of the time read and wrote words one after another with recurrent networks, or used convolutions, which made training slow. The authors ask whether attention alone, letting every word look directly at every other word, is enough."
+  },
+  "answer": {
+    "short": "Yes. The Transformer sets new records (28.4 BLEU English→German, 41.8 English→French) at a fraction of the training cost.",
+    "detail": "It trains in 12 hours (base) to 3.5 days (big) on 8 GPUs and also does well at English parsing. Ablations show that several attention heads and a large enough key size matter; learned and sinusoidal positions work about equally well."
+  },
+  "other_questions": [],
+  "why_important": [
+    {
+      "headline": "Recurrent models can't be parallelised",
+      "detail": "An RNN computes position t only after position t−1, so training on long sentences is slow and memory limits batching.",
+      "refs": [
+        13,
+        35
+      ],
+      "flag": "key"
+    },
+    {
+      "headline": "Distant words are hard to connect",
+      "detail": "In recurrent and convolutional networks the signal path between two words grows with their distance, which makes long-range dependencies hard to learn.",
+      "refs": [
+        12
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Attention helped, but only as an add-on",
+      "detail": "Attention had become central to translation, but almost always bolted onto a recurrent encoder–decoder.",
+      "refs": [
+        2,
+        24
+      ],
+      "flag": "none"
+    }
+  ],
+  "background": [
+    {
+      "headline": "Encoder–decoder translation",
+      "detail": "One network reads the source sentence into vectors; a second writes the translation one word at a time.",
+      "refs": [
+        35,
+        5
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Attention lets the decoder look back",
+      "detail": "Bahdanau et al. added a learned soft alignment over source words; Luong et al. introduced the simpler dot-product form.",
+      "refs": [
+        2,
+        24
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Convolutional models compute in parallel",
+      "detail": "ByteNet and ConvS2S avoid recurrence, but connecting distant positions still takes O(log n) or O(n) steps.",
+      "refs": [
+        18,
+        9
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Self-attention existed in pieces",
+      "detail": "Attention within one sentence had been used for reading, entailment and sentence embeddings, including one model without any RNN.",
+      "refs": [
+        4,
+        27,
+        22
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Tricks for deep networks",
+      "detail": "Residual connections and layer normalisation make deep stacks of layers trainable.",
+      "refs": [
+        11,
+        1
+      ],
+      "flag": "none"
+    }
+  ],
+  "setup": [
+    {
+      "headline": "Transformer: attention and nothing else",
+      "detail": "Encoder and decoder are stacks of 6 identical layers, each self-attention plus a feed-forward network, with residual connections and layer normalisation. No recurrence or convolution. The paper claims it is the first transduction model built entirely on self-attention.",
+      "refs": [],
+      "flag": "novel"
+    },
+    {
+      "headline": "Scaled dot-product, multi-head attention",
+      "detail": "Dot-product attention (as in Luong et al.) is divided by √d_k to keep the softmax gradients healthy, and 8 heads attend to different learned projections in parallel. Dot-product attention itself was not new; the scaling and the multi-head design are.",
+      "refs": [
+        24,
+        3
+      ],
+      "flag": "novel"
+    },
+    {
+      "headline": "Sinusoidal positional encodings",
+      "detail": "With no recurrence, word order is injected by adding sine and cosine waves of different wavelengths to the embeddings. Learned positions (as in ConvS2S) work almost identically.",
+      "refs": [
+        9
+      ],
+      "flag": "novel"
+    },
+    {
+      "headline": "WMT 2014 data, byte-pair tokens",
+      "detail": "4.5M English–German sentence pairs with a 37k byte-pair vocabulary; 36M English–French sentences with 32k word pieces.",
+      "refs": [
+        31,
+        38
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Standard training recipe",
+      "detail": "Adam with a warm-up then inverse-square-root learning rate, dropout 0.1, label smoothing 0.1, 8 P100 GPUs; beam search (size 4) at test time.",
+      "refs": [
+        20,
+        33,
+        36
+      ],
+      "flag": "none"
+    }
+  ],
+  "analyses": [
+    {
+      "method": {
+        "headline": "How does self-attention compare on paper?",
+        "detail": "complexity per layer, sequential operations and maximum path length for self-attention, recurrent and convolutional layers (Table 1).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "Constant path between any two words",
+          "detail": "O(1) sequential operations and path length, versus O(n) for recurrence; cost per layer is O(n²·d), cheaper than recurrence when sentence length n is below the dimension d.",
+          "refs": [],
+          "flag": "key",
+          "condition": "self-attention"
+        },
+        {
+          "headline": "Cost grows with the square of length",
+          "detail": "O(n²) per layer becomes expensive for very long inputs. Attention restricted to a window is proposed but not tested.",
+          "refs": [],
+          "flag": "caveat",
+          "condition": "long sequences"
+        }
+      ],
+      "question": 1
+    },
+    {
+      "method": {
+        "headline": "Does it beat the best translation models?",
+        "detail": "BLEU on WMT 2014 newstest2014 against ByteNet, GNMT, ConvS2S and MoE, including ensembles (Table 2).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "28.4 BLEU, over 2 above all previous",
+          "detail": "The big model beats even ensembles; the base model (27.3) already beats every earlier model.",
+          "refs": [
+            38,
+            9
+          ],
+          "flag": "key",
+          "condition": "EN→DE"
+        },
+        {
+          "headline": "41.8 BLEU single-model record",
+          "detail": "Best single model, at under a quarter of the previous best's training cost. The abstract and Table 2 give 41.8, but the text of §6.1 says 41.0.",
+          "refs": [
+            32
+          ],
+          "flag": "caveat",
+          "condition": "EN→FR"
+        }
+      ],
+      "question": 1
+    },
+    {
+      "method": {
+        "headline": "How much cheaper is training?",
+        "detail": "training cost estimated as training time × number of GPUs × an assumed sustained throughput per GPU (Table 2).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "3.3·10¹⁸ FLOPs, 12 hours",
+          "detail": "Roughly 10–100× less compute than competing models at similar or better quality.",
+          "refs": [],
+          "flag": "none",
+          "condition": "base"
+        },
+        {
+          "headline": "2.3·10¹⁹ FLOPs, 3.5 days on 8 GPUs",
+          "detail": "Still cheaper than the earlier state of the art.",
+          "refs": [],
+          "flag": "none",
+          "condition": "big"
+        },
+        {
+          "headline": "Costs are rough estimates",
+          "detail": "FLOPs come from time × GPUs × an assumed throughput rather than being measured, so the comparisons are approximate.",
+          "refs": [],
+          "flag": "caveat",
+          "condition": ""
+        }
+      ],
+      "question": 1
+    },
+    {
+      "method": {
+        "headline": "Which parts matter?",
+        "detail": "ablations on the English→German dev set, varying heads, key size, model size, dropout and position encoding (Table 3).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "Single head is 0.9 BLEU worse",
+          "detail": "Too many heads also hurts; 8–16 heads work best.",
+          "refs": [],
+          "flag": "none",
+          "condition": "1 head"
+        },
+        {
+          "headline": "Smaller keys hurt",
+          "detail": "Suggests the dot-product compatibility function is a limitation.",
+          "refs": [],
+          "flag": "none",
+          "condition": "smaller d_k"
+        },
+        {
+          "headline": "Bigger models and dropout help",
+          "detail": "As expected; dropout is important against over-fitting.",
+          "refs": [],
+          "flag": "none",
+          "condition": "bigger, dropout"
+        },
+        {
+          "headline": "Learned positions ≈ sinusoids",
+          "detail": "Nearly identical results; sinusoids are kept because they might extrapolate to longer sentences, which is not tested.",
+          "refs": [],
+          "flag": "none",
+          "condition": "learned positions"
+        }
+      ],
+      "question": 1
+    },
+    {
+      "method": {
+        "headline": "Does it work beyond translation?",
+        "detail": "English constituency parsing on the Penn Treebank (WSJ), 4 layers, minimal tuning (Table 4).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "91.3 F1, beats the BerkeleyParser",
+          "detail": "With only 40K training sentences, where RNN sequence-to-sequence models had struggled.",
+          "refs": [
+            29,
+            37
+          ],
+          "flag": "none",
+          "condition": "WSJ only"
+        },
+        {
+          "headline": "92.7 F1, close to the best",
+          "detail": "Better than all previous models except the RNN Grammar (93.3).",
+          "refs": [
+            8
+          ],
+          "flag": "none",
+          "condition": "semi-supervised"
+        }
+      ],
+      "question": 1
+    },
+    {
+      "method": {
+        "headline": "What do the attention heads learn?",
+        "detail": "attention-weight visualisations for single sentences (appendix).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "Heads seem to track syntax",
+          "detail": "Some heads follow long-distance dependencies or resolve what 'its' refers to; shown with a few hand-picked examples only.",
+          "refs": [],
+          "flag": "caveat",
+          "condition": ""
+        }
+      ],
+      "question": 1
+    }
+  ],
+  "conclusion": [
+    {
+      "headline": "Attention alone is enough for translation",
+      "detail": "Replacing recurrence with multi-head self-attention gives a new state of the art and trains much faster.",
+      "refs": [],
+      "flag": "key"
+    },
+    {
+      "headline": "Plans: other inputs and local attention",
+      "detail": "Images, audio and video; restricted attention for long inputs; less sequential generation.",
+      "refs": [],
+      "flag": "none"
+    },
+    {
+      "headline": "Caveat: quadratic in sentence length",
+      "detail": "Full self-attention compares every pair of positions, so cost grows as n²; left for future work.",
+      "refs": [],
+      "flag": "caveat"
+    },
+    {
+      "headline": "Caveat: two tasks, one main metric",
+      "detail": "Evidence comes from translation (judged by BLEU) and one parsing benchmark.",
+      "refs": [],
+      "flag": "caveat"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "The Transformer: the encoder stack (left) and decoder stack (right) of attention and feed-forward layers.",
+      "attach": "setup,setup#1"
+    },
+    {
+      "number": 2,
+      "caption": "Scaled dot-product attention (left) and multi-head attention, several attention layers in parallel (right).",
+      "attach": "setup,setup#2"
+    },
+    {
+      "number": 3,
+      "caption": "Encoder self-attention in layer 5 following the long-distance dependency 'making … more difficult'.",
+      "attach": "results:6,results:6#1"
+    },
+    {
+      "number": 4,
+      "caption": "Two heads that appear to resolve what 'its' refers to.",
+      "attach": "results:6,results:6#1"
+    },
+    {
+      "number": 5,
+      "caption": "Two heads whose attention seems to follow sentence structure.",
+      "attach": "results:6,results:6#1"
+    }
+  ],
+  "glossary": [
+    {
+      "term": "BLEU",
+      "meaning": "Automatic translation score from 0 to 100 based on word overlap with human translations."
+    }
+  ],
+  "references": [
+    {
+      "id": 1,
+      "label": "Ba, Kiros & Hinton 2016",
+      "title": "Layer normalization",
+      "doi": "",
+      "arxiv": "1607.06450"
+    },
+    {
+      "id": 2,
+      "label": "Bahdanau, Cho & Bengio 2014",
+      "title": "Neural machine translation by jointly learning to align and translate",
+      "doi": "",
+      "arxiv": "1409.0473"
+    },
+    {
+      "id": 3,
+      "label": "Britz et al. 2017",
+      "title": "Massive exploration of neural machine translation architectures",
+      "doi": "",
+      "arxiv": "1703.03906"
+    },
+    {
+      "id": 4,
+      "label": "Cheng, Dong & Lapata 2016",
+      "title": "Long short-term memory-networks for machine reading",
+      "doi": "",
+      "arxiv": "1601.06733"
+    },
+    {
+      "id": 5,
+      "label": "Cho et al. 2014",
+      "title": "Learning phrase representations using RNN encoder-decoder for statistical machine translation",
+      "doi": "",
+      "arxiv": "1406.1078"
+    },
+    {
+      "id": 9,
+      "label": "Gehring et al. 2017 (ConvS2S)",
+      "title": "Convolutional sequence to sequence learning",
+      "doi": "",
+      "arxiv": "1705.03122"
+    },
+    {
+      "id": 11,
+      "label": "He et al. 2016 (ResNet)",
+      "title": "Deep residual learning for image recognition",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 12,
+      "label": "Hochreiter et al. 2001",
+      "title": "Gradient flow in recurrent nets: the difficulty of learning long-term dependencies",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 13,
+      "label": "Hochreiter & Schmidhuber 1997 (LSTM)",
+      "title": "Long short-term memory",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 18,
+      "label": "Kalchbrenner et al. 2017 (ByteNet)",
+      "title": "Neural machine translation in linear time",
+      "doi": "",
+      "arxiv": "1610.10099"
+    },
+    {
+      "id": 20,
+      "label": "Kingma & Ba 2015 (Adam)",
+      "title": "Adam: A method for stochastic optimization",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 22,
+      "label": "Lin et al. 2017",
+      "title": "A structured self-attentive sentence embedding",
+      "doi": "",
+      "arxiv": "1703.03130"
+    },
+    {
+      "id": 24,
+      "label": "Luong, Pham & Manning 2015",
+      "title": "Effective approaches to attention-based neural machine translation",
+      "doi": "",
+      "arxiv": "1508.04025"
+    },
+    {
+      "id": 27,
+      "label": "Parikh et al. 2016",
+      "title": "A decomposable attention model",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 25,
+      "label": "Marcus et al. 1993",
+      "title": "Building a large annotated corpus of English: the Penn Treebank",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 29,
+      "label": "Petrov et al. 2006 (BerkeleyParser)",
+      "title": "Learning accurate, compact, and interpretable tree annotation",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 8,
+      "label": "Dyer et al. 2016 (RNN Grammar)",
+      "title": "Recurrent neural network grammars",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 31,
+      "label": "Sennrich, Haddow & Birch 2015 (BPE)",
+      "title": "Neural machine translation of rare words with subword units",
+      "doi": "",
+      "arxiv": "1508.07909"
+    },
+    {
+      "id": 32,
+      "label": "Shazeer et al. 2017 (MoE)",
+      "title": "Outrageously large neural networks: the sparsely-gated mixture-of-experts layer",
+      "doi": "",
+      "arxiv": "1701.06538"
+    },
+    {
+      "id": 33,
+      "label": "Srivastava et al. 2014 (dropout)",
+      "title": "Dropout: a simple way to prevent neural networks from overfitting",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 35,
+      "label": "Sutskever, Vinyals & Le 2014",
+      "title": "Sequence to sequence learning with neural networks",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 36,
+      "label": "Szegedy et al. 2015 (label smoothing)",
+      "title": "Rethinking the inception architecture for computer vision",
+      "doi": "",
+      "arxiv": "1512.00567"
+    },
+    {
+      "id": 37,
+      "label": "Vinyals & Kaiser et al. 2015",
+      "title": "Grammar as a foreign language",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 38,
+      "label": "Wu et al. 2016 (GNMT)",
+      "title": "Google's neural machine translation system: bridging the gap between human and machine translation",
+      "doi": "",
+      "arxiv": "1609.08144"
+    }
+  ],
+  "equations": [
+    {
+      "latex": "\\mathrm{Attention}(Q,K,V) = \\mathrm{softmax}\\!\\left(\\frac{QK^{\\mathsf T}}{\\sqrt{d_k}}\\right)V",
+      "meaning": "Each query scores every key by a dot product, scaled by √d_k; the softmax turns the scores into weights for averaging the values.",
+      "symbols": "Q, K, V = matrices of queries, keys and values; d_k = key dimension.",
+      "number": "1",
+      "attach": "setup,setup#2,results:4#2",
+      "concepts": [
+        "scaled",
+        "qkv"
+      ]
+    },
+    {
+      "latex": "\\mathrm{MultiHead}(Q,K,V) = \\mathrm{Concat}(\\mathrm{head}_1,\\dots,\\mathrm{head}_h)\\,W^O,\\quad \\mathrm{head}_i = \\mathrm{Attention}(QW_i^Q, KW_i^K, VW_i^V)",
+      "meaning": "Several attention operations run in parallel on different learned projections, then their outputs are joined.",
+      "symbols": "h = 8 heads; W = learned weight matrices.",
+      "number": "",
+      "attach": "setup,setup#2,results:4#1",
+      "concepts": [
+        "multihead"
+      ]
+    },
+    {
+      "latex": "\\mathrm{FFN}(x) = \\max(0,\\,xW_1 + b_1)\\,W_2 + b_2",
+      "meaning": "The feed-forward layer applied to each position: two linear maps with a ReLU in between.",
+      "symbols": "",
+      "number": "2",
+      "attach": "setup,setup#1",
+      "concepts": [
+        "ffn"
+      ]
+    },
+    {
+      "latex": "\\mathrm{LayerNorm}\\big(x + \\mathrm{Sublayer}(x)\\big)",
+      "meaning": "Every sub-layer is wrapped in a residual connection followed by layer normalisation.",
+      "symbols": "",
+      "number": "",
+      "attach": "setup,setup#1,background#5",
+      "concepts": [
+        "residual",
+        "layernorm"
+      ]
+    },
+    {
+      "latex": "PE_{(pos,2i)} = \\sin\\!\\big(pos/10000^{2i/d_{\\rm model}}\\big),\\qquad PE_{(pos,2i+1)} = \\cos\\!\\big(pos/10000^{2i/d_{\\rm model}}\\big)",
+      "meaning": "Positional encodings: each dimension is a sine wave of a different wavelength, added to the word embedding so the model knows word order.",
+      "symbols": "pos = position in the sentence, i = dimension index.",
+      "number": "",
+      "attach": "setup,setup#3,results:4#4",
+      "concepts": [
+        "posenc"
+      ]
+    },
+    {
+      "latex": "\\mathrm{lrate} = d_{\\rm model}^{-0.5}\\cdot\\min\\!\\big(\\mathrm{step}^{-0.5},\\ \\mathrm{step}\\cdot\\mathrm{warmup}^{-1.5}\\big)",
+      "meaning": "The learning rate rises linearly for 4000 warm-up steps, then decays as one over the square root of the step number.",
+      "symbols": "",
+      "number": "3",
+      "attach": "setup,setup#5",
+      "concepts": [
+        "adam"
+      ]
+    },
+    {
+      "latex": "\\underbrace{O(n^2\\cdot d)}_{\\text{self-attention}}\\ \\text{vs}\\ \\underbrace{O(n\\cdot d^2)}_{\\text{recurrent}},\\qquad \\text{path length } O(1)\\ \\text{vs}\\ O(n)",
+      "meaning": "Cost per layer and longest signal path (Table 1): self-attention connects any two words in one step, at a cost that grows with the square of length.",
+      "symbols": "n = sentence length, d = representation size.",
+      "number": "Table 1",
+      "attach": "results:1,results:1#1,results:1#2",
+      "concepts": [
+        "complexity",
+        "selfattn"
+      ]
+    }
+  ]
+}
