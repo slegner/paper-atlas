@@ -1,0 +1,571 @@
+{
+  "title": "AI's Capability in Assisting Scientific Research in Physics, Astrophysics, and Cosmology I: Literature Review",
+  "authors": "Hell, K. Vovk, Krishnaraj, Liu, Aizawa, Bayer, Blot, Cowell, Garg, Grée, Horowitz, Ichikawa, Iemoto, Kondo, Lorsin, McCarthy, Robinson, Ruiz-Granda, Thiele, I. Vovk & Zhou",
+  "year": "2026",
+  "venue": "arXiv:2607.25672 [astro-ph.IM]",
+  "tldr": "On eight real physics projects, mid-2025 chatbots found useful papers the experts had missed but almost none of the experts' own picks, and 64% of their references had a wrong title, author, year or journal. ChatGPT Pro 5.5 got every reference right in a one-project test.",
+  "question": {
+    "short": "Can LLMs help physicists find the literature for a new research project?",
+    "detail": "Researchers starting something new want a quick check of what has already been done. The authors ask whether chatbots can do this search at the research frontier, and how many of the papers they suggest an expert would actually use."
+  },
+  "answer": {
+    "short": "As a helper, not a replacement: under 6% of the papers are shared with the expert's list, but the AI adds many relevant papers the expert missed.",
+    "detail": "Relevant papers found only by the AI make up 30–36% of each model's combined list with the expert's, against 36–53% found only by the expert. The AI searches by the project's keywords, while experts also reach for foundational work and neighbouring fields."
+  },
+  "other_questions": [
+    {
+      "short": "How reliable are the references LLMs give?",
+      "detail": "Chatbots are known to invent citations. The authors check every AI reference the expert didn't also pick against the real paper.",
+      "answer": {
+        "short": "Mid-2025 models need checking: 3% of references don't exist and 64% have at least one wrong field. ChatGPT Deep Research is far better, and ChatGPT Pro 5.5 made no errors on one project.",
+        "detail": "Only 33% of the 641 references checked are fully correct. The first author is the field most often wrong. The authors think the newer models improve mainly because of their search and checking tools, not the language model alone."
+      },
+      "separate": false
+    }
+  ],
+  "why_important": [
+    {
+      "headline": "Too many papers to keep up with",
+      "detail": "The number of new papers per day keeps growing, so important work is easy to miss, especially early in a project.",
+      "refs": [],
+      "flag": "key"
+    },
+    {
+      "headline": "Newcomers need a quick novelty check",
+      "detail": "Someone entering a field first wants to know whether their idea has been done before committing to a full literature search.",
+      "refs": [],
+      "flag": "none"
+    },
+    {
+      "headline": "Researchers already use LLMs for this",
+      "detail": "LLMs are increasingly used for literature reviews and paper feedback, but they are known to make up references.",
+      "refs": [
+        1,
+        2,
+        4
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "No direct test against experts at the frontier",
+      "detail": "Comparisons of humans and AI on real research projects in physics are largely missing.",
+      "refs": [],
+      "flag": "none"
+    }
+  ],
+  "background": [
+    {
+      "headline": "Fake citations are a known problem",
+      "detail": "Studies of 2023–2025 ChatGPT and Gemini models found many invented or garbled references across fields.",
+      "refs": [
+        5,
+        6,
+        7
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "AI in physics so far",
+      "detail": "Machine learning already speeds up computations and parameter inference, e.g. lens modelling and the CAMELS simulations.",
+      "refs": [
+        8,
+        9
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "LLMs as research partners",
+      "detail": "LLMs are being tested on scientific tasks, reviewing and whole research projects.",
+      "refs": [
+        2,
+        3,
+        14,
+        24,
+        25,
+        26
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Part I of a series",
+      "detail": "A companion paper (II) tests project planning and proposal evaluation.",
+      "refs": [
+        27
+      ],
+      "flag": "none"
+    }
+  ],
+  "setup": [
+    {
+      "headline": "Eight real frontier projects",
+      "detail": "Each was conceived by a graduate student or postdoc who works on the topic: AGN duty cycles, Lyman-break galaxies, intrinsic alignments, laser-machined anti-reflection structures, radio galaxies in HalfDome, the environment of gravitational-wave black holes, pulsar timing arrays and inflation from massive Yang–Mills fields (Table I).",
+      "refs": [
+        28,
+        29
+      ],
+      "flag": "none"
+    },
+    {
+      "headline": "Human and AI search in parallel",
+      "detail": "Each expert searched as usual and kept up to 50 important papers. Separately, AI prompters (students without experience in these projects) gave the same project to each model.",
+      "refs": [],
+      "flag": "none"
+    },
+    {
+      "headline": "One standard prompt",
+      "detail": "A three-sentence background and a three-sentence goal written by the expert, asking for at most 50 refereed papers in four categories (reviews, highly cited, recent, other) as a table of title, first author, journal, year, DOI and link (Appendix B).",
+      "refs": [],
+      "flag": "none"
+    },
+    {
+      "headline": "Three mid-2025 models, plus one 2026 model",
+      "detail": "ChatGPT-4o, ChatGPT Deep Research and Gemini 2.5 Flash, all with web search. ChatGPT Pro 5.5 (July 2026) was later run on the SU(2) project only.",
+      "refs": [],
+      "flag": "none"
+    },
+    {
+      "headline": "The expert judges relevance",
+      "detail": "Each expert marked which AI suggestions were irrelevant to their project. The authors note this is subjective.",
+      "refs": [],
+      "flag": "caveat"
+    },
+    {
+      "headline": "Matches need the same title and category",
+      "detail": "A paper the human called 'recent' and the AI called 'other' counts as two different papers, and one paper listed in two categories counts twice. This can make the overlap look smaller than it is.",
+      "refs": [],
+      "flag": "caveat"
+    },
+    {
+      "headline": "Checking each AI reference",
+      "detail": "Every AI reference the expert didn't pick was looked up via its DOI, then its link, then its title, and compared with Crossref. Each ends up perfect, a metadata mismatch (real paper, at least one wrong field) or a fabrication (no such paper) (Fig. 1).",
+      "refs": [],
+      "flag": "none"
+    },
+    {
+      "headline": "A controlled human-vs-AI test on real projects",
+      "detail": "The paper's new contribution is the design: the same frontier projects searched in parallel by their own experts and by LLMs, with the experts judging the AI's output.",
+      "refs": [],
+      "flag": "novel"
+    }
+  ],
+  "analyses": [
+    {
+      "method": {
+        "headline": "How much do the human and AI lists overlap?",
+        "detail": "each model's references compared with the expert's, by category, over all eight projects (Fig. 2, Table II).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "Under 6% of papers are found by both",
+          "detail": "Shared papers make up 4.3% (ChatGPT-4o), 5.4% (Deep Research) and 2.2% (Gemini) of each model's combined list with the expert's. None are shared in the 'other' category.",
+          "refs": [],
+          "flag": "key",
+          "condition": "all models"
+        },
+        {
+          "headline": "The expert's papers are mostly missed",
+          "detail": "Papers only the expert found are the largest group for every model: 45% (4o), 53% (Deep Research), 36% (Gemini).",
+          "refs": [],
+          "flag": "none",
+          "condition": "expert only"
+        },
+        {
+          "headline": "The AI adds many relevant papers",
+          "detail": "Relevant papers only the AI found are 30% (4o), 36% (Deep Research) and 31% (Gemini), so the AI can fill gaps in an expert's search.",
+          "refs": [],
+          "flag": "key",
+          "condition": "AI only"
+        },
+        {
+          "headline": "Humans found 194 papers, the AI 701",
+          "detail": "ChatGPT-4o gave 219, Deep Research 157 and Gemini 325 references over the eight projects.",
+          "refs": [],
+          "flag": "none",
+          "condition": ""
+        }
+      ],
+      "question": 1
+    },
+    {
+      "method": {
+        "headline": "How many AI suggestions are relevant?",
+        "detail": "the share of each model's combined list that the expert marked irrelevant (Table II).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "Only 6% irrelevant",
+          "detail": "The fewest references, but nearly all on topic.",
+          "refs": [],
+          "flag": "none",
+          "condition": "Deep Research"
+        },
+        {
+          "headline": "21% irrelevant",
+          "detail": "84 of its suggestions were marked irrelevant.",
+          "refs": [],
+          "flag": "none",
+          "condition": "ChatGPT-4o"
+        },
+        {
+          "headline": "31% irrelevant",
+          "detail": "Gemini gives the most references but also the most off-topic ones.",
+          "refs": [],
+          "flag": "none",
+          "condition": "Gemini"
+        },
+        {
+          "headline": "Relevance is one person's opinion",
+          "detail": "Each project had a single expert judge, and the authors note that relevance is subjective.",
+          "refs": [],
+          "flag": "caveat",
+          "condition": ""
+        }
+      ],
+      "question": 1
+    },
+    {
+      "method": {
+        "headline": "What kinds of papers does each side pick?",
+        "detail": "reading the titles chosen for each project, and the SU(2) project in detail.",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "AI follows the keywords; experts go wider",
+          "detail": "The AI picks papers matching the project's key words. Experts also choose foundational work and related fields.",
+          "refs": [],
+          "flag": "key",
+          "condition": ""
+        },
+        {
+          "headline": "The expert reached into field theory",
+          "detail": "The expert chose 14 foundational Yang–Mills papers; ChatGPT-4o and Pro 5.5 both stayed with inflation models, and neither picked papers far from cosmology.",
+          "refs": [],
+          "flag": "none",
+          "condition": "SU(2)"
+        },
+        {
+          "headline": "Based on reading titles, not measured",
+          "detail": "This is the authors' impression from the titles, and they call the reason for the SU(2) difference speculation.",
+          "refs": [],
+          "flag": "caveat",
+          "condition": ""
+        }
+      ],
+      "question": 1
+    },
+    {
+      "method": {
+        "headline": "Are the AI references real and correct?",
+        "detail": "the 641 AI references the expert didn't pick (each paper counted once), checked against Crossref (Fig. 1, Table III).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "Only a third are fully correct",
+          "detail": "211 (33%) are perfect, 408 (64%) are real papers with at least one wrong field, and 22 (3%) don't exist.",
+          "refs": [],
+          "flag": "key",
+          "condition": "mid-2025"
+        },
+        {
+          "headline": "A partly wrong field also counts as wrong",
+          "detail": "Fields that disagree only partly are counted as mismatches, so some of the 64% may be small errors.",
+          "refs": [],
+          "flag": "caveat",
+          "condition": ""
+        },
+        {
+          "headline": "Only the AI-only references were checked",
+          "detail": "References that the expert also picked aren't checked.",
+          "refs": [],
+          "flag": "caveat",
+          "condition": ""
+        }
+      ],
+      "question": 2
+    },
+    {
+      "method": {
+        "headline": "Which model is most reliable?",
+        "detail": "the same check split by model (Table III, Fig. 3).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "No fabrications, 78% perfect",
+          "detail": "108 of 139 perfect, 31 (22%) mismatched. The authors credit its stronger search and checking tools.",
+          "refs": [],
+          "flag": "key",
+          "condition": "Deep Research"
+        },
+        {
+          "headline": "1 fabrication, but 76% mismatched",
+          "detail": "149 of 196 references have a wrong field.",
+          "refs": [],
+          "flag": "none",
+          "condition": "ChatGPT-4o"
+        },
+        {
+          "headline": "Most fabrications",
+          "detail": "21 of 306 references (7%) don't exist and 228 (75%) are mismatched.",
+          "refs": [],
+          "flag": "none",
+          "condition": "Gemini"
+        },
+        {
+          "headline": "Gemini was the fast default model",
+          "detail": "The study used Gemini 2.5 Flash, the default in mid-2025, not Google's larger Pro model.",
+          "refs": [],
+          "flag": "caveat",
+          "condition": "Gemini"
+        }
+      ],
+      "question": 2
+    },
+    {
+      "method": {
+        "headline": "Which details are wrong?",
+        "detail": "the 399 mismatches whose real paper could be found from a working DOI or link (Table IV).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "First author is wrong most often",
+          "detail": "First author 306, title 181, journal 124, year 105. Most often two of the four fields are wrong (206 papers).",
+          "refs": [],
+          "flag": "none",
+          "condition": ""
+        },
+        {
+          "headline": "9 more have a broken DOI and link",
+          "detail": "They were found only by title, so their fields couldn't be checked.",
+          "refs": [],
+          "flag": "none",
+          "condition": ""
+        }
+      ],
+      "question": 2
+    },
+    {
+      "method": {
+        "headline": "Have newer models improved?",
+        "detail": "ChatGPT Pro 5.5 (July 2026) run on the SU(2) project with the same prompt, against ChatGPT-4o (Sec. III C, Fig. 3).",
+        "refs": [],
+        "flag": "none"
+      },
+      "results": [
+        {
+          "headline": "Every reference correct",
+          "detail": "44 papers, 4 shared with the expert; all 40 checked were perfect, with no fabrications.",
+          "refs": [],
+          "flag": "key",
+          "condition": "Pro 5.5"
+        },
+        {
+          "headline": "Still little overlap with the expert",
+          "detail": "Each model shares 4 papers with the expert's 14, and the two models share 7 papers with each other.",
+          "refs": [],
+          "flag": "none",
+          "condition": "4o vs Pro 5.5"
+        },
+        {
+          "headline": "One project only",
+          "detail": "Pro 5.5 was tested on a single project, so its perfect score is a spot check, not a benchmark.",
+          "refs": [],
+          "flag": "caveat",
+          "condition": ""
+        }
+      ],
+      "question": 2
+    }
+  ],
+  "conclusion": [
+    {
+      "headline": "Use AI and human searches together",
+      "detail": "Experts and LLMs each find many relevant papers the other misses, so combining them gives a fuller reading list.",
+      "refs": [],
+      "flag": "key"
+    },
+    {
+      "headline": "Check every mid-2025 AI reference",
+      "detail": "3% are fabricated and 64% have a wrong field. Deep Research did much better, with no fabrications.",
+      "refs": [],
+      "flag": "key"
+    },
+    {
+      "headline": "The improvement probably comes from the tools",
+      "detail": "Deep Research's and Pro 5.5's accuracy likely reflects web search, checking and more computing time, not the language model alone.",
+      "refs": [],
+      "flag": "none"
+    },
+    {
+      "headline": "AI searches more narrowly",
+      "detail": "It follows the project's keywords; experts also bring in foundations and neighbouring fields.",
+      "refs": [],
+      "flag": "none"
+    },
+    {
+      "headline": "Caveat: eight projects, one expert each",
+      "detail": "A larger study with more projects is needed.",
+      "refs": [],
+      "flag": "caveat"
+    },
+    {
+      "headline": "Caveat: the 2026 test is one project",
+      "detail": "The Pro 5.5 result needs a systematic benchmark before it can be trusted.",
+      "refs": [],
+      "flag": "caveat"
+    }
+  ],
+  "figures": [
+    {
+      "number": 1,
+      "caption": "How each AI reference was checked: DOI first, then the link, then a title search. Each ends up perfect, a metadata mismatch or a fabrication.",
+      "attach": "setup#7,results:4"
+    },
+    {
+      "number": 2,
+      "caption": "For each model and paper type: papers found by both (green), only by the expert (pink), only by the AI and relevant (blue), and by the AI but irrelevant (grey).",
+      "attach": "results:1,results:2"
+    },
+    {
+      "number": 3,
+      "caption": "Per model: AI references that are perfect (green), mismatched (yellow) or fabricated (red). Pro 5.5 is for the SU(2) project only.",
+      "attach": "results:5,results:7"
+    }
+  ],
+  "equations": [],
+  "glossary": [
+    {
+      "term": "DOI",
+      "meaning": "Digital Object Identifier: a permanent ID for a published paper that resolves to its web page."
+    },
+    {
+      "term": "Crossref",
+      "meaning": "The registry of DOIs, which holds each paper's official title, authors, year and journal."
+    }
+  ],
+  "references": [
+    {
+      "id": 1,
+      "label": "Scherbakov et al. 2025",
+      "title": "The emergence of large language models as tools in literature reviews (J. Am. Med. Inform. Assoc. 32, 1071)",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 2,
+      "label": "Liang et al. 2024",
+      "title": "Can large language models provide useful feedback on research papers? (NEJM AI)",
+      "doi": "",
+      "arxiv": "2310.01783"
+    },
+    {
+      "id": 3,
+      "label": "Wang et al. 2026",
+      "title": "LLMs performing scientific tasks",
+      "doi": "",
+      "arxiv": "2601.21165"
+    },
+    {
+      "id": 4,
+      "label": "Woesle, Fischer-Brandies & Buettner 2025",
+      "title": "Review of LLM hallucinations (IEEE Access 13, 148231)",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 5,
+      "label": "Walters & Wilder 2023",
+      "title": "Fabrication and errors in the bibliographic citations generated by ChatGPT (Sci. Rep. 13, 14045)",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 6,
+      "label": "Franzoni Velázquez, Huerta & Jensen 2024",
+      "title": "ChatGPT reference accuracy (Discov. Educ. 3, 226)",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 7,
+      "label": "Pastucha et al. 2026",
+      "title": "LLM reference accuracy in medicine (Med. Sci. Monit. 32)",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 8,
+      "label": "Hezaveh, Perreault Levasseur & Marshall 2017",
+      "title": "Fast automated analysis of strong gravitational lenses with convolutional neural networks (Nature 548, 555)",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 9,
+      "label": "Villaescusa-Navarro et al. 2021 (CAMELS)",
+      "title": "The CAMELS project: cosmology and astrophysics with machine-learning simulations (ApJ 915, 71)",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 14,
+      "label": "Lu et al. 2024",
+      "title": "The AI Scientist: towards fully automated open-ended scientific discovery",
+      "doi": "",
+      "arxiv": "2408.06292"
+    },
+    {
+      "id": 24,
+      "label": "Villaescusa-Navarro et al. 2025",
+      "title": "The Denario project: deep knowledge AI agents for scientific discovery",
+      "doi": "",
+      "arxiv": "2510.26887"
+    },
+    {
+      "id": 25,
+      "label": "Miao et al. 2026",
+      "title": "PRL-Bench: evaluating LLMs' capabilities in frontier physics research",
+      "doi": "",
+      "arxiv": "2604.15411"
+    },
+    {
+      "id": 26,
+      "label": "Hell & Thiele 2026",
+      "title": "LLMs with in-context learning for algorithmic theoretical physics",
+      "doi": "",
+      "arxiv": "2605.08212"
+    },
+    {
+      "id": 27,
+      "label": "Liu et al. 2026 (Paper II)",
+      "title": "AI's capability in assisting scientific research II: project planning and proposal evaluation",
+      "doi": "",
+      "arxiv": ""
+    },
+    {
+      "id": 28,
+      "label": "Bayer et al. 2024 (HalfDome)",
+      "title": "HalfDome simulations (JCAP 05, 016)",
+      "doi": "",
+      "arxiv": "2407.17462"
+    },
+    {
+      "id": 29,
+      "label": "Hell 2022",
+      "title": "The smooth massless limit of massive Yang–Mills theory (JHEP 03, 167)",
+      "doi": "",
+      "arxiv": "2111.00017"
+    }
+  ]
+}

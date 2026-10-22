@@ -7,3 +7,5 @@ maps/arxiv-*[0-9].html
 maps/*.roots.html
 # kept locally, not published
 maps/arxiv-2610.18864*
+maps/library.html
+maps/library.local.json

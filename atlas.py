@@ -17,6 +17,7 @@ import argparse
 import json
 from pathlib import Path
 
+import library
 import paper_map
 import roots_map
 
@@ -28,7 +29,8 @@ def render(paper, roots, out_html, fig_dir=None):
     paper = paper_map.with_figures(paper, fig_dir)
     as_json = lambda d: json.dumps(d, ensure_ascii=False).replace("</", "<\\/")
     html = TEMPLATE.read_text()
-    for key, value in [("__PAPER_DATA__", as_json(paper)), ("__ROOTS_DATA__", as_json(roots)),
+    library = "library.html" if (out_html.parent / "library.json").exists() else ""
+    for key, value in [("__PAPER_DATA__", as_json(paper)), ("__ROOTS_DATA__", as_json(roots)), ("__LIBRARY_LINK__", library),
                        ("__PAGE_TITLE__", paper_map.escape(paper.get("title", "Paper atlas")))]:
         html = html.replace(key, value)
     out_html.write_text(html)
@@ -72,6 +74,10 @@ def main():
     out_html = out_dir / f"{stem}.atlas.html"
     render(paper, roots, out_html, fig_dir)
     print(f"Wrote {out_html}")
+    # Keep the reading map in step: the new paper appears on it (as Unsorted until library.json places it).
+    library.build(out_dir, quiet=True)
+    if (out_dir / "library.json").exists() and stem not in json.loads((out_dir / "library.json").read_text()).get("papers", {}):
+        print(f"  {stem} is not in library.json yet: add it by hand, or run  python3 library.py --suggest {stem}")
     if args.open:
         import webbrowser
         webbrowser.open(out_html.resolve().as_uri())

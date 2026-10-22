@@ -114,6 +114,35 @@ areas, each with what it is, its part in the paper and the best way in), `concep
 foundations to 4 frontier, a plain explanation, why the paper needs it, `prereqs`, the words the paper uses for
 it, and a reading ladder) and `readings`.
 
+## The reading map: everything you've read, connected
+
+`library.py` joins every atlas in `maps/` into one page, `maps/library.html`. Each paper is a circle inside its
+research area (a paper can belong to two), the newest has a dashed ring, and lines join papers that connect.
+Clicking a paper shows its question, answer and every connection, with a link to its atlas. Clicking a line
+shows how the two papers connect and the **ideas that bridge them** (a concept from each paper's learning map,
+side by side). *Threads* in the legend highlight an idea that runs through several papers, and *Connections
+list* shows the same as text.
+
+Connections come from two places:
+
+- **found automatically** from the saved maps: one paper cites the other, both list the same reading, or both
+  have a concept with the same name or term;
+- **written** in `maps/library.json`: the areas, each paper's short name and areas, a note for each connection
+  (`builds_on`, `same_method`, `same_topic` or `contrast`) with its bridging concept pairs, and threads. The
+  format is at the top of `library.py`. Papers you'd rather keep out of git go in `maps/library.local.json` (same format,
+  gitignored), which is merged in when the page is built.
+
+`atlas.py` rebuilds the reading map whenever it makes an atlas. A new paper shows up as *Unsorted* until
+`library.json` places it, either by hand (or by asking Claude Code to) or with an API key:
+
+```sh
+python3 library.py --suggest arxiv-2607.25672   # Claude picks its areas and writes its connections
+python3 library.py --open                       # rebuild after editing library.json
+```
+
+`maps/library.html` is personal (it shows whatever is in your `maps/`), so it isn't committed: run
+`python3 library.py` once after cloning to build it.
+
 ## Other outputs
 
 - `paper_map.py paper.pdf` makes the paper map alone as a standalone page (`template.html`).
@@ -126,12 +155,14 @@ it, and a reading ladder) and `readings`.
 |---|---|
 | Legner et al., *Alleviating the Hubble tension with Torsion Condensation (TorC)*, arXiv:2507.09228 | [`maps/arxiv-2507.09228.atlas.html`](maps/arxiv-2507.09228.atlas.html) |
 | Vaswani et al., *Attention Is All You Need*, arXiv:1706.03762 | [`maps/arxiv-1706.03762.atlas.html`](maps/arxiv-1706.03762.atlas.html) |
+| Hell et al., *AI's Capability in Assisting Scientific Research in Physics, Astrophysics, and Cosmology I: Literature Review*, arXiv:2607.25672 | [`maps/arxiv-2607.25672.atlas.html`](maps/arxiv-2607.25672.atlas.html) |
 
 ## Files
 
 - `atlas.py`, `atlas_template.html`: the atlas (mind map, concept cards, paper view)
 - `paper_map.py`, `template.html`: the paper map, PDF/arXiv loading and the Claude call (`claude-opus-5-5`, structured output)
 - `roots_map.py`, `roots_template.html`: the learning map
+- `library.py`, `library_template.html`: the reading map of every paper in `maps/`
 - `figures.py`: crops numbered figures out of a PDF
 - `maps/`: the example maps and atlases; `examples/`: a hand-written paper map (Riess et al. 1998)
 - `docs/`: the screenshots above

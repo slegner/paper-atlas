@@ -399,6 +399,7 @@
       <div class="gx-meta" id="gx-meta"></div>
     </div>
     <div class="gx-tools">
+      <button id="gx-lib" hidden>← Reading map</button>
       <button class="primary" id="gx-flow">Read the paper →</button>
       <span id="gx-tools-open"></span>
       <button id="gx-order">Reading order</button>
@@ -420,6 +421,7 @@
 <div id="fl-view" hidden>
   <div class="fl-bar">
     <button id="fl-back">← Mind map</button>
+    <button id="fl-lib" hidden>← Reading map</button>
     <div class="seg" id="fl-mode"><button data-mode="full" aria-pressed="true">Full flow</button><button data-mode="key" aria-pressed="false">Key points</button></div>
     <div class="seg" id="fl-hl"><span>Highlight:</span><button data-hl="novel" aria-pressed="false">★ New</button><button data-hl="caveat" aria-pressed="false">⚠ Caveats</button></div>
     <button id="fl-openall">Open all</button>
@@ -455,6 +457,11 @@
 (function () {
   const paper = JSON.parse(document.getElementById("paper-data").textContent);
   const roots = JSON.parse(document.getElementById("roots-data").textContent);
+  // Set by atlas.py when this atlas sits next to a reading map (library.html) of all the papers read.
+  const LIBRARY = "__LIBRARY_LINK__";
+  if (LIBRARY) ["gx-lib", "fl-lib"].forEach((id) => {
+    const b = document.getElementById(id); b.hidden = false; b.onclick = () => { location.href = LIBRARY; };
+  });
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const $ = (id) => document.getElementById(id);

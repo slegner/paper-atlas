@@ -1,0 +1,1353 @@
+{
+  "title": "AI's Capability in Assisting Scientific Research in Physics, Astrophysics, and Cosmology I: Literature Review",
+  "authors": "Hell et al.",
+  "year": "2026",
+  "venue": "arXiv:2607.25672",
+  "tldr": "Chatbots find useful papers experts miss, but mid-2025 models get most references' details wrong.",
+  "newcomer": "This paper is a study of AI tools rather than of physics. To follow it you need a rough idea of how chatbots work and why they invent things, how physicists search the literature, and how a search is scored. The physics of the eight test projects is optional.",
+  "sections": [
+    {
+      "key": "llm",
+      "name": "Language models",
+      "where": "§I, §III",
+      "summary": "What chatbots are, how they are prompted, why they make things up, and how search tools change that.",
+      "role": "The models under test, and the reasons the authors give for why newer ones are more accurate.",
+      "key_reads": [
+        "jurafsky",
+        "ji2023"
+      ]
+    },
+    {
+      "key": "lit",
+      "name": "Literature search",
+      "where": "§II C–E",
+      "summary": "How physicists find papers, and the identifiers and records that say whether a reference is right.",
+      "role": "The task itself, the four kinds of reference, and the DOI/Crossref check behind the hallucination results.",
+      "key_reads": [
+        "booth2016",
+        "kurtz2000"
+      ]
+    },
+    {
+      "key": "eval",
+      "name": "Judging the results",
+      "where": "§II D, §III A",
+      "summary": "How to score a search against a reference list, and why relevance judgements are subjective.",
+      "role": "Explains the overlap and relevance numbers in Table II and the study's caveats.",
+      "key_reads": [
+        "manning2008"
+      ]
+    },
+    {
+      "key": "ai",
+      "name": "AI in science",
+      "where": "§I, §IV",
+      "summary": "From machine learning for simulations to LLMs that review, plan and do research.",
+      "role": "Places this study in a series testing AI at each step of research.",
+      "key_reads": [
+        "carleo2019",
+        "liang2024"
+      ]
+    },
+    {
+      "key": "phys",
+      "name": "The eight test projects",
+      "where": "§II A, App. A",
+      "summary": "The physics behind the projects used as test cases, from galaxies to gravitational waves and inflation.",
+      "role": "Not needed for the results, but helps read the project descriptions and judge the SU(2) comparison.",
+      "key_reads": [
+        "ryden",
+        "mo2010"
+      ]
+    }
+  ],
+  "concepts": [
+    {
+      "id": "llm",
+      "name": "Large language models",
+      "section": "llm",
+      "level": 1,
+      "plain": "Neural networks trained on huge amounts of text to predict the next word; chatbots like ChatGPT and Gemini are built on them.",
+      "why_here": "The things being tested: ChatGPT-4o, ChatGPT Deep Research, Gemini and ChatGPT Pro 5.5.",
+      "terms": [
+        "large language models",
+        "LLMs",
+        "LLM"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "jurafsky",
+          "role": "start",
+          "where": "Ch. 10 (large language models)"
+        },
+        {
+          "reading": "vaswani2017",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "brown2020",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "prompt",
+      "name": "Prompting",
+      "section": "llm",
+      "level": 2,
+      "plain": "Telling a model what to do in plain text, with any context it needs; the same prompt can give different answers on different runs or models.",
+      "why_here": "Every model got the same standard prompt, filled in with each project's background and goal (Appendix B).",
+      "terms": [
+        "prompt",
+        "prompts",
+        "prompted",
+        "standardized prompt",
+        "AI prompters"
+      ],
+      "prereqs": [
+        "llm"
+      ],
+      "reads": [
+        {
+          "reading": "jurafsky",
+          "role": "start",
+          "where": "Ch. 12 (prompting)"
+        },
+        {
+          "reading": "brown2020",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "hallucination",
+      "name": "Hallucination",
+      "section": "llm",
+      "level": 2,
+      "plain": "When a model states something fluent but false, such as a citation to a paper that doesn't exist.",
+      "why_here": "The paper's second question: it splits hallucinated references into fabrications and metadata mismatches.",
+      "terms": [
+        "hallucination",
+        "hallucinations",
+        "hallucinate",
+        "hallucinated"
+      ],
+      "prereqs": [
+        "llm"
+      ],
+      "reads": [
+        {
+          "reading": "ji2023",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "woesle2025",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "walters2023",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "rag",
+      "name": "Retrieval and web search",
+      "section": "llm",
+      "level": 3,
+      "plain": "Letting a model look things up (a search engine or database) and base its answer on what it finds, rather than on memory alone.",
+      "why_here": "All three mid-2025 models had online search; the authors think better search explains why Deep Research made fewer errors.",
+      "terms": [
+        "online search",
+        "search capability"
+      ],
+      "prereqs": [
+        "llm"
+      ],
+      "reads": [
+        {
+          "reading": "lewis2020",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "nakano2021",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "agents",
+      "name": "Tool-using research agents",
+      "section": "llm",
+      "level": 4,
+      "plain": "Models that plan, search, read and check over many steps before answering, like ChatGPT's Deep Research mode.",
+      "why_here": "Deep Research and Pro 5.5 were by far the most reliable; the paper reads this as a property of the model plus its tools.",
+      "terms": [
+        "Deep Research",
+        "tool use",
+        "tool-augmented"
+      ],
+      "prereqs": [
+        "rag"
+      ],
+      "reads": [
+        {
+          "reading": "yao2022",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "nakano2021",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "denario2025",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "testtime",
+      "name": "Test-time compute",
+      "section": "llm",
+      "level": 3,
+      "plain": "Letting a model spend more computation (longer reasoning, more searches) on each question instead of making the model bigger.",
+      "why_here": "One of the authors' explanations for Pro 5.5's perfect references.",
+      "terms": [
+        "test-time compute"
+      ],
+      "prereqs": [
+        "llm"
+      ],
+      "reads": [
+        {
+          "reading": "snell2024",
+          "role": "start",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "litreview",
+      "name": "Literature reviews",
+      "section": "lit",
+      "level": 1,
+      "plain": "Finding and reading what has already been done on a topic, to place new work and check that it is original.",
+      "why_here": "The research task being tested: the first of four steps in a physics project.",
+      "terms": [
+        "literature review",
+        "literature search",
+        "literature reviews"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "booth2016",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "scherbakov2025",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "growth",
+      "name": "The growth of the literature",
+      "section": "lit",
+      "level": 2,
+      "plain": "The number of papers published each year keeps rising fast, so no one can read everything in their field.",
+      "why_here": "The paper's motivation: the volume of new papers makes it easy to miss important work.",
+      "terms": [
+        "number of submitted papers"
+      ],
+      "prereqs": [
+        "litreview"
+      ],
+      "reads": [
+        {
+          "reading": "bornmann2015",
+          "role": "start",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "databases",
+      "name": "ADS, INSPIRE and arXiv",
+      "section": "lit",
+      "level": 2,
+      "plain": "The databases physicists use to find papers: NASA ADS for astronomy, INSPIRE for high-energy physics and the arXiv preprint server.",
+      "why_here": "The prompt asked models to give ADS, INSPIRE or arXiv links where possible.",
+      "terms": [
+        "ADS",
+        "INSPIRE",
+        "arXiv links"
+      ],
+      "prereqs": [
+        "litreview"
+      ],
+      "reads": [
+        {
+          "reading": "kurtz2000",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "ginsparg2011",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "doi",
+      "name": "DOIs and Crossref metadata",
+      "section": "lit",
+      "level": 2,
+      "plain": "A DOI is a permanent ID for a paper; Crossref keeps the official record of its title, authors, year and journal.",
+      "why_here": "Each AI reference was checked by looking up its DOI in Crossref and comparing the fields.",
+      "terms": [
+        "DOI",
+        "Crossref",
+        "metadata"
+      ],
+      "prereqs": [
+        "databases"
+      ],
+      "reads": [
+        {
+          "reading": "crossref",
+          "role": "start",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "categories",
+      "name": "Kinds of reference",
+      "section": "lit",
+      "level": 2,
+      "plain": "Reviews give an overview, highly cited papers mark the key results, recent papers the current state, and collaboration papers (Planck, DES, HSC…) the data everyone uses.",
+      "why_here": "Both humans and AI sorted their references into these four categories, and matches had to agree on the category.",
+      "terms": [
+        "Review papers",
+        "Highly cited papers",
+        "Recent papers",
+        "Other papers"
+      ],
+      "prereqs": [
+        "litreview"
+      ],
+      "reads": [
+        {
+          "reading": "booth2016",
+          "role": "start",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "fabrication",
+      "name": "Fabrications vs metadata mismatches",
+      "section": "lit",
+      "level": 3,
+      "plain": "A fabricated reference points to a paper that doesn't exist; a mismatched one points to a real paper but gets some details wrong.",
+      "why_here": "The paper's two kinds of hallucination: 3% fabrications, 64% mismatches in mid-2025.",
+      "terms": [
+        "fabrication",
+        "fabrications",
+        "fabricated",
+        "metadata mismatch",
+        "metadata mismatches",
+        "mismatch"
+      ],
+      "prereqs": [
+        "hallucination",
+        "doi"
+      ],
+      "reads": [
+        {
+          "reading": "walters2023",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "ji2023",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "ir",
+      "name": "Overlap, precision and recall",
+      "section": "eval",
+      "level": 2,
+      "plain": "Ways to score a search: recall is the share of the right papers you found, precision the share of what you found that is right.",
+      "why_here": "'Found by both', 'human not AI' and 'AI irrelevant' in Table II are versions of these.",
+      "terms": [
+        "overlap"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "manning2008",
+          "role": "start",
+          "where": "Ch. 8 (evaluation)"
+        }
+      ]
+    },
+    {
+      "id": "relevance",
+      "name": "Relevance judgements",
+      "section": "eval",
+      "level": 2,
+      "plain": "Deciding whether a document is useful for a need; different people often disagree, so studies measure how well judges agree.",
+      "why_here": "Each expert alone judged whether the AI's papers were relevant; the authors note this is subjective.",
+      "terms": [
+        "relevance",
+        "relevant",
+        "irrelevant"
+      ],
+      "prereqs": [
+        "ir"
+      ],
+      "reads": [
+        {
+          "reading": "manning2008",
+          "role": "start",
+          "where": "Ch. 8.5 (assessing relevance)"
+        },
+        {
+          "reading": "cohen1960",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "design",
+      "name": "Controlled comparisons",
+      "section": "eval",
+      "level": 3,
+      "plain": "Testing two methods on the same tasks under the same conditions, so differences come from the methods and not the tasks.",
+      "why_here": "The study's design: the same eight projects searched in parallel by experts and by LLMs with the same prompt.",
+      "terms": [
+        "controlled study"
+      ],
+      "prereqs": [
+        "ir"
+      ],
+      "reads": [
+        {
+          "reading": "booth2016",
+          "role": "start",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "benchmark",
+      "name": "Benchmarks for AI in physics",
+      "section": "eval",
+      "level": 4,
+      "plain": "Standard sets of tasks used to score AI models and track progress over time.",
+      "why_here": "The authors say their one-project Pro 5.5 result needs a systematic benchmark to confirm.",
+      "terms": [
+        "benchmark"
+      ],
+      "prereqs": [
+        "design"
+      ],
+      "reads": [
+        {
+          "reading": "prlbench2026",
+          "role": "start",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "mlphys",
+      "name": "Machine learning in physics",
+      "section": "ai",
+      "level": 2,
+      "plain": "Neural networks used to speed up simulations, find patterns in data and infer physical parameters.",
+      "why_here": "The paper's starting point: AI in physics began with numerical work before LLMs arrived.",
+      "terms": [
+        "Deep learning",
+        "parameter inferences"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "carleo2019",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "hezaveh2017",
+          "role": "builds_on",
+          "where": ""
+        },
+        {
+          "reading": "camels2021",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "aiassist",
+      "name": "LLMs as research assistants",
+      "section": "ai",
+      "level": 4,
+      "plain": "Using chatbots to review papers, plan projects or carry out parts of research.",
+      "why_here": "The wider question the paper series asks: can LLMs help at each step of a physics project?",
+      "terms": [
+        "cognitive partners",
+        "feedback on papers"
+      ],
+      "prereqs": [
+        "llm",
+        "mlphys"
+      ],
+      "reads": [
+        {
+          "reading": "liang2024",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "hell2026",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "liu2026",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "aiscientist",
+      "name": "Autonomous AI scientists",
+      "section": "ai",
+      "level": 4,
+      "plain": "Systems that try to run a whole research project, from idea to paper, with little human help.",
+      "why_here": "The authors plan to test project execution and paper writing next.",
+      "terms": [
+        "executing projects",
+        "writing papers"
+      ],
+      "prereqs": [
+        "aiassist",
+        "agents"
+      ],
+      "reads": [
+        {
+          "reading": "lu2024",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "denario2025",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "cosmo",
+      "name": "Cosmology and large-scale structure",
+      "section": "phys",
+      "level": 1,
+      "plain": "How the universe expands and how matter clumps into a web of galaxies and dark matter halos.",
+      "why_here": "Most of the eight test projects (LBG, IA, RG, GW) are about large-scale structure.",
+      "terms": [
+        "large-scale structure",
+        "cosmology",
+        "dark matter halo"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "ryden",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "mo2010",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "halo",
+      "name": "Galaxy bias and the halo connection",
+      "section": "phys",
+      "level": 3,
+      "plain": "Galaxies sit in dark matter halos, so they trace the matter distribution with a 'bias'; the halo occupation distribution says how many galaxies each halo holds.",
+      "why_here": "The LBG project; the GW project also estimates a bias for black-hole mergers.",
+      "terms": [
+        "galaxy bias",
+        "halo occupation distribution",
+        "Lyman-break galaxies",
+        "assembly bias"
+      ],
+      "prereqs": [
+        "cosmo"
+      ],
+      "reads": [
+        {
+          "reading": "wechsler2018",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "steidel1996",
+          "role": "origin",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "lensing",
+      "name": "Weak lensing and intrinsic alignments",
+      "section": "phys",
+      "level": 3,
+      "plain": "Matter bends light and slightly stretches background galaxies; galaxies' own aligned shapes (intrinsic alignments) can mimic that signal.",
+      "why_here": "The IA project, and the weak-lensing maps used in the GW project.",
+      "terms": [
+        "weak-lensing",
+        "weak lensing",
+        "intrinsic alignment"
+      ],
+      "prereqs": [
+        "cosmo"
+      ],
+      "reads": [
+        {
+          "reading": "bartelmann2001",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "troxel2015",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "agn",
+      "name": "Active galactic nuclei",
+      "section": "phys",
+      "level": 3,
+      "plain": "Galaxies whose central black hole is swallowing gas and shining brightly; they can switch on and off over thousands of years.",
+      "why_here": "The AGN duty-cycle project, and the radio galaxies that contaminate CMB maps.",
+      "terms": [
+        "AGN",
+        "Active galactic nuclei",
+        "radio galaxies"
+      ],
+      "prereqs": [
+        "cosmo"
+      ],
+      "reads": [
+        {
+          "reading": "mo2010",
+          "role": "start",
+          "where": "Ch. 14 (AGN)"
+        },
+        {
+          "reading": "schawinski2015",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "dezotti2010",
+          "role": "deeper",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "gw",
+      "name": "Gravitational waves and pulsar timing",
+      "section": "phys",
+      "level": 3,
+      "plain": "Ripples in spacetime, seen by LIGO from merging black holes and, at much lower frequencies, by timing many pulsars.",
+      "why_here": "The GW and PTA projects; the Hellings–Downs curve is the GR prediction the PTA project tests.",
+      "terms": [
+        "gravitational wave",
+        "gravitational-wave",
+        "pulsar timing array",
+        "Hellings–Downs",
+        "overlap reduction function"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "maggiore2007",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "ligo2016",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "hellings1983",
+          "role": "origin",
+          "where": ""
+        },
+        {
+          "reading": "nanograv2023",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "inflation",
+      "name": "Inflation from vector fields",
+      "section": "phys",
+      "level": 3,
+      "plain": "A burst of accelerated expansion in the early universe, usually driven by a scalar field; some models use gauge fields instead.",
+      "why_here": "The SU(2) project, also used for the Pro 5.5 test: can a massive Yang–Mills or Proca field drive inflation?",
+      "terms": [
+        "inflation",
+        "Yang–Mills",
+        "Proca"
+      ],
+      "prereqs": [
+        "cosmo"
+      ],
+      "reads": [
+        {
+          "reading": "baumann2009",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "maleknejad2013",
+          "role": "deeper",
+          "where": ""
+        },
+        {
+          "reading": "adshead2012",
+          "role": "builds_on",
+          "where": ""
+        },
+        {
+          "reading": "heisenberg2014",
+          "role": "builds_on",
+          "where": ""
+        },
+        {
+          "reading": "hell2022",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    },
+    {
+      "id": "gpr",
+      "name": "Laser ablation and Gaussian processes",
+      "section": "phys",
+      "level": 3,
+      "plain": "Short laser pulses remove material to carve tiny structures; Gaussian-process regression predicts results between measured settings.",
+      "why_here": "The AR project: predicting when debris forms on laser-machined anti-reflection surfaces.",
+      "terms": [
+        "laser ablation",
+        "Gaussian-process regression"
+      ],
+      "prereqs": [],
+      "reads": [
+        {
+          "reading": "chichkov1996",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "rasmussen2006",
+          "role": "start",
+          "where": "Ch. 2"
+        }
+      ]
+    },
+    {
+      "id": "cmb",
+      "name": "CMB foregrounds and simulations",
+      "section": "phys",
+      "level": 3,
+      "plain": "Sources between us and the cosmic microwave background, such as radio galaxies, add signal that must be modelled and removed; N-body simulations help.",
+      "why_here": "The RG project, built on the HalfDome simulations.",
+      "terms": [
+        "CMB",
+        "HalfDome",
+        "N-body simulations",
+        "foreground"
+      ],
+      "prereqs": [
+        "cosmo",
+        "agn"
+      ],
+      "reads": [
+        {
+          "reading": "dezotti2010",
+          "role": "start",
+          "where": ""
+        },
+        {
+          "reading": "halfdome2024",
+          "role": "builds_on",
+          "where": ""
+        }
+      ]
+    }
+  ],
+  "readings": [
+    {
+      "id": "jurafsky",
+      "label": "Jurafsky & Martin",
+      "title": "Speech and Language Processing (3rd ed. draft)",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://web.stanford.edu/~jurafsky/slp3/",
+      "note": "free online"
+    },
+    {
+      "id": "vaswani2017",
+      "label": "Vaswani et al. 2017",
+      "title": "Attention is all you need",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "1706.03762",
+      "url": "",
+      "note": "the Transformer behind every model tested"
+    },
+    {
+      "id": "brown2020",
+      "label": "Brown et al. 2020",
+      "title": "Language models are few-shot learners",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "2005.14165",
+      "url": "",
+      "note": "GPT-3: prompting instead of training"
+    },
+    {
+      "id": "ji2023",
+      "label": "Ji et al. 2023",
+      "title": "Survey of hallucination in natural language generation",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "2202.03629",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "lewis2020",
+      "label": "Lewis et al. 2020",
+      "title": "Retrieval-augmented generation for knowledge-intensive NLP tasks",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "2005.11401",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "nakano2021",
+      "label": "Nakano et al. 2021",
+      "title": "WebGPT: browser-assisted question-answering with human feedback",
+      "kind": "paper",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "2112.09332",
+      "url": "",
+      "note": "an early model that searches the web and cites"
+    },
+    {
+      "id": "yao2022",
+      "label": "Yao et al. 2022",
+      "title": "ReAct: synergizing reasoning and acting in language models",
+      "kind": "paper",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "2210.03629",
+      "url": "",
+      "note": "the reason-then-use-a-tool loop"
+    },
+    {
+      "id": "snell2024",
+      "label": "Snell et al. 2024",
+      "title": "Scaling LLM test-time compute optimally can be more effective than scaling model parameters",
+      "kind": "paper",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "2408.03314",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "manning2008",
+      "label": "Manning, Raghavan & Schütze 2008",
+      "title": "Introduction to Information Retrieval",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://nlp.stanford.edu/IR-book/",
+      "note": "free online"
+    },
+    {
+      "id": "booth2016",
+      "label": "Booth, Sutton & Papaioannou",
+      "title": "Systematic Approaches to a Successful Literature Review",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "bornmann2015",
+      "label": "Bornmann & Mutz 2015",
+      "title": "Growth rates of modern science: a bibliometric analysis",
+      "kind": "paper",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "1402.4578",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "kurtz2000",
+      "label": "Kurtz et al. 2000",
+      "title": "The NASA Astrophysics Data System: overview",
+      "kind": "paper",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "astro-ph/0002104",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "ginsparg2011",
+      "label": "Ginsparg 2011",
+      "title": "ArXiv at 20 (Nature 476, 145)",
+      "kind": "notes",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "crossref",
+      "label": "Crossref",
+      "title": "Crossref documentation: DOIs and metadata",
+      "kind": "notes",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://www.crossref.org/documentation/",
+      "note": ""
+    },
+    {
+      "id": "cohen1960",
+      "label": "Cohen 1960",
+      "title": "A coefficient of agreement for nominal scales",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "Cohen's kappa"
+    },
+    {
+      "id": "scherbakov2025",
+      "label": "Scherbakov et al. 2025",
+      "title": "LLMs as tools in literature reviews (J. Am. Med. Inform. Assoc.)",
+      "kind": "review",
+      "cited": 1,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "liang2024",
+      "label": "Liang et al. 2024",
+      "title": "Can large language models provide useful feedback on research papers?",
+      "kind": "paper",
+      "cited": 2,
+      "doi": "",
+      "arxiv": "2310.01783",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "woesle2025",
+      "label": "Woesle, Fischer-Brandies & Buettner 2025",
+      "title": "Review of LLM hallucinations (IEEE Access)",
+      "kind": "review",
+      "cited": 4,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "walters2023",
+      "label": "Walters & Wilder 2023",
+      "title": "Fabrication and errors in the bibliographic citations generated by ChatGPT",
+      "kind": "paper",
+      "cited": 5,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the closest earlier study"
+    },
+    {
+      "id": "hezaveh2017",
+      "label": "Hezaveh, Perreault Levasseur & Marshall 2017",
+      "title": "Fast automated analysis of strong gravitational lenses with convolutional neural networks",
+      "kind": "paper",
+      "cited": 8,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "camels2021",
+      "label": "Villaescusa-Navarro et al. 2021",
+      "title": "The CAMELS project",
+      "kind": "paper",
+      "cited": 9,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "lu2024",
+      "label": "Lu et al. 2024",
+      "title": "The AI Scientist",
+      "kind": "paper",
+      "cited": 14,
+      "doi": "",
+      "arxiv": "2408.06292",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "denario2025",
+      "label": "Villaescusa-Navarro et al. 2025",
+      "title": "The Denario project: deep knowledge AI agents for scientific discovery",
+      "kind": "paper",
+      "cited": 24,
+      "doi": "",
+      "arxiv": "2510.26887",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "prlbench2026",
+      "label": "Miao et al. 2026",
+      "title": "PRL-Bench: evaluating LLMs in frontier physics research",
+      "kind": "paper",
+      "cited": 25,
+      "doi": "",
+      "arxiv": "2604.15411",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "hell2026",
+      "label": "Hell & Thiele 2026",
+      "title": "LLMs with in-context learning for algorithmic theoretical physics",
+      "kind": "paper",
+      "cited": 26,
+      "doi": "",
+      "arxiv": "2605.08212",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "liu2026",
+      "label": "Liu et al. 2026",
+      "title": "AI's capability in assisting scientific research II: project planning and proposal evaluation",
+      "kind": "paper",
+      "cited": 27,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "the companion paper"
+    },
+    {
+      "id": "halfdome2024",
+      "label": "Bayer et al. 2024",
+      "title": "HalfDome simulations",
+      "kind": "paper",
+      "cited": 28,
+      "doi": "",
+      "arxiv": "2407.17462",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "hell2022",
+      "label": "Hell 2022",
+      "title": "The smooth massless limit of massive Yang–Mills theory",
+      "kind": "paper",
+      "cited": 29,
+      "doi": "",
+      "arxiv": "2111.00017",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "carleo2019",
+      "label": "Carleo et al. 2019",
+      "title": "Machine learning and the physical sciences",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "1903.10563",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "ryden",
+      "label": "Ryden",
+      "title": "Introduction to Cosmology (2nd ed.)",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": "gentle"
+    },
+    {
+      "id": "mo2010",
+      "label": "Mo, van den Bosch & White 2010",
+      "title": "Galaxy Formation and Evolution",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "wechsler2018",
+      "label": "Wechsler & Tinker 2018",
+      "title": "The connection between galaxies and their dark matter halos",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "1804.03097",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "steidel1996",
+      "label": "Steidel et al. 1996",
+      "title": "Spectroscopic confirmation of a population of normal star-forming galaxies at redshifts z > 3",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "astro-ph/9602024",
+      "url": "",
+      "note": "Lyman-break galaxies"
+    },
+    {
+      "id": "bartelmann2001",
+      "label": "Bartelmann & Schneider 2001",
+      "title": "Weak gravitational lensing",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "astro-ph/9912508",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "troxel2015",
+      "label": "Troxel & Ishak 2015",
+      "title": "The intrinsic alignment of galaxies and its impact on weak gravitational lensing",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "1407.6990",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "schawinski2015",
+      "label": "Schawinski et al. 2015",
+      "title": "Active galactic nuclei flicker: an observational estimate of the duration of black hole growth phases",
+      "kind": "paper",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "1505.06733",
+      "url": "",
+      "note": "the ~100 kyr switching"
+    },
+    {
+      "id": "dezotti2010",
+      "label": "De Zotti et al. 2010",
+      "title": "Radio and millimeter continuum surveys and their astrophysical implications",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "0908.1896",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "maggiore2007",
+      "label": "Maggiore 2007",
+      "title": "Gravitational Waves, Vol. 1: Theory and Experiments",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "hellings1983",
+      "label": "Hellings & Downs 1983",
+      "title": "Upper limits on the isotropic gravitational radiation background from pulsar timing analysis",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "nanograv2023",
+      "label": "Agazie et al. 2023 (NANOGrav)",
+      "title": "The NANOGrav 15 yr data set: evidence for a gravitational-wave background",
+      "kind": "paper",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "2306.16213",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "ligo2016",
+      "label": "Abbott et al. 2016",
+      "title": "Observation of gravitational waves from a binary black hole merger",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "1602.03837",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "baumann2009",
+      "label": "Baumann 2009",
+      "title": "TASI lectures on inflation",
+      "kind": "notes",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "0907.5424",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "maleknejad2013",
+      "label": "Maleknejad, Sheikh-Jabbari & Soda 2013",
+      "title": "Gauge fields and inflation",
+      "kind": "review",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "1212.2921",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "adshead2012",
+      "label": "Adshead & Wyman 2012",
+      "title": "Chromo-natural inflation: natural inflation on a steep potential with classical non-Abelian gauge fields",
+      "kind": "paper",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "1202.2366",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "heisenberg2014",
+      "label": "Heisenberg 2014",
+      "title": "Generalization of the Proca action",
+      "kind": "paper",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "1402.7026",
+      "url": "",
+      "note": ""
+    },
+    {
+      "id": "rasmussen2006",
+      "label": "Rasmussen & Williams 2006",
+      "title": "Gaussian Processes for Machine Learning",
+      "kind": "textbook",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "https://gaussianprocess.org/gpml/",
+      "note": "free online"
+    },
+    {
+      "id": "chichkov1996",
+      "label": "Chichkov et al. 1996",
+      "title": "Femtosecond, picosecond and nanosecond laser ablation of solids",
+      "kind": "classic",
+      "cited": 0,
+      "doi": "",
+      "arxiv": "",
+      "url": "",
+      "note": ""
+    }
+  ],
+  "shortlist": [
+    "jurafsky",
+    "ji2023",
+    "manning2008",
+    "walters2023"
+  ]
+}

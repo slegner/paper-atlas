@@ -1,0 +1,92 @@
+{
+  "areas": [
+    {
+      "key": "ai",
+      "name": "AI & language models",
+      "blurb": "How machines read and write language, and how well they help with research."
+    },
+    {
+      "key": "cosmo",
+      "name": "Cosmology & gravity",
+      "blurb": "The expanding universe, its tensions, and theories of gravity that might resolve them."
+    }
+  ],
+  "papers": {
+    "arxiv-1706.03762": {
+      "short": "Transformer",
+      "areas": [
+        "ai"
+      ],
+      "added": "2026-10-21"
+    },
+    "arxiv-2507.09228": {
+      "short": "TorC",
+      "areas": [
+        "cosmo"
+      ],
+      "added": "2026-10-21"
+    },
+    "arxiv-2607.25672": {
+      "short": "AI literature review",
+      "areas": [
+        "ai",
+        "cosmo"
+      ],
+      "added": "2026-10-22"
+    }
+  },
+  "links": [
+    {
+      "a": "arxiv-2607.25672",
+      "b": "arxiv-1706.03762",
+      "kind": "builds_on",
+      "title": "Testing what the Transformer grew into",
+      "note": "Every chatbot tested in the literature-review study (ChatGPT, Gemini) is a large language model built from the Transformer. The 2017 paper introduced the architecture; the 2026 study asks whether its descendants can do a physicist's literature search.",
+      "ideas": [
+        [
+          "llm",
+          "selfattn"
+        ],
+        [
+          "llm",
+          "lm"
+        ]
+      ]
+    },
+    {
+      "a": "arxiv-2607.25672",
+      "b": "arxiv-2507.09228",
+      "kind": "same_topic",
+      "title": "Cosmology projects and gauge fields",
+      "note": "Most of the study's eight test projects are cosmology, the field TorC works in. Its SU(2) project, the one used for the ChatGPT Pro 5.5 test, builds inflation from Yang–Mills gauge fields, while TorC builds gravity itself as a gauge theory.",
+      "ideas": [
+        [
+          "inflation",
+          "gauge"
+        ],
+        [
+          "cosmo",
+          "friedmann"
+        ]
+      ]
+    }
+  ],
+  "threads": [
+    {
+      "name": "Is the reference right?",
+      "note": "Comparisons where the yardstick itself is uncertain: an expert's opinion of what is relevant, or ΛCDM as the baseline TorC must beat.",
+      "papers": [
+        "arxiv-2607.25672",
+        "arxiv-2507.09228"
+      ]
+    },
+    {
+      "name": "Gauge fields",
+      "note": "Building physics from symmetry: torsion in TorC's gauge gravity, SU(2) fields driving inflation in the literature-review test project.",
+      "papers": [
+        "arxiv-2507.09228",
+        "arxiv-2607.25672"
+      ]
+    }
+  ]
+}
